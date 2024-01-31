@@ -18,7 +18,7 @@ package-lock.json*
 update_dotenv.json*
 update_be_cargo_toml.py*
 update_fe_package_json.py*
-Makefile(
+Makefile*
 build_contract.sh*
 /.vscode
 **/__pycache__
