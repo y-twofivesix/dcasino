@@ -20,6 +20,7 @@ update_be_cargo_toml.py*
 update_fe_package_json.py*
 Makefile*
 setup.sh*
+update_dotenv.js*
 build_contract.sh*
 /.vscode
 **/__pycache__
