@@ -22,12 +22,16 @@ export class Pvp {
   cli         : SecretNetworkClient = {} as SecretNetworkClient;
   granter     : SecretNetworkClient = {} as SecretNetworkClient;
   code_hash   : string      = '';
-  ready       : boolean = false;
+  ready        : boolean = false;
   enable_alias : boolean = false;
   viewing_key         : string      = '';
+  pos_this_session : number = 0;
 
   constructor () {};
 
+  update_position(val: number) {
+    this.pos_this_session += val;
+  }
 
   set_cli( cli : SecretNetworkClient) {
     this.cli = cli;

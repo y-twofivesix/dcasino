@@ -20,6 +20,8 @@ function Dashboard() {
   const [need_vk, setNeedVk] = useState(false);
   const [held, setHeld] = useState(new Set<number>([]));
   const [user_bal, setBalance] = useState('-');
+  const [updated, setUpdated] = useState('-');
+
 
   useEffect(function () {
 
@@ -28,19 +30,21 @@ function Dashboard() {
       return;
   }
 
-   let do_query = async function(){
+   let do_query = async function() {
+
       let bal = await balance();
       setBalance(`${bal[0]} ${bal[1]}`);
       let inst_state_result = await instance_state();
+
       if (inst_state_result[1]) {
         let inst_state = inst_state_result[0] as InstanceState;
         
         // sync state with backend
         setHand(inst_state.hand);
         setDealt(inst_state.dealt);
+        console.log(inst_state.last_outcome)
 
         if (!inst_state.dealt) setOutcome(inst_state.last_outcome);
-
         let won_curr = currency_str(inst_state.last_win, "uscrt");
         setWon(`${won_curr[0]} ${won_curr[1]}`);
 
@@ -71,9 +75,9 @@ function Dashboard() {
         outcome={outcome}/>
 
         <div className={
-          `p-2 text-2xl text-center w-full 
+          `p-2 text-2xl text-center w-full text-white
           ${outcome == 'Lose' || outcome == 'Undefined'? '': 'rainbow' }`}>
-          {dealt? '-': outcome }
+          {dealt ? 'hold and/or draw': `Result: ${outcome}` }
         </div>
 
         <div className='w-2/3 h-60 left-0 right-0 m-auto'>
@@ -81,16 +85,19 @@ function Dashboard() {
             hand={hand}
             dealt={dealt}
             held={held}
-            setHeld={setHeld}/>
+            setHeld={setHeld}
+            updated={updated}/>
         </div>
 
         <div className='p-2 text-lg bg-white w-fit inline text-black rounded-r-2xl'>
-          {dealt ? '-' : `You won: ${won}` }
+          {dealt ? '-' : (parseInt(won) == 0 ? 'You lost!':`You won: ${won}`) }
         </div>
 
         <div className='p-2 float-right text-lg inline bg-white text-black rounded-l-2xl'>
-          Credit: {user_bal}
+          <div>Credit: {user_bal}</div>
+          <div>position: <span className={pvp.pos_this_session < 0 ? 'text-red-600':'text-green-600'}>{pvp.pos_this_session}</span></div>
         </div>
+
 
           <Controls 
             bet={bet} 
@@ -101,7 +108,8 @@ function Dashboard() {
             setNeedVk={setNeedVk}
             held={held}
             setHeld={setHeld}
-            setOutcome={setOutcome}/>
+            setOutcome={setOutcome}
+            setUpdated={setUpdated}/>
       </div>
       
 

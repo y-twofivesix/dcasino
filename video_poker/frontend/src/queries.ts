@@ -1,7 +1,6 @@
 import { pvp } from "@/generated/constants"
 import * as i from "./interfaces"
 import { QueryBalanceResponse } from "secretjs/dist/extensions/snip1155/msg/getBalance";
-import { SecretNetworkClient } from "secretjs";
 import { currency_str } from "./helpers";
 
 export async function balance() : Promise<[string, string]> {
@@ -21,16 +20,16 @@ export async function balance() : Promise<[string, string]> {
 
 export async function instance_state():  Promise<[i.InstanceState | any, boolean ]>  {
 
-
     let handInfo : i.InstanceState | any = await pvp.granter?.query.compute.queryContract({
         contract_address: pvp.CONTRACT_ADDRESS,
         code_hash: pvp.code_hash,
-        query: { instance_state : { 
-        sender_addr : pvp.granter.address, 
-        sender_key: pvp.viewing_key
-    }},
+        query: 
+        { instance_state : { 
+            sender_addr : pvp.granter.address, 
+            sender_key: pvp.viewing_key
+        }},
     }).catch(async (e: any) => {
-        
+        console.error(e)
         return [{}, false];
     });
 

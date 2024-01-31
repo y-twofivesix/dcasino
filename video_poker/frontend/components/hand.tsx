@@ -1,13 +1,13 @@
 import { numberToImg } from '@/src/helpers';
 import React from 'react'
-import Image  from 'next/image'
+import { motion } from 'framer-motion'
 
 interface HandProps {
     hand : number[],
     dealt: boolean,
     held: Set<number>,
     setHeld:  React.Dispatch<React.SetStateAction<Set<number>>>,
-
+    updated:  string,
 }
 
 
@@ -23,12 +23,19 @@ function Hand(props : HandProps) {
     }
 
   }
+
+  
   return (
     <>
       <div
         onClick={_ => handleClickCard(props.hand[0])}
         className='float-left w-1/5 h-full'>
-          <Image 
+          <motion.img
+          key={props.held.has(props.hand[0]) ? 'held' :props.updated}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1,}}
+
           width="0"
           height="0"
           sizes="100vw"
@@ -46,7 +53,11 @@ function Hand(props : HandProps) {
       <div
         onClick={_ => handleClickCard(props.hand[1])}
         className='float-left w-1/5 h-full'>
-          <Image 
+          <motion.img
+          key={props.held.has(props.hand[1]) ? 'held' :props.updated}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1,}}
           width="0"
           height="0"
           sizes="100vw"
@@ -64,7 +75,11 @@ function Hand(props : HandProps) {
       <div
         onClick={_ => handleClickCard(props.hand[2])}
         className='float-left w-1/5 h-full'>
-          <Image 
+          <motion.img
+          key={props.held.has(props.hand[2]) ? 'held' :props.updated}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1,}}
           width="0"
           height="0"
           sizes="100vw"
@@ -82,7 +97,11 @@ function Hand(props : HandProps) {
       <div
         onClick={_ => handleClickCard(props.hand[3])}
         className='float-left w-1/5 h-full'>
-          <Image 
+          <motion.img
+          key={props.held.has(props.hand[3]) ? 'held' :props.updated}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1,}}
           width="0"
           height="0"
           sizes="100vw"
@@ -100,7 +119,11 @@ function Hand(props : HandProps) {
       <div
         onClick={_ => handleClickCard(props.hand[4])}
         className='float-left w-1/5 h-full'>
-          <Image 
+          <motion.img
+          key={props.held.has(props.hand[4]) ? 'held' :props.updated}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1,}}
           width="0"
           height="0"
           sizes="100vw"
@@ -117,8 +140,8 @@ function Hand(props : HandProps) {
 
     </>
 
-
   )
+  
 }
 
 export default Hand

@@ -1,7 +1,7 @@
-import { SecretNetworkClient, Wallet, MetaMaskWallet } from 'secretjs';
-import swal from 'sweetalert2';
+import { SecretNetworkClient, MetaMaskWallet } from 'secretjs';
 import { QueryBalanceResponse } from 'secretjs/dist/extensions/snip1155/msg/getBalance';
 import { pvp } from '@/generated/constants';
+import Swal from 'sweetalert2';
 
 
 export function green(text : string) {
@@ -287,82 +287,102 @@ export const check_env = async () => {
 
 export const swal_confirm = async ( message : string, title : string = '') : Promise<boolean> => {
   let result = false;
-  /*
-  await swal({
+  await Swal.fire({
     title: title,
     text: message,  
-    buttons: ["No!", "Go!"],
-  }).then( (inner_result : boolean ) => { result = inner_result} );
-  */
+    showDenyButton: true,
+    showCancelButton: false,
+    confirmButtonText: 'Go!',
+    denyButtonText: `No!`,
+    backdrop: `rgba(0,0,123,0.4)`
+  }).then( (inner_result) => { result = inner_result.isConfirmed} );
   return result;
 }
 
-export const swal_input = async ( message : string, title : string = '', placeholder : string = '') : Promise<string> => {
+export const swal_input = async ( message : string, title : string = '', placeholder : string = '', can_deny = true) : Promise<string> => {
   let result = '';
-  /*
-  //await swal.fire({
-    content: {
-      element: "input",
-      attributes: {
-        placeholder: placeholder,
-      },
-    },
+  await Swal.fire({
     title: title,
     text: message,
-    buttons: ["Cancel", "Go!"],
-  //}).then( (inner_result : string) => { result = inner_result} );
-  */
+    showDenyButton: can_deny,
+    denyButtonText: `Cancel`,
+    backdrop: `rgba(0,0,123,0.4)`,
+    html:
+    `
+    <div>${message}</div>
+    <input id="swal-input" class="swal2-input" placeholder="${placeholder}">
+    `,
+    preConfirm: function () {
+       //@ts-ignore
+      return document.getElementById('swal-input').value
+    },
+  }).then(function (res) {
+    if (!res.isDenied) {
+      result = res.value;
+    }
+  })
   return result;
 }
 
 export const swal_error = async ( message : string, title : string = '', timer = 0) => {
-  /*
+
   if (timer) {
-    await swal ({
+    await Swal.fire ({
       title: title,
       icon: "error",
+      text: message,
+      timer: timer,
+    });
+  } else {
+    await Swal.fire ({
+      title: title,
+      icon: "error",
+      text: message,
+      backdrop: `rgba(0,0,123,0.4)`,
+
+    });
+  }
+}
+
+export const swal_alert = async ( message : string, title : string = '',  timer = 0) => {
+
+  if (timer) {
+    await Swal.fire ({
+      title: title,
+      icon: "info",
       text: message,
       timer: timer
     });
   } else {
-    await swal ({
+    await Swal.fire ({
       title: title,
-      icon: "error",
+      icon: "info",
       text: message,
+      backdrop: `rgba(0,0,123,0.4)`,
     });
-  }*/
-}
-
-export const swal_alert = async ( message : string, title : string = '') => {
-  /*
-  await swal({
-    title: title,
-    icon: "info",
-    text: message
-  });*/
+  }
 }
 
 export const swal_success = async ( message: string, title: string = '', timer = 0) => {
 
-  /*
+
   if (timer) {
-    await swal ({
+    await Swal.fire ({
       title: title,
       icon: "success",
       text: message,
       timer: timer
     });
   } else {
-    await swal ({
+    await Swal.fire ({
       title: title,
       icon: "success",
       text: message,
+      backdrop: `rgba(0,0,123,0.4)`,
     });
   }
-  */
 
 }
-
 
 
 
