@@ -71,7 +71,7 @@ function Controls( props : ControlsProps) {
     }
     
   return (
-    <div className='absolute select-none text-white m-auto bottom-5 p-4 left-0 right-0 w-full h-fit'>
+    <div className='absolute select-none text-white m-auto bottom-2 p-4 left-0 right-0 w-full h-fit'>
 
         <div 
         onClick={async _ => { 
@@ -79,31 +79,31 @@ function Controls( props : ControlsProps) {
                 await handleSetVk()
             }
         }} 
-        className={`float-left bg-red-300 p-4 rounded-l-2xl hover:bg-red-600 ${props.need_vk ? 'rainbow-bg' :'opacity-50'}`}>
+        className={`float-left bg-neutral-800 p-4 rounded-l-2xl hover:bg-red-600 ${props.need_vk ? 'rainbow-bg' :'opacity-50'}`}>
             {props.need_vk ? 'set viewing key' : 'viewing!'}
         </div>
 
         <div 
         onClick={_ => { if (!props.dealt && props.bet>1)  props.setBet(props.bet-1) }} 
-        className={`${props.dealt?'opacity-50':''} float-left bg-red-400 p-4 hover:bg-red-800 select-none`}>
+        className={`${props.dealt || props.bet==1  ?'opacity-50':''} float-left bg-neutral-800 p-4 hover:bg-red-800 select-none`}>
             down bet
         </div>
 
         <div 
-        className={`float-left bg-red-600 ${props.dealt? 'opacity-50' :''} p-4 select-none`}>
+        className={`float-left bg-neutral-800 ${props.dealt? 'opacity-50' :''} p-4 select-none`}>
             bet {props.bet}
         </div>
 
         <div 
         onClick={_ => { if (!props.dealt && props.bet<5)  props.setBet(props.bet+1) }} 
-        className={`${props.dealt?'opacity-50':''} float-left bg-red-400 p-4 hover:bg-red-800 select-none`}>
+        className={`${props.dealt || props.bet==5 ?'opacity-50':''} float-left bg-neutral-800 p-4 hover:bg-green-800 select-none`}>
             up bet
         </div>
 
         <div 
         onClick={async _ => {  if (!props.need_vk) {props.dealt? await handleDraw() : await handleDeal()} }}
-        className={`float-left bg-red-400 rounded-r-2xl p-4 hover:bg-red-800 ${props.need_vk? 'opacity-50': ''}`}>
-            {props.dealt ? 'draw':'deal'}
+        className={`float-left bg-blue-600 rounded-r-2xl p-4 hover:bg-green-800 ${props.need_vk? 'opacity-50': ''}`}>
+            {props.dealt? 'draw':'deal'}
         </div>
     </div>
   )

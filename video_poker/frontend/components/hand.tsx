@@ -8,6 +8,7 @@ interface HandProps {
     held: Set<number>,
     setHeld:  React.Dispatch<React.SetStateAction<Set<number>>>,
     updated:  string,
+    dark: boolean
 }
 
 
@@ -27,116 +28,38 @@ function Hand(props : HandProps) {
   
   return (
     <>
-      <div
-        onClick={_ => handleClickCard(props.hand[0])}
-        className='float-left w-1/5 h-full'>
-          <motion.img
-          key={props.held.has(props.hand[0]) ? 'held' :props.updated}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1,}}
+    {
+      (()=>{
+        let entries = []
+        for (const card of props.hand) {
+          let hold = props.held.has(card)
+          entries.push(
+            <div
+            onClick={_ => handleClickCard(card)}
+            className={`float-left w-1/5 relative p-2`}>
+              <motion.img
+              initial={{ opacity: 0 }}
+              animate={{ opacity: hold || !props.dealt? 1:0.5  }}
+              width="0"
+              height="0"
+              sizes="100vw"
+              className={`${props.dark?'invert':''} w-fit h-[270px] select-none left-0 right-0 m-auto p-2`}
+              alt='hand4'
+              //src={`/deck2/as.svg`}
+              src={`/deck2/${numberToImg(card)}.png`}
+              />
 
-          width="0"
-          height="0"
-          sizes="100vw"
-          className="w-full h-48 select-none"
-          alt='hand4' 
-          src={`/deck/${numberToImg(props.hand[0])}.png`}
-          />
-          <div className={`
-          text-center w-full p-4 text-white ${props.dealt? '':'hidden'}
-          ${props.held.has(props.hand[0]) ? 'rainbow' :''} `}>
-            {props.held.has(props.hand[0]) ? 'held!' : 'click to hold'}
+              <div className={`
+              text-center w-full p-4 text-neutral-800 ${props.dealt? '':'hidden'}
+              ${hold ? 'bg-neutral-300' :''} `}>
+                {hold ? 'held!' : 'click to hold'}
+              </div>
           </div>
-      </div>
-
-      <div
-        onClick={_ => handleClickCard(props.hand[1])}
-        className='float-left w-1/5 h-full'>
-          <motion.img
-          key={props.held.has(props.hand[1]) ? 'held' :props.updated}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1,}}
-          width="0"
-          height="0"
-          sizes="100vw"
-          className="w-full h-48 select-none"
-          alt='hand4' 
-          src={`/deck/${numberToImg(props.hand[1])}.png`}
-          />
-          <div className={`
-          text-center w-full p-4 text-white ${props.dealt? '':'hidden'}
-          ${props.held.has(props.hand[1]) ? 'rainbow' :''} `}>
-            {props.held.has(props.hand[1]) ? 'held!' : 'click to hold'}
-          </div>
-      </div>
-
-      <div
-        onClick={_ => handleClickCard(props.hand[2])}
-        className='float-left w-1/5 h-full'>
-          <motion.img
-          key={props.held.has(props.hand[2]) ? 'held' :props.updated}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1,}}
-          width="0"
-          height="0"
-          sizes="100vw"
-          className="w-full h-48 select-none"
-          alt='hand4' 
-          src={`/deck/${numberToImg(props.hand[2])}.png`}
-          />
-          <div className={`
-          text-center w-full p-4 text-white ${props.dealt? '':'hidden'}
-          ${props.held.has(props.hand[2]) ? 'rainbow' :''} `}>
-            {props.held.has(props.hand[2]) ? 'held!' : 'click to hold'}
-          </div>
-      </div>
-
-      <div
-        onClick={_ => handleClickCard(props.hand[3])}
-        className='float-left w-1/5 h-full'>
-          <motion.img
-          key={props.held.has(props.hand[3]) ? 'held' :props.updated}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1,}}
-          width="0"
-          height="0"
-          sizes="100vw"
-          className="w-full h-48 select-none"
-          alt='hand4' 
-          src={`/deck/${numberToImg(props.hand[3])}.png`}
-          />
-          <div className={`
-          text-center w-full p-4 text-white ${props.dealt? '':'hidden'}
-          ${props.held.has(props.hand[3]) ? 'rainbow' :''} `}>
-            {props.held.has(props.hand[3]) ? 'held!' : 'click to hold'}
-          </div>
-      </div>
-
-      <div
-        onClick={_ => handleClickCard(props.hand[4])}
-        className='float-left w-1/5 h-full'>
-          <motion.img
-          key={props.held.has(props.hand[4]) ? 'held' :props.updated}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1,}}
-          width="0"
-          height="0"
-          sizes="100vw"
-          className="w-full h-48 select-none"
-          alt='hand4' 
-          src={`/deck/${numberToImg(props.hand[4])}.png`}
-          />
-          <div className={`
-          text-center w-full p-4 text-white ${props.dealt? '':'hidden'}
-          ${props.held.has(props.hand[4]) ? 'rainbow' :''} `}>
-            {props.held.has(props.hand[4]) ? 'held!' : 'click to hold'}
-          </div>
-      </div>
+          )
+        }
+        return entries
+      })()
+    }
 
     </>
 

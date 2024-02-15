@@ -7,9 +7,10 @@ import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation';
 import { ERR_UNAUTHORISED, pvp } from '@/generated/constants';
 import { currency_str } from '@/src/helpers';
+import { motion } from 'framer-motion';
 
 
-function Dashboard() {
+function VideoPoker() {
 
   const { push } = useRouter();
   const [hand, setHand] = useState([255,255,255,255,255]);
@@ -21,14 +22,16 @@ function Dashboard() {
   const [held, setHeld] = useState(new Set<number>([]));
   const [user_bal, setBalance] = useState('-');
   const [updated, setUpdated] = useState('-');
+  const [dark, setDark] = useState(false);
 
 
   useEffect(function () {
 
     if (!pvp.ready ) {
-      push('/landingpage')
+      push('/')
       return;
-  }
+    }
+
 
    let do_query = async function() {
 
@@ -66,27 +69,20 @@ function Dashboard() {
 
 
   return (
-    <div className='w-screen h-screen relative p-10 bg-retro-blue'>
+    <motion.div 
+    exit={{ opacity: 0 }}
+    className={`w-screen h-screen relative p-10 bg-neutral-250 ${dark?'invert':''}`}>
 
-      <div className='w-full h-full bg-black relative'>
+      <div className='w-full h-full relative bg-neutral-200'>
 
         <BettingTable 
         bet={bet}
         outcome={outcome}/>
 
         <div className={
-          `p-2 text-2xl text-center w-full text-white
-          ${outcome == 'Lose' || outcome == 'Undefined'? '': 'rainbow' }`}>
+          `p-2 text-2xl text-center text-white left-0 right-0 m-auto
+          ${outcome == 'Lose' || outcome == 'Undefined'? 'bg-red-600': 'bg-green-600' } w-fit text-white`}>
           {dealt ? 'hold and/or draw': `Result: ${outcome}` }
-        </div>
-
-        <div className='w-2/3 h-60 left-0 right-0 m-auto'>
-            <Hand 
-            hand={hand}
-            dealt={dealt}
-            held={held}
-            setHeld={setHeld}
-            updated={updated}/>
         </div>
 
         <div className='p-2 text-lg bg-white w-fit inline text-black rounded-r-2xl'>
@@ -97,6 +93,18 @@ function Dashboard() {
           <div>Credit: {user_bal}</div>
           <div>position: <span className={pvp.pos_this_session < 0 ? 'text-red-600':'text-green-600'}>{pvp.pos_this_session}</span></div>
         </div>
+
+        <div className='w-2/3 h-60 left-0 right-0 m-auto py-2'>
+            <Hand 
+            hand={hand}
+            dealt={dealt}
+            held={held}
+            setHeld={setHeld}
+            updated={updated}
+            dark={dark}/>
+        </div>
+
+
 
 
           <Controls 
@@ -113,8 +121,8 @@ function Dashboard() {
       </div>
       
 
-    </div>
+    </motion.div>
   )
 }
 
-export default Dashboard
+export default VideoPoker

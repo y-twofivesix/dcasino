@@ -26,7 +26,7 @@ function NoSSRApp({ Component, pageProps }: AppProps) {
     onDragStart={ e => e.preventDefault()}
     onDragEnd={ e => e.preventDefault()}
     onContextMenu={ e=> e.preventDefault()}
-    lang="en" className={`${IBM_MDA.variable} font-ibm`}>
+    lang="en" /*className={`${IBM_MDA.variable} font-ibm`}*/ >
 
     <Head>
       <link rel="shortcut icon" href="/images/logo.png" />

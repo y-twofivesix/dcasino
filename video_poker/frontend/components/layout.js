@@ -1,16 +1,14 @@
 "use client";
 
-import Footer from './footer'
+import { AnimatePresence } from "framer-motion";
 
 
 function Layout({ children  }) {
 
   return (
-    <>
+    <AnimatePresence>
       <main>{ children }</main>
-      <Footer/>
-    </>
-   
+    </AnimatePresence>
   )
 }
 
