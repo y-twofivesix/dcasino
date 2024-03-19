@@ -8,6 +8,7 @@ export interface InstanceState {
     bet : number;
     last_outcome : string
     last_win : string
+    timestamp: number
 
 }
 
@@ -18,7 +19,8 @@ export function isInstanceState(object : any) : boolean {
     'dealt' in object &&
     'bet' in object &&
     'last_outcome' in object &&
-    'last_win' in object
+    'last_win' in object &&
+    'timestamp' in object
 
 }
 

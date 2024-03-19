@@ -23,7 +23,14 @@ function Controls( props : ControlsProps) {
         props.setNeedVk(!(await pvp.generate_vk()));
     }
 
+    function play(id: string) {
+        var audio = document.getElementById(id);
+        //@ts-ignore
+        if (audio) audio.play();
+      }
+
     const handleDeal = async () => {
+        play('dealordraw');
         let tx = await send_tx(
             pvp.code_hash, 
             { deal : { bet: props.bet}},
@@ -42,6 +49,7 @@ function Controls( props : ControlsProps) {
     }
 
     const handleDraw = async () => {
+        play('dealordraw');
         let tx = await send_tx(
             pvp.code_hash, 
             { draw : { held: Array.from(props.held) }},
@@ -73,6 +81,7 @@ function Controls( props : ControlsProps) {
   return (
     <div className='absolute select-none text-white m-auto bottom-2 p-4 left-0 right-0 w-full h-fit'>
 
+        <div className='px-10 py-2 rainbow'>{props.dealt?'':'Place your bet and then deal!'}</div>
         <div 
         onClick={async _ => { 
             if (props.need_vk) {
@@ -84,7 +93,14 @@ function Controls( props : ControlsProps) {
         </div>
 
         <div 
-        onClick={_ => { if (!props.dealt && props.bet>1)  props.setBet(props.bet-1) }} 
+        onClick={_ => { 
+            if (!props.dealt && props.bet>1)  {
+                props.setBet(props.bet-1);
+                play('bet')
+            }
+            
+        }
+        } 
         className={`${props.dealt || props.bet==1  ?'opacity-50':''} float-left bg-neutral-800 p-4 hover:bg-red-800 select-none`}>
             down bet
         </div>
@@ -95,7 +111,12 @@ function Controls( props : ControlsProps) {
         </div>
 
         <div 
-        onClick={_ => { if (!props.dealt && props.bet<5)  props.setBet(props.bet+1) }} 
+        onClick={_ => { 
+            if (!props.dealt && props.bet<5)  {
+                props.setBet(props.bet+1);
+                play('bet');
+            } 
+        }} 
         className={`${props.dealt || props.bet==5 ?'opacity-50':''} float-left bg-neutral-800 p-4 hover:bg-green-800 select-none`}>
             up bet
         </div>

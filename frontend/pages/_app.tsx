@@ -6,14 +6,24 @@ import Layout from '../components/layout'
 import localFont from 'next/font/local'
 import Head from 'next/head'
 
-const IBM_MDA = localFont({
+const CASINO = localFont({
   src: [
     {
-      path: '../public/fonts/IBM_MDA.woff',
+      path: '../public/fonts/casino_filled.ttf',
       weight: '400'
     },
   ],
-  variable: '--font-ibm-mda'
+  variable: '--font-casino'
+})
+
+const CASINO_FILLED = localFont({
+  src: [
+    {
+      path: '../public/fonts/casino_filled.ttf',
+      weight: '400'
+    },
+  ],
+  variable: '--font-casino-filled'
 })
 
 
@@ -26,7 +36,7 @@ function NoSSRApp({ Component, pageProps }: AppProps) {
     onDragStart={ e => e.preventDefault()}
     onDragEnd={ e => e.preventDefault()}
     onContextMenu={ e=> e.preventDefault()}
-    lang="en" /*className={`${IBM_MDA.variable} font-ibm`}*/ >
+    lang="en" className={`${CASINO.variable} ${CASINO_FILLED.variable}`} >
 
     <Head>
       <link rel="shortcut icon" href="/images/logo.png" />

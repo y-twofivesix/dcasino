@@ -23,6 +23,7 @@ function VideoPoker() {
   const [user_bal, setBalance] = useState('-');
   const [updated, setUpdated] = useState('-');
   const [dark, setDark] = useState(false);
+  const [last_timestamp, setLastTimeStamp] = useState(0)
 
 
   useEffect(function () {
@@ -45,9 +46,25 @@ function VideoPoker() {
         // sync state with backend
         setHand(inst_state.hand);
         setDealt(inst_state.dealt);
-        console.log(inst_state.last_outcome)
 
-        if (!inst_state.dealt) setOutcome(inst_state.last_outcome);
+        if (!inst_state.dealt) {
+          setOutcome(inst_state.last_outcome);
+
+          if (inst_state.timestamp!== last_timestamp) {
+            
+            let this_outcome = inst_state.last_outcome;
+            if (this_outcome == 'Undefined') return
+            let id = 'win'
+            if (inst_state.last_outcome == 'Lose') {
+              id = 'lose'
+            }
+            var audio = document.getElementById(id);
+            //@ts-ignore
+            if (audio) audio.play();
+            setLastTimeStamp(inst_state.timestamp)
+          }
+
+        };
         let won_curr = currency_str(inst_state.last_win, "uscrt");
         setWon(`${won_curr[0]} ${won_curr[1]}`);
 
@@ -71,22 +88,30 @@ function VideoPoker() {
   return (
     <motion.div 
     exit={{ opacity: 0 }}
-    className={`w-screen h-screen relative p-10 bg-neutral-250 ${dark?'invert':''}`}>
+    className={`w-screen h-screen relative p-10 bg-blue-800 ${dark?'invert':''}`}>
 
-      <div className='w-full h-full relative bg-neutral-200'>
+      <audio id="bet" className="display-none" src={`/audio/bet.wav`}/>
+      <audio id="dealordraw" className="display-none" src={`/audio/dealordraw.wav`}/>
+      <audio id="win" className="display-none" src={`/audio/win.wav`}/>
+      <audio id="lose" className="display-none" src={`/audio/lose.wav`}/>
+      <audio id="select" className="display-none" src={`/audio/select.wav`}/>
 
-        <BettingTable 
+
+      <div className='w-full h-full relative bg-blue-700'>
+
+        <BettingTable
+        dealt={dealt}
         bet={bet}
         outcome={outcome}/>
 
         <div className={
-          `p-2 text-2xl text-center text-white left-0 right-0 m-auto
+          `p-1 text-xl text-center text-white left-0 right-0 m-auto
           ${outcome == 'Lose' || outcome == 'Undefined'? 'bg-red-600': 'bg-green-600' } w-fit text-white`}>
           {dealt ? 'hold and/or draw': `Result: ${outcome}` }
         </div>
 
         <div className='p-2 text-lg bg-white w-fit inline text-black rounded-r-2xl'>
-          {dealt ? '-' : (parseInt(won) == 0 ? 'You lost!':`You won: ${won}`) }
+          {dealt ? '...' : (parseInt(won) == 0 ? 'You lost!':`You won: ${won}`) }
         </div>
 
         <div className='p-2 float-right text-lg inline bg-white text-black rounded-l-2xl'>

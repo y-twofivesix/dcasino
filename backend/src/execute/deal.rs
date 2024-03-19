@@ -10,7 +10,7 @@ pub fn execute_deal( deps : DepsMut,
     bet : u8) -> StdResult<Response> {
 
 
-        let mut inst  = match try_option(INSTANCES.get(deps.storage, &info.sender.to_string())) {
+        let mut inst = match try_option(INSTANCES.get(deps.storage, &info.sender.to_string())) {
             Ok(inst) => inst,
             _ => Instance {
                 deck: (0..52).collect::<Vec<u8>>(),
@@ -19,7 +19,8 @@ pub fn execute_deal( deps : DepsMut,
                 rng: Pcg64::from_seed(try_option(env.block.random.clone())?.to_array::<32>()?),
                 bet,
                 last_outcome: format!("{:?}", Outcome::Undefined),
-                last_win: "0".to_string()
+                last_win: "0".to_string(),
+                timestamp: env.block.time
             }
         };
 
@@ -30,6 +31,7 @@ pub fn execute_deal( deps : DepsMut,
         make_payment(&env, &info, bet as u128 * 1_000_000, "uscrt".to_string())?;
         inst.deal()?;
         inst.bet = bet;
+        inst.timestamp = env.block.time;
         INSTANCES.insert(deps.storage, &info.sender.to_string(), &inst)?;
         
         Ok(Response::new())

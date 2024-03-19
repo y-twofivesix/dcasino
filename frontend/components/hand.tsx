@@ -14,7 +14,11 @@ interface HandProps {
 
 function Hand(props : HandProps) {
 
+  
   const handleClickCard = (num : number) => {
+
+    if (!props.dealt) return
+  
     if (props.held.has(num)) {
       // remove it from the held set
       props.setHeld(prev_set => new Set([...prev_set].filter(x => x !== num)))
@@ -22,9 +26,16 @@ function Hand(props : HandProps) {
       // add it to the unheld set
       props.setHeld(prev_set => new Set<number>([...prev_set, num]))
     }
+    
+    play('select')
 
   }
-
+  
+  function play(id: string) {
+    var audio = document.getElementById(id);
+    //@ts-ignore
+    if (audio) audio.play();
+  }
   
   return (
     <>
@@ -43,14 +54,14 @@ function Hand(props : HandProps) {
               width="0"
               height="0"
               sizes="100vw"
-              className={`${props.dark?'invert':''} w-fit h-[270px] select-none left-0 right-0 m-auto p-2`}
+              className={`${props.dark?'invert':''} w-fit h-[250px] select-none left-0 right-0 m-auto p-2`}
               alt='hand4'
               //src={`/deck2/as.svg`}
               src={`/deck2/${numberToImg(card)}.png`}
               />
 
               <div className={`
-              text-center w-full p-4 text-neutral-800 ${props.dealt? '':'hidden'}
+              text-center w-full p-2 text-neutral-800 ${props.dealt? '':'hidden'}
               ${hold ? 'bg-neutral-300' :''} `}>
                 {hold ? 'held!' : 'click to hold'}
               </div>

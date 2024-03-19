@@ -19,6 +19,7 @@ export default function Home() {
 
   const handleConnect = async (route: string) =>{
 
+    
     let wallets = [];
       //@ts-ignore
     if (window.keplr) wallets.push('Keplr');
@@ -34,6 +35,8 @@ export default function Home() {
       // do init
       await try_enter_game(wallets[0], route);
     } else  {
+      //@ts-ignore
+      console.log(wallets)
       // show wallet options
       setShowWallets(true);
     }
@@ -51,15 +54,43 @@ export default function Home() {
 
   const cards : Card[] = [
     {name: 'Video Poker', icon: 'arcade.png', route:'videopoker'},
-    {name: 'BlackJack (Vingt et un)', icon: 'spade.png', route:''},
+    {name: 'BlackJack (Vingt et un) COMING SOON', icon: 'spade.png', route:''},
   ]
 
   return (
 
     <motion.div
     exit={{ opacity: 0 }}
-    className='w-screen h-screen bg-[#6600ff] relative'>
-      <div className='h-fit w-fit absolute left-0 right-0 top-0 bottom-0 m-auto'>
+    className='w-screen h-screen bg-orange-100 relative'>
+
+
+      <motion.div
+        animate={{ opacity: show_wallets ? 1: 0, scale: show_wallets ? 1: 0}}
+        transition={{
+          duration: 0.4,
+          delay: 0.2,
+          ease: [0, 0.71, 0.2, 1.01]
+        }}
+        className={` ${show_wallets ? '':'hidden'}
+        absolute bg-orange-300 h-fit text-center
+         top-0 bottom-0 left-0 right-0 m-auto z-50
+         p-4 rounded-2xl 
+         w-1/3`}>
+          <h1 className=' px-2 py-4 text-4xl rounded-2xl font-casino'>Choose your wallet</h1>
+          <ul>
+            <li className='py-4 hoverrainbow hover:bg-indigo-900 rounded-2xl' onClick={async _ => await try_enter_game('Keplr', 'videopoker')}>Keplr</li>
+            <li className='py-4 hoverrainbow hover:bg-indigo-900 rounded-2xl' onClick={async _ => await try_enter_game('MetaMask', 'videopoker')}>MetaMask</li>
+            <li className='py-4 hoverrainbow hover:bg-indigo-900 rounded-2xl' onClick={async _ => await try_enter_game('Fina', 'videopoker')}>Fina</li>
+            <li className='py-4 hoverrainbow hover:bg-indigo-900 rounded-2xl' onClick={async _ => await try_enter_game('Leap', 'videopoker')}>Leap</li>
+          </ul>
+      </motion.div>
+
+      <div className=' text-center text-9xl px-32 py-28 font-casino'>
+        SCRT CASINO
+      </div>
+
+
+      <div className='h-fit w-fit absolute left-0 right-0 bottom-15 m-auto'>
         <div className={'grid grid-cols-3 gap-4'}>
           {
             (()=>{
@@ -77,7 +108,7 @@ export default function Home() {
                   }}
                   transition={{duration: 1}}
                   className={`
-                  bg-[#9900ff] relative hover:bg-red-600
+                  bg-orange-200 relative hover:bg-green-600
                   rounded-xl duration-700 shadow-retro`}>
 
                       {
@@ -98,7 +129,7 @@ export default function Home() {
           }
         </div>
 
-        <div className='w-full h-10 text-neutral-200 text-center p-4'>{hovered}</div>
+        <div className='w-full h-10 text-neutral-800 text-center p-4'>{hovered}</div>
       </div>
     </motion.div>
 

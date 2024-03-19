@@ -1,3 +1,18 @@
 {
-  "dependencies": {}
+    "scripts": {
+        "load_contract": "ts-node --pretty load_contract.ts",
+        "dotenv_update": "ts-node dotenv_update.ts",
+        "instantiate_contract": "ts-node --pretty instantiate_contract.ts",
+        "migrate_contract": "ts-node --pretty migrate_contract.ts",
+        "register_receive": "ts-node register_receive.ts",
+        "dev": "make generate && next dev"
+    },
+    "devDependencies": {
+        "dotenv": "^16.0.3",
+        "secretjs": "^1.11.1",
+        "ts-node": "^10.9.1",
+        "ts-node-dev": "^2.0.0",
+        "typescript": "^4.9.5",
+        "update-dotenv": "^1.1.1"
+    }
 }

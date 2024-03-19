@@ -3,7 +3,7 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 use crate::{rng::Pcg64, helpers::translate_card};
-use cosmwasm_std::StdResult;
+use cosmwasm_std::{StdResult, Timestamp};
 
 #[derive(Serialize, Debug, Deserialize, Clone, JsonSchema)]
 pub struct Instance {
@@ -13,7 +13,8 @@ pub struct Instance {
     pub dealt: bool,
     pub bet: u8,
     pub last_outcome: String,
-    pub last_win: String
+    pub last_win: String,
+    pub timestamp: Timestamp
 }
 
 #[derive(Debug)]
@@ -86,7 +87,6 @@ impl Instance {
                 self.deck.push(*i);
                 *i = 255;
             }
-            
         }
 
         // reshuffle cards
@@ -314,7 +314,8 @@ mod test_instance {
             rng: Pcg64::from_seed([0u8; 32]),
             bet: 1,
             last_outcome: format!("{:?}", Outcome::Undefined),
-            last_win: "0".to_string()
+            last_win: "0".to_string(),
+            timestamp: Timestamp::from_seconds(0)
 
         }
     }

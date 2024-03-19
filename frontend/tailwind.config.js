@@ -16,7 +16,8 @@ module.exports = {
         '18': '4.05rem',
       },
       fontFamily: {
-        ibm: ['var(--font-ibm-mda)']
+        casino: ['var(--font-casino)'],
+        casinofilled: ['var(--font-casino-filled)']
       },
       boxShadow: {
         retro: '5px 5px black',

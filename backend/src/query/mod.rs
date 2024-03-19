@@ -1,5 +1,5 @@
 pub mod instance_state;
-use cosmwasm_std::Storage;
+use cosmwasm_std::{Storage, Timestamp};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -25,7 +25,8 @@ pub struct InstanceState {
     pub bet: u8,
     pub dealt: bool,
     pub last_outcome: String,
-    pub last_win: String
+    pub last_win: String,
+    pub timestamp: Timestamp
 }
 
 pub fn querier_is_auth(store: &dyn Storage, sender_addr: &String, sender_key: &str) -> bool {

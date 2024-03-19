@@ -2,9 +2,8 @@ type Addr = String;
 type ViewingKey = String;
 
 use crate::instance::Instance;
-use cosmwasm_std::Timestamp;
 use secret_toolkit::serialization::Json;
-use secret_toolkit::storage::{Item, Keymap, KeymapBuilder, WithoutIter };
+use secret_toolkit::storage::{Keymap, KeymapBuilder, WithoutIter };
 
 /******************************************************************************
  Globals

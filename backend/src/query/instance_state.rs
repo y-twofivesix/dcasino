@@ -23,6 +23,7 @@ pub fn query_instance_state(
         bet: inst.bet, 
         dealt: inst.dealt,
         last_outcome: inst.last_outcome,
-        last_win: inst.last_win
+        last_win: inst.last_win,
+        timestamp: inst.timestamp
     })
 }
