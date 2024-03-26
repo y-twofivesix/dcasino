@@ -1,6 +1,6 @@
 import { SecretNetworkClient, MetaMaskWallet } from 'secretjs';
 import { QueryBalanceResponse } from 'secretjs/dist/extensions/snip1155/msg/getBalance';
-import { pvp } from '@/generated/constants';
+import { dcasino } from '@/generated/constants';
 import Swal from 'sweetalert2';
 
 
@@ -128,10 +128,10 @@ export const init_metamask = async (): Promise<SecretNetworkClient| null> => {
   //@ts-ignore
   const wallet = await MetaMaskWallet.create(metamask, ethAddress);
 
-  const chainId =  pvp.CHAIN_ID;
+  const chainId =  dcasino.CHAIN_ID;
 
   const secretcli : SecretNetworkClient = new SecretNetworkClient({
-    url: pvp.LCD_URL,
+    url: dcasino.LCD_URL,
     chainId: chainId,
     wallet: wallet,
     walletAddress: wallet.address,
@@ -152,7 +152,7 @@ export const init_leap = async (): Promise<SecretNetworkClient | null> => {
       return null
     }
 
-    const chainId =  pvp.CHAIN_ID;
+    const chainId =  dcasino.CHAIN_ID;
     const key = await leap.getKey(chainId);
     window.addEventListener('leap_keystorechange', leap.getKey);
 
@@ -162,7 +162,7 @@ export const init_leap = async (): Promise<SecretNetworkClient | null> => {
     const enigmaUtils = window.getEnigmaUtils(chainId);
 
     const secretcli : SecretNetworkClient = new SecretNetworkClient({
-      url: pvp.LCD_URL,
+      url: dcasino.LCD_URL,
       chainId: chainId,
       wallet: offlineSigner,
       walletAddress: accounts[0].address,
@@ -178,7 +178,7 @@ export const init_fina = async (): Promise<SecretNetworkClient | null> => {
   //@ts-ignore
   if (window.fina) {
     //@ts-ignore
-    pvp.set_mobile(true);
+    dcasino.set_mobile(true);
     return await init_keplr();
   } else {
     await swal_error('Fina wallet not detected!', '', 2000);
@@ -198,7 +198,7 @@ export const init_keplr = async (): Promise<SecretNetworkClient | null> => {
     await swal_error('Keplr wallet not detected!', '', 2000);
     return null
   }
-  const chainId = pvp.CHAIN_ID;
+  const chainId = dcasino.CHAIN_ID;
 
   // Enabling before using the Keplr is recommended.
   // This method will ask the user whether to allow access if they haven't visited this website.
@@ -223,7 +223,7 @@ export const init_keplr = async (): Promise<SecretNetworkClient | null> => {
   // Initialize the gaia api with the offline signer that is injected by Keplr extension.
   /*@ts-ignore */
   const secretcli : SecretNetworkClient = new SecretNetworkClient({
-    url: pvp.LCD_URL,
+    url: dcasino.LCD_URL,
     chainId: chainId,
     wallet: offlineSigner,
     walletAddress: accounts[0].address,
@@ -248,9 +248,9 @@ export const do_init = async (wallet: string) => {
     return false;
   }
 
-  pvp.set_granter(secretcli);
-  pvp.set_cli(secretcli);
-  await pvp.set_code_hash(secretcli);
+  dcasino.set_granter(secretcli);
+  dcasino.set_cli(secretcli);
+  await dcasino.set_code_hash(secretcli);
 
   const { balance } = await secretcli?.query.bank.balance({
     address: secretcli.address,
@@ -261,8 +261,8 @@ export const do_init = async (wallet: string) => {
     await swal_alert('You wont be able to perform basic actions (They will simply fail).', 'Your balance is zero!');
   }
   
-  pvp.ready = true;
-  document.title = `Black Jack${pvp.CHAIN_ID.includes('pulsar') ? ' (testnet)' : ''}`
+  dcasino.ready = true;
+  document.title = `Black Jack${dcasino.CHAIN_ID.includes('pulsar') ? ' (testnet)' : ''}`
 
   return true;
 
@@ -274,11 +274,11 @@ export const check_env = async () => {
   let storage_vk = window.localStorage.getItem('pvp_viewing_key');
 
   if (storage_vk) {
-    pvp.set_viewing_key(storage_vk);
+    dcasino.set_viewing_key(storage_vk);
   }
 
-  if (!pvp.code_hash) {
-    await pvp.set_code_hash();
+  if (!dcasino.dcasino_code_hash && !dcasino.video_poker_code_hash) {
+    await dcasino.set_code_hash();
   }
 
   return storage_vk;
@@ -366,7 +366,7 @@ export const swal_alert = async ( message : string, title : string = '',  timer 
 export const swal_success = async ( message: string, title: string = '', timer = 0) => {
 
 
-  if (timer) {
+  if (timer != 0) {
     await Swal.fire ({
       title: title,
       icon: "success",

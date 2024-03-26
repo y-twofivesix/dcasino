@@ -4,7 +4,8 @@
         "dotenv_update": "ts-node dotenv_update.ts",
         "instantiate_contract": "ts-node --pretty instantiate_contract.ts",
         "migrate_contract": "ts-node --pretty migrate_contract.ts",
-        "register_receive": "ts-node register_receive.ts",
+        "set_parent_contract": "ts-node set_parent_contract.ts",
+        "add_child_contract": "ts-node add_child_contract.ts",
         "dev": "make generate && next dev"
     },
     "devDependencies": {

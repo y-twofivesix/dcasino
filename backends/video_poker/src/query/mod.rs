@@ -1,5 +1,5 @@
 pub mod instance_state;
-use cosmwasm_std::{Storage, Timestamp};
+use cosmwasm_std::{QuerierWrapper, StdResult, Storage, Timestamp};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -15,6 +15,12 @@ pub struct AliasOf {
     pub alias_of: String,
 }
 
+#[derive(Serialize, Deserialize, Clone, Debug, JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub struct User {
+    pub kyc_validated: bool,
+    pub credits : u64
+}
 /******************************************************************************
  instance query obj
 *******************************************************************************/
@@ -25,11 +31,27 @@ pub struct InstanceState {
     pub bet: u8,
     pub dealt: bool,
     pub last_outcome: String,
-    pub last_win: String,
-    pub timestamp: Timestamp
+    pub last_win: u64,
+    pub timestamp: Timestamp,
+    pub credits: u64
 }
 
-pub fn querier_is_auth(store: &dyn Storage, sender_addr: &String, sender_key: &str) -> bool {
+pub fn contract_query_user(
+    querier: &QuerierWrapper, 
+    sender_addr: &String, 
+    sender_key: &String,
+    hash: &String,
+    contract: &String)->
+StdResult<User> {
+    querier.query_wasm_smart::<User>(
+        hash, 
+        contract, 
+        &QueryMsg::User { sender_key: sender_key.clone(), sender_addr: sender_addr.clone() }
+    )
+}
+
+pub fn querier_is_auth(store: &dyn Storage, sender_addr: &String, sender_key: &String) -> bool {
+    // TODO query dcasino smart contract viewing keys
     VIEWING_KEYS.get(store, sender_addr) == Some(sender_key.to_owned())
 }
 
@@ -42,6 +64,13 @@ pub enum QueryMsg {
     *******************************************************************************/
     InstanceState{
         sender_addr: String,
-        sender_key: String
+        sender_key: String,
+        hash: String,
+        contract: String
     },
+
+    User {
+        sender_addr: String,
+        sender_key: String,
+    }
 }

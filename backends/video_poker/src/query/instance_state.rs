@@ -1,29 +1,35 @@
 
-use cosmwasm_std::{Deps, StdError, StdResult};
+use cosmwasm_std::{Deps, StdResult};
 
 use crate::{helpers::try_option, generated::state::INSTANCES};
 
-use super::querier_is_auth;
+use super::contract_query_user;
 
 
 pub fn query_instance_state(
     deps: Deps,
     sender_addr: String,
     sender_key: String,
+    hash: String,
+    contract: String,
 ) -> StdResult<super::InstanceState> {
     
-    if !querier_is_auth(deps.storage, &sender_addr, &sender_key) {
-        return Err(StdError::generic_err("Unauthorised!"));
-    }
+    let user = contract_query_user(
+        &deps.querier, 
+        &sender_addr, 
+        &sender_key,
+        &hash,
+        &contract)?;
 
     let inst = try_option(INSTANCES.get(deps.storage, &sender_addr))?;
-    
+
     Ok(super::InstanceState { 
         hand: inst.hand, 
         bet: inst.bet, 
         dealt: inst.dealt,
         last_outcome: inst.last_outcome,
         last_win: inst.last_win,
-        timestamp: inst.timestamp
+        timestamp: inst.timestamp,
+        credits: user.credits
     })
 }

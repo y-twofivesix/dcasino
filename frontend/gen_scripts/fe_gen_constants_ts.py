@@ -6,12 +6,12 @@ from generate import generate
 import gen_cfg
 
 VERSION = sys.argv[1]
-CONTRACT_ADDRESS = sys.argv[2]
-CODE_ID = int(sys.argv[3])
+DCASINO_CONTRACT_ADDRESS = sys.argv[2]
+DCASINO_CODE_ID = int(sys.argv[3])
 CHAIN_ID = sys.argv[4]
 LCD_URL = sys.argv[5]
-
-
+VIDEO_POKER_CONTRACT_ADDRESS = sys.argv[6]
+VIDEO_POKER_CODE_ID = int(sys.argv[7])
 
 PATH = './src'
 FILENAME = 'constants.tsx'
@@ -37,45 +37,14 @@ AFFILIATIONS:   --
 INJECTIONS = \
 {
     "METADATA" :
-    f'''PVP_VERSION : string     = "{VERSION}";              \n'''
-    f'''CONTRACT_ADDRESS : string      = "{CONTRACT_ADDRESS}";     \n'''
-    f'''CODE_ID : number               = {CODE_ID};                \n'''
-    f'''CHAIN_ID : string               = "{CHAIN_ID}";            \n'''
-    f'''LCD_URL : string               = "{LCD_URL}";            \n''',
+    f'''DCASINO_VERSION : string                = "{VERSION}";                      \n'''
+    f'''DCASINO_CONTRACT_ADDRESS : string       = "{DCASINO_CONTRACT_ADDRESS}";     \n'''
+    f'''DCASINO_CODE_ID : number                =  {DCASINO_CODE_ID};               \n'''
+    f'''CHAIN_ID : string                       = "{CHAIN_ID}";                     \n'''
+    f'''LCD_URL : string                        = "{LCD_URL}";                      \n'''
+    f'''VIDEO_POKER_CONTRACT_ADDRESS : string   = "{VIDEO_POKER_CONTRACT_ADDRESS}"; \n'''
+    f'''VIDEO_POKER_CODE_ID: string             = "{VIDEO_POKER_CODE_ID}";          \n''',
 
-
-
-    "CLIENT_ENDPOINTS" :
-     '''this.cli = [  \n'''
-     '''                                                    \n'''
-     '''    [new SecretNetworkClient({                      \n'''
-     '''    url: 'http://testnet.securesecrets.org:1317',   \n'''
-     '''    wallet: this.wallet,                            \n'''
-     '''    walletAddress: this.wallet.address,             \n'''
-     f'''   chainId: '{CHAIN_ID}',                         \n'''
-     '''    }),                                            \n'''
-     f'''    '{CHAIN_ID}',                                   \n'''
-     '''    'http://testnet.securesecrets.org:1317'],       \n'''
-     '''                                                    \n'''
-     '''    [new SecretNetworkClient({                      \n'''
-     '''    url: 'https://lcd.testnet.secretsaturn.net',    \n'''
-     '''    wallet: this.wallet,                            \n'''
-     '''    walletAddress: this.wallet.address,             \n'''
-     f'''    chainId: '{CHAIN_ID}',                         \n'''
-     '''    }),                                             \n''' 
-     f'''    '{CHAIN_ID}',                                  \n'''
-     '''    'https://lcd.testnet.secretsaturn.net'],        \n'''
-     '''                                                    \n'''
-     '''    [new SecretNetworkClient({                      \n'''
-     '''    url: 'https://api.pulsar.scrttestnet.com',      \n'''
-     '''    wallet: this.wallet,                            \n'''
-     '''    walletAddress: this.wallet.address,             \n'''
-     f'''    chainId: '{CHAIN_ID}',                          \n'''
-     '''    }),                                             \n'''
-     f'''    '{CHAIN_ID}',                                   \n'''
-     '''    'https://api.pulsar.scrttestnet.com'],          \n'''
-     '''];                                                  \n'''
-     '''                                                    \n''',
 }
 
 generate(PATH, FILENAME, HEADER, INJECTIONS, gen_cfg.OUT_DIR )

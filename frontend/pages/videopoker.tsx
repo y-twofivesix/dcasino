@@ -1,13 +1,18 @@
 import BettingTable from '@/components/betting_table'
 import Controls from '@/components/controls';
 import Hand from '@/components/hand'
-import { InstanceState } from '@/src/interfaces';
-import { balance, instance_state } from '@/src/queries';
+import { IInstanceState } from '@/src/interfaces';
+import { balance, vp_instance_state } from '@/src/queries';
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation';
-import { ERR_UNAUTHORISED, pvp } from '@/generated/constants';
-import { currency_str } from '@/src/helpers';
+import { ERR_UNAUTHORISED, dcasino } from '@/generated/constants';
+import { currency_str, swal_alert } from '@/src/helpers';
 import { motion } from 'framer-motion';
+import { faHome } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Link from 'next/link';
+
+const home = <FontAwesomeIcon color='black' icon={faHome} />
 
 
 function VideoPoker() {
@@ -17,18 +22,19 @@ function VideoPoker() {
   const [bet, setBet] = useState(1);
   const [dealt, setDealt] = useState(false);
   const [outcome, setOutcome] = useState('Undefined');
-  const [won, setWon] = useState('-');
+  const [won, setWon] = useState(0);
   const [need_vk, setNeedVk] = useState(false);
   const [held, setHeld] = useState(new Set<number>([]));
   const [user_bal, setBalance] = useState('-');
   const [updated, setUpdated] = useState('-');
   const [dark, setDark] = useState(false);
-  const [last_timestamp, setLastTimeStamp] = useState(0)
+  const [last_timestamp, setLastTimeStamp] = useState(0);
+  
 
 
   useEffect(function () {
 
-    if (!pvp.ready ) {
+    if (!dcasino.ready ) {
       push('/')
       return;
     }
@@ -36,22 +42,23 @@ function VideoPoker() {
 
    let do_query = async function() {
 
-      let bal = await balance();
-      setBalance(`${bal[0]} ${bal[1]}`);
-      let inst_state_result = await instance_state();
+      //let bal = await balance();
+      //setBalance(`${bal[0]} ${bal[1]}`);
+      let inst_state_result = await vp_instance_state();
 
-      if (inst_state_result[1]) {
-        let inst_state = inst_state_result[0] as InstanceState;
-        
+      if (inst_state_result.is_ok) {
+        let inst_state = inst_state_result.inner as IInstanceState;
         // sync state with backend
         setHand(inst_state.hand);
         setDealt(inst_state.dealt);
+        setBalance(String(inst_state.credits))
+        setWon(Number(inst_state.last_win))
 
         if (!inst_state.dealt) {
-          setOutcome(inst_state.last_outcome);
-
+          
           if (inst_state.timestamp!== last_timestamp) {
-            
+
+            setOutcome(inst_state.last_outcome);
             let this_outcome = inst_state.last_outcome;
             if (this_outcome == 'Undefined') return
             let id = 'win'
@@ -65,13 +72,13 @@ function VideoPoker() {
           }
 
         };
-        let won_curr = currency_str(inst_state.last_win, "uscrt");
-        setWon(`${won_curr[0]} ${won_curr[1]}`);
 
-      } else if (ERR_UNAUTHORISED.test(inst_state_result[0])){
+        setWon(inst_state.last_win);
+
+      } else if (ERR_UNAUTHORISED.test(inst_state_result.inner as string)){
         setNeedVk(true);
       } else {
-        console.log(inst_state_result[0]);
+        console.log(inst_state_result.inner);
       }
 
     }
@@ -79,8 +86,8 @@ function VideoPoker() {
     do_query();
 
     // check state every 7 seconds
-    const id = setInterval(do_query, 7000);
-    return () => clearInterval(id);
+    //const id = setInterval(do_query, 7000);
+    //return () => clearInterval(id);
   },[dealt, outcome]);
 
 
@@ -91,12 +98,11 @@ function VideoPoker() {
     className={`w-screen h-screen relative p-10 bg-blue-800 ${dark?'invert':''}`}>
 
       <audio id="bet" className="display-none" src={`/audio/bet.wav`}/>
-      <audio id="dealordraw" className="display-none" src={`/audio/dealordraw.wav`}/>
+      <audio id="dealordraw" className="display-none" src={`/audio/dealordraw2.wav`}/>
       <audio id="win" className="display-none" src={`/audio/win.wav`}/>
       <audio id="lose" className="display-none" src={`/audio/lose.wav`}/>
       <audio id="select" className="display-none" src={`/audio/select.wav`}/>
-
-
+      
       <div className='w-full h-full relative bg-blue-700'>
 
         <BettingTable
@@ -111,12 +117,12 @@ function VideoPoker() {
         </div>
 
         <div className='p-2 text-lg bg-white w-fit inline text-black rounded-r-2xl'>
-          {dealt ? '...' : (parseInt(won) == 0 ? 'You lost!':`You won: ${won}`) }
+          {dealt ? '...' : (won == 0 ? 'You lost!':`You won: ${won}`) }
         </div>
 
         <div className='p-2 float-right text-lg inline bg-white text-black rounded-l-2xl'>
-          <div>Credit: {user_bal}</div>
-          <div>position: <span className={pvp.pos_this_session < 0 ? 'text-red-600':'text-green-600'}>{pvp.pos_this_session}</span></div>
+          <div>Credits: {user_bal}</div>
+          <div>position: <span className={dcasino.pos_this_session < 0 ? 'text-red-600':'text-green-600'}>{dcasino.pos_this_session}</span></div>
         </div>
 
         <div className='w-2/3 h-60 left-0 right-0 m-auto py-2'>
@@ -129,11 +135,8 @@ function VideoPoker() {
             dark={dark}/>
         </div>
 
-
-
-
           <Controls 
-            bet={bet} 
+            bet={bet}
             setBet={setBet} 
             dealt={dealt} 
             setDealt={setDealt} 
@@ -146,6 +149,7 @@ function VideoPoker() {
       </div>
       
 
+      <Link className='top-2 right-2 absolute hover:invert' href="/">{home}</Link>
     </motion.div>
   )
 }

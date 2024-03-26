@@ -1,7 +1,7 @@
 *.env
-**/backend/target
-**/backend/Cargo.lock
-**/backend/contract*
+**/backends/**/target
+**/backends/**/Cargo.lock
+**/backends/**/contract*
 contract_history.ts*
 contract_info.ts*
 deploy.yml*

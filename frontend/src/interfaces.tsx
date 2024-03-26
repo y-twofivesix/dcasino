@@ -1,18 +1,24 @@
+export interface Result<T> {
+    inner: T,
+    is_ok: boolean
+  }
+
 /******************************************************************************
 Selection Interface
 ******************************************************************************/
 
-export interface InstanceState {
-    hand : number[];
-    dealt : boolean;
-    bet : number;
+export interface IInstanceState {
+    hand : number[]
+    dealt : boolean
+    bet : number
     last_outcome : string
-    last_win : string
+    last_win : number
     timestamp: number
+    credits: number
 
 }
 
-export function isInstanceState(object : any) : boolean {
+export function isInstanceState(object : any) : object is IInstanceState {
     return !(object instanceof String) &&
     typeof(object) !== "string" &&
     'hand' in object &&
@@ -20,7 +26,8 @@ export function isInstanceState(object : any) : boolean {
     'bet' in object &&
     'last_outcome' in object &&
     'last_win' in object &&
-    'timestamp' in object
+    'timestamp' in object &&
+    'credits' in object
 
 }
 
@@ -37,3 +44,16 @@ export function isAliasInfo(object: any): object is IAliasInfo {
     typeof(object) !== "string" &&
     'alias_of' in object
 }
+
+export interface IUser{
+    kyc_validated: boolean,
+    credits : number
+} 
+
+export function isUser(object: any): object is IAliasInfo {
+    return !(object instanceof String) &&
+    typeof(object) !== "string" &&
+    'kyc_validated' in object &&
+    'credits' in object
+}
+

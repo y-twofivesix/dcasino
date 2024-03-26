@@ -1,6 +1,6 @@
 "use client";
 
-import { pvp } from "@/generated/constants";
+import { dcasino } from "@/generated/constants";
 import { green, } from "@/src/helpers";
 import Link from "next/link";
 
@@ -32,11 +32,11 @@ function Footer() {
             </div>
 
             <div className="table-row text-bold select-none">
-              <div className="table-cell text-center px-2">Version: {pvp.PVP_VERSION}</div>
+              <div className="table-cell text-center px-2">Version: {dcasino.DCASINO_VERSION}</div>
             </div>
 
             <div className="table-row text-bold select-none">
-              <div className="table-cell text-center px-2">Contract: {pvp.CONTRACT_ADDRESS}</div>
+              <div className="table-cell text-center px-2">Contract: {dcasino.DCASINO_CONTRACT_ADDRESS}</div>
             </div>
 
 
@@ -58,7 +58,7 @@ function Footer() {
 
       </div>
 
-      <div className={`grid text-white p-2 bg-black w-screen place-items-center`}>© PVP 2023. All Rights Reserved.</div>
+      <div className={`grid text-white p-2 bg-black w-screen place-items-center`}>© dcasino 2023. All Rights Reserved.</div>
     </div>
 
 

@@ -1,4 +1,4 @@
-import { pvp } from '@/generated/constants'
+import { dcasino } from '@/generated/constants'
 import { swal_error } from '@/src/helpers'
 import { send_tx } from '@/src/transactions'
 import React, { useCallback } from 'react'
@@ -20,7 +20,7 @@ interface ControlsProps {
 function Controls( props : ControlsProps) {
 
     const handleSetVk = async () => {
-        props.setNeedVk(!(await pvp.generate_vk()));
+        props.setNeedVk(!(await dcasino.generate_vk()));
     }
 
     function play(id: string) {
@@ -32,48 +32,48 @@ function Controls( props : ControlsProps) {
     const handleDeal = async () => {
         play('dealordraw');
         let tx = await send_tx(
-            pvp.code_hash, 
-            { deal : { bet: props.bet}},
-            [{ amount: String(props.bet * 1_000_000), denom: 'uscrt' }], 66_000);
+            dcasino.VIDEO_POKER_CONTRACT_ADDRESS,
+            dcasino.video_poker_code_hash, 
+            { deal : { 
+                        bet: props.bet, 
+                        sender_key: dcasino.viewing_key,
+                        hash: dcasino.dcasino_code_hash,
+                        contract: dcasino.DCASINO_CONTRACT_ADDRESS
+                     }
+            },
+            [{ amount: String(props.bet * 1_000_000), denom: 'uscrt' }], 150_000);
 
         if (typeof tx === 'string') {
-
             swal_error (tx);
             return;
         }
+
         props.setDealt(true);
         props.setHeld(new Set<number>([]));
-        props.setOutcome('-');
+        props.setOutcome('Undefined');
         props.setUpdated('dealt');
-        pvp.update_position(-props.bet);
+        dcasino.update_position(-props.bet);
     }
 
     const handleDraw = async () => {
         play('dealordraw');
         let tx = await send_tx(
-            pvp.code_hash, 
+            dcasino.VIDEO_POKER_CONTRACT_ADDRESS,
+            dcasino.video_poker_code_hash, 
             { draw : { held: Array.from(props.held) }},
-            [], 66_000);
+            [], 150_000);
 
         if (typeof tx === 'string') {
 
             swal_error (tx);
             return;
         }
+
         props.setDealt(false);
         props.setUpdated('drawn');
         let tx_arr_log = tx.arrayLog;
-        if ( 
-            tx_arr_log && tx_arr_log[0].key =='receiver' &&
-            tx_arr_log[0].value == pvp.granter.address &&
-            tx_arr_log[1].key == 'amount'
-            ) {
-                let coins_won = stringToCoin(tx_arr_log[1].value);
-                if (coins_won.denom == 'uscrt') {
-                    let pos_update = parseInt(coins_won.amount) / 1e6;
-                    pvp.update_position(pos_update);
-                }
-
+        if ( tx_arr_log && tx_arr_log[7] && tx_arr_log[7].key =='credits' ) {
+            dcasino.update_position(Number(tx_arr_log[7].value));
         }
 
     }
@@ -96,9 +96,9 @@ function Controls( props : ControlsProps) {
         onClick={_ => { 
             if (!props.dealt && props.bet>1)  {
                 props.setBet(props.bet-1);
+                props.setOutcome('Undefined');
                 play('bet')
             }
-            
         }
         } 
         className={`${props.dealt || props.bet==1  ?'opacity-50':''} float-left bg-neutral-800 p-4 hover:bg-red-800 select-none`}>
@@ -114,6 +114,7 @@ function Controls( props : ControlsProps) {
         onClick={_ => { 
             if (!props.dealt && props.bet<5)  {
                 props.setBet(props.bet+1);
+                props.setOutcome('Undefined');
                 play('bet');
             } 
         }} 

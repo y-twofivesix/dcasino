@@ -13,8 +13,8 @@ pub struct Instance {
     pub dealt: bool,
     pub bet: u8,
     pub last_outcome: String,
-    pub last_win: String,
-    pub timestamp: Timestamp
+    pub last_win: u64,
+    pub timestamp: Timestamp,
 }
 
 #[derive(Debug)]
@@ -30,7 +30,6 @@ pub enum Outcome {
     FourOfAKind,
     StraightFlush,
     RoyalFlush,
-
 }
 
 impl Outcome {
@@ -166,7 +165,6 @@ impl Instance {
         self.hand.iter().filter(|&n| translate_card(*n).1 == 0 /*Ace*/).count() == 2
     }
 
-    // TODO need to find two SEPERATE PAIRS
     fn is_two_pair (&self) -> bool {
 
         // count first 4 since there are 5 (n-1)
@@ -302,7 +300,6 @@ impl Instance {
 
 #[cfg(test)]
 mod test_instance {
-    // TODO
 
     use super::*;
 
@@ -314,9 +311,8 @@ mod test_instance {
             rng: Pcg64::from_seed([0u8; 32]),
             bet: 1,
             last_outcome: format!("{:?}", Outcome::Undefined),
-            last_win: "0".to_string(),
-            timestamp: Timestamp::from_seconds(0)
-
+            last_win: 0,
+            timestamp: Timestamp::from_seconds(0),
         }
     }
 
@@ -378,7 +374,6 @@ mod test_instance {
     # [test]
     fn test_identify_four_of_a_kind() {
 
-
         let mut inst = mock_inst();
 
         // 4 5s
@@ -395,7 +390,6 @@ mod test_instance {
         inst.hand = vec![3, 42, 16, 2, 29];
         inst.dealt = true;
         assert_eq!(inst.draw(&inst.hand.clone()).unwrap(), Outcome::FourOfAKind.value()); 
-
 
     }
 

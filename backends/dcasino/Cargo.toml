@@ -1,6 +1,6 @@
 [package]
-name = "dcasino-videopoker-backend"
-version = "0.1.0-beta"
+name = "dcasino-backend"
+version = "0.3.8-beta"
 authors = [ "YAESHA256 (AART)",]
 edition = "2021"
 exclude = [ "contract.wasm", "hash.txt",]

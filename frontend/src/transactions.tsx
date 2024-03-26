@@ -1,15 +1,16 @@
 
 import { TxResponse, Coin, MsgExecuteContract } from "secretjs";
-import { pvp } from "../generated/constants";
+import { dcasino } from "../generated/constants";
 
 export async function send_tx (
-  contractCodeHash: string, 
+  contract_address: string,
+  code_hash: string, 
   msg: object, 
   sent: Coin[] = [],
   gas: number = 50_000,
-  cli = pvp.granter): Promise<TxResponse | string> {
+  cli = dcasino.granter): Promise<TxResponse | string> {
 
-  if (!pvp.granter) {
+  if (!dcasino.granter) {
     let msg = 'Failed to get Secret Client';
     console.error(msg);
     return msg;
@@ -19,15 +20,15 @@ export async function send_tx (
   let tx_resp = await  cli.tx.compute.executeContract(
     {
       sender: cli.address,
-      contract_address: pvp.CONTRACT_ADDRESS,
-      code_hash: contractCodeHash,
+      contract_address: contract_address,
+      code_hash: code_hash,
       msg: msg,
       sent_funds: sent,
     },
 
     {
       gasLimit: gas,
-      feeGranter: (cli.address != pvp.granter.address) ? pvp.granter.address : undefined,
+      feeGranter: (cli.address != dcasino.granter.address) ? dcasino.granter.address : undefined,
     }
 
   ).catch(e => {

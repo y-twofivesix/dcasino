@@ -9,23 +9,27 @@ import { MsgExecuteContract, MsgGrantAllowance, SecretNetworkClient, TxResponse,
 import { random_string, swal_confirm, swal_error } from "@/src/helpers";
 import { send_tx } from "@/src/transactions";
 
-export class Pvp {
+export class Dcasino {
 
   /// BEGIN AUTOGEN METADATA 
-  declare PVP_VERSION : string;
-  declare CONTRACT_ADDRESS  : string;
-  declare CODE_ID           : number;
+  declare DCCASINO_VERSION : string;
+  declare DCASINO_CONTRACT_ADDRESS  : string;
+  declare DCASINO_CODE_ID           : number;
+  declare VIDEO_POKER_CONTRACT_ADDRESS  : string;
+  declare VIDEO_POKER_CODE_ID           : number;
   declare CHAIN_ID          : string;
   declare LCD_URL           : string;
   /// END AUTOGEN
 
   cli         : SecretNetworkClient = {} as SecretNetworkClient;
   granter     : SecretNetworkClient = {} as SecretNetworkClient;
-  code_hash   : string      = '';
+  dcasino_code_hash   : string      = '';
   ready        : boolean = false;
   enable_alias : boolean = false;
   viewing_key         : string      = '';
   pos_this_session : number = 0;
+  video_poker_code_hash   : string      = '';
+
 
   constructor () {};
 
@@ -49,13 +53,20 @@ export class Pvp {
 
   set_viewing_key( vk : string) {
     this.viewing_key = vk;
-    window.localStorage.setItem('pvp_viewing_key', pvp.viewing_key);
+    window.localStorage.setItem('pvp_viewing_key', dcasino.viewing_key);
   }
 
   async set_code_hash( querier : SecretNetworkClient | null = null) {
 
     let cli = querier ? querier : this.cli;
-    this.code_hash = (await cli?.query.compute.codeHashByCodeId({code_id: String(this.CODE_ID)})
+    this.dcasino_code_hash = (await cli?.query.compute.codeHashByCodeId({code_id: String(this.DCASINO_CODE_ID)})
+    .catch(async (e: any) => { 
+        console.log(`failed to get code hash:\n${JSON.stringify(e)}`);
+      return ""
+    }) as QueryCodeHashResponse).code_hash as string;
+
+
+    this.video_poker_code_hash = (await cli?.query.compute.codeHashByCodeId({code_id: String(this.VIDEO_POKER_CODE_ID)})
     .catch(async (e: any) => { 
         console.log(`failed to get code hash:\n${JSON.stringify(e)}`);
       return ""
@@ -71,9 +82,11 @@ export class Pvp {
     
     let entropy = random_string();
 
-    let set_vk_result = await send_tx(this.code_hash as string,
+    let set_vk_result = await send_tx(
+      this.DCASINO_CONTRACT_ADDRESS,
+      this.dcasino_code_hash as string,
       {set_viewing_key: { key: entropy }}, 
-      [], 55_000, (pvp.enable_alias? pvp.cli: pvp.granter)) as TxResponse;
+      [], 55_000, (dcasino.enable_alias? dcasino.cli: dcasino.granter)) as TxResponse;
     
     if (set_vk_result.arrayLog) {
       this.viewing_key = set_vk_result.arrayLog[6].value;
@@ -82,7 +95,7 @@ export class Pvp {
       return false;
     }
 
-    window.localStorage.setItem('pvp_viewing_key', pvp.viewing_key);
+    window.localStorage.setItem('pvp_viewing_key', dcasino.viewing_key);
 
     return true
   }
@@ -92,7 +105,7 @@ export class Pvp {
     const newWallet = new Wallet();
 
     const grantee = new SecretNetworkClient({
-      url: pvp.LCD_URL,
+      url: dcasino.LCD_URL,
       chainId: this.CHAIN_ID,
       wallet: newWallet,
       walletAddress: newWallet.address,
@@ -110,8 +123,8 @@ export class Pvp {
     const set_alias_msg = new MsgExecuteContract (
       {
         sender: this.granter.address,
-        contract_address: pvp.CONTRACT_ADDRESS,
-        code_hash: pvp.code_hash,
+        contract_address: dcasino.DCASINO_CONTRACT_ADDRESS,
+        code_hash: dcasino.dcasino_code_hash,
         msg: {set_alias: {alias: grantee.address } },
         sent_funds: [],
       },
@@ -130,11 +143,11 @@ export class Pvp {
       return !await swal_confirm("try again?")
     }
 
-    pvp.set_cli(grantee);
+    dcasino.set_cli(grantee);
     window.localStorage.setItem('pvp_alias_cli_mnem', newWallet.mnemonic);
     return true;
 
     }
   }
 
-export var pvp = new Pvp();
+export var dcasino = new Dcasino();
