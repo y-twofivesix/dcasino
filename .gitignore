@@ -25,6 +25,8 @@ build_contract.sh*
 /.vscode
 **/__pycache__
 .DS_Store*
+add_child_contract.ts
+set_parent_contract.ts
 
 **/frontend/gen_scripts/__pycache__
 **/backend/gen_scripts/__pycache__
