@@ -509,3 +509,28 @@ html, body {
   left: 45%;
   transform: rotate(45deg);
 }
+
+.screen_overlay {
+  background-image: radial-gradient(transparent 80%, black);
+}
+
+.scan-bar {
+  animation: scan 10s infinite;
+}
+.scan {
+  height: 15px;
+  width: 100%;
+  background-color:  blue;
+}
+
+@keyframes scan {
+  0% {
+    transform: translateY(0%);
+  }
+
+  20%, 100% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  
+}

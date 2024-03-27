@@ -54,8 +54,8 @@ function Hand(props : HandProps) {
               width="0"
               height="0"
               sizes="100vw"
-              className={`${props.dark?'invert':''} w-fit h-[250px] select-none left-0 right-0 m-auto p-2`}
-              alt='hand4'
+              className={`${props.dark?'invert':''} w-fit h-auto select-none left-0 right-0 m-auto p-2`}
+              alt='hand'
               //src={`/deck2/as.svg`}
               src={`/deck2/${numberToImg(card)}.png`}
               />

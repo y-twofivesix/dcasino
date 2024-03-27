@@ -90,66 +90,76 @@ function VideoPoker() {
     //return () => clearInterval(id);
   },[dealt, outcome]);
 
+  let screen =  <div className='w-full h-full bg-blue-700 absolute p-6'>
 
+  <BettingTable
+  dealt={dealt}
+  bet={bet}
+  outcome={outcome}/>
+
+  <div className={
+    `p-1 text-xl text-center text-white left-0 right-0 m-auto
+    ${outcome == 'Lose' || outcome == 'Undefined'? 'bg-red-600': 'bg-green-600' } w-fit text-white`}>
+    {dealt ? 'hold and/or draw': `Result: ${outcome}` }
+  </div>
+
+  <div className='p-2 text-lg bg-white w-fit inline text-black rounded-r-2xl'>
+    {dealt ? '...' : (won == 0 ? 'You lost!':`You won: ${won}`) }
+  </div>
+
+  <div className='p-2 float-right text-lg inline bg-white text-black rounded-l-2xl'>
+    <div>Credits: {user_bal}</div>
+    <div>position: <span className={dcasino.pos_this_session < 0 ? 'text-red-600':'text-green-600'}>{dcasino.pos_this_session}</span></div>
+  </div>
+
+  <div className='w-2/3 left-0 right-0 m-auto py-2'>
+      <Hand 
+      hand={hand}
+      dealt={dealt}
+      held={held}
+      setHeld={setHeld}
+      updated={updated}
+      dark={dark}/>
+  </div>
+
+                
+</div>
 
   return (
     <motion.div 
     exit={{ opacity: 0 }}
-    className={`w-screen h-screen relative p-10 bg-blue-800 ${dark?'invert':''}`}>
+    className={`w-screen h-screen relative p-5 bg-blue-800 ${dark?'invert':''} overflow-hidden`}>
 
       <audio id="bet" className="display-none" src={`/audio/bet.wav`}/>
       <audio id="dealordraw" className="display-none" src={`/audio/dealordraw2.wav`}/>
       <audio id="win" className="display-none" src={`/audio/win.wav`}/>
       <audio id="lose" className="display-none" src={`/audio/lose.wav`}/>
       <audio id="select" className="display-none" src={`/audio/select.wav`}/>
-      
-      <div className='w-full h-full relative bg-blue-700'>
 
-        <BettingTable
-        dealt={dealt}
-        bet={bet}
-        outcome={outcome}/>
-
-        <div className={
-          `p-1 text-xl text-center text-white left-0 right-0 m-auto
-          ${outcome == 'Lose' || outcome == 'Undefined'? 'bg-red-600': 'bg-green-600' } w-fit text-white`}>
-          {dealt ? 'hold and/or draw': `Result: ${outcome}` }
-        </div>
-
-        <div className='p-2 text-lg bg-white w-fit inline text-black rounded-r-2xl'>
-          {dealt ? '...' : (won == 0 ? 'You lost!':`You won: ${won}`) }
-        </div>
-
-        <div className='p-2 float-right text-lg inline bg-white text-black rounded-l-2xl'>
-          <div>Credits: {user_bal}</div>
-          <div>position: <span className={dcasino.pos_this_session < 0 ? 'text-red-600':'text-green-600'}>{dcasino.pos_this_session}</span></div>
-        </div>
-
-        <div className='w-2/3 h-60 left-0 right-0 m-auto py-2'>
-            <Hand 
-            hand={hand}
-            dealt={dealt}
-            held={held}
-            setHeld={setHeld}
-            updated={updated}
-            dark={dark}/>
-        </div>
-
-          <Controls 
-            bet={bet}
-            setBet={setBet} 
-            dealt={dealt} 
-            setDealt={setDealt} 
-            need_vk={need_vk} 
-            setNeedVk={setNeedVk}
-            held={held}
-            setHeld={setHeld}
-            setOutcome={setOutcome}
-            setUpdated={setUpdated}/>
+      <div id='crt-screen' className='screen m-auto top-10 left-0 right-0 relative w-[60%] h-[85%] relative'>
+        {screen}
+        <div className='screen_overlay w-full h-full absolute pointer-events-none'></div>
+        <div className='scan-bar w-full h-full absolute pointer-events-none'><div className='scan'></div></div>
+        <img className='bezel w-full h-full absolute pointer-events-none' src='/images/bezel.png'/>
+        
       </div>
       
 
-      <Link className='top-2 right-2 absolute hover:invert' href="/">{home}</Link>
+
+
+      <Controls 
+      bet={bet}
+      setBet={setBet} 
+      dealt={dealt} 
+      setDealt={setDealt} 
+      need_vk={need_vk} 
+      setNeedVk={setNeedVk}
+      held={held}
+      setHeld={setHeld}
+      setOutcome={setOutcome}
+      setUpdated={setUpdated}/>
+                
+      <Link className='top-4 right-4 absolute hover:invert' href="/">{home}</Link>
     </motion.div>
   )
 }

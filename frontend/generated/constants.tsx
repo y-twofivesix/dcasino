@@ -28,11 +28,11 @@ export class Dcasino {
 
 DCASINO_VERSION : string                = "0.3.8-dev";                      
 DCASINO_CONTRACT_ADDRESS : string       = "secret16tm8cyy34z3sshxpm2sxqfq9u3cs3fhaaux4zf";     
-DCASINO_CODE_ID : number                =  6149;               
+DCASINO_CODE_ID : number                =  6153;               
 CHAIN_ID : string                       = "pulsar-3";                     
 LCD_URL : string                        = "https://api.pulsar.scrttestnet.com";                      
 VIDEO_POKER_CONTRACT_ADDRESS : string   = "secret1g84w5z02j7zxzzkrzz50sgm76c3e39v4cfvwa3"; 
-VIDEO_POKER_CODE_ID: string             = "6150";          
+VIDEO_POKER_CODE_ID: string             = "6154";          
 
   cli         : SecretNetworkClient = {} as SecretNetworkClient;
   granter     : SecretNetworkClient = {} as SecretNetworkClient;
