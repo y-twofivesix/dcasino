@@ -16,14 +16,14 @@ const CASINO = localFont({
   variable: '--font-casino'
 })
 
-const CASINO_FILLED = localFont({
+const IBM = localFont({
   src: [
     {
-      path: '../public/fonts/casino_filled.ttf',
+      path: '../public/fonts/IBM_MDA.woff',
       weight: '400'
     },
   ],
-  variable: '--font-casino-filled'
+  variable: '--font-ibm'
 })
 
 
@@ -36,7 +36,7 @@ function NoSSRApp({ Component, pageProps }: AppProps) {
     onDragStart={ e => e.preventDefault()}
     onDragEnd={ e => e.preventDefault()}
     onContextMenu={ e=> e.preventDefault()}
-    lang="en" className={`${CASINO.variable} ${CASINO_FILLED.variable}`} >
+    lang="en" className={`${CASINO.variable} ${IBM.variable}`} >
 
     <Head>
       <link rel="shortcut icon" href="/images/logo.png" />

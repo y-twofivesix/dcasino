@@ -32,7 +32,7 @@ function BettingTable( props : IBettingTableProps) {
 
 
   return (
-    <div className='p-8'>
+    <div className='p-1'>
         
         <div className={`table w-full text-lg rounded-lg p-2`}>
 

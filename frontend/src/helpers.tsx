@@ -108,6 +108,14 @@ export function currency_str(amount : string, denom : string) : [string, string]
   return [amount_str, denom]
 }
 
+export function red(text : string) {
+  return (<p className="inline text-red-600 font-ibm">{text}</p>)
+}
+
+export function normal(text : string) {
+  return (<p className="inline font-ibm">{text}</p>)
+}
+
 export const init_metamask = async (): Promise<SecretNetworkClient| null> => {
 
   let metamask = null;

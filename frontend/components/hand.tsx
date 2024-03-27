@@ -61,9 +61,9 @@ function Hand(props : HandProps) {
               />
 
               <div className={`
-              text-center w-full p-2 text-neutral-800 ${props.dealt? '':'hidden'}
+              text-center w-full p-1 text-neutral-800 ${props.dealt? '':'hidden'}
               ${hold ? 'bg-neutral-300' :''} `}>
-                {hold ? 'held!' : 'click to hold'}
+                {hold ? 'held!' : 'hold?'}
               </div>
           </div>
           )

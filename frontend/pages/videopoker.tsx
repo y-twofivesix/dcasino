@@ -6,13 +6,12 @@ import { balance, vp_instance_state } from '@/src/queries';
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation';
 import { ERR_UNAUTHORISED, dcasino } from '@/generated/constants';
-import { currency_str, swal_alert } from '@/src/helpers';
+import { currency_str, normal, red, swal_alert } from '@/src/helpers';
 import { motion } from 'framer-motion';
 import { faHome } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Link from 'next/link';
 
-const home = <FontAwesomeIcon color='black' icon={faHome} />
 
 
 function VideoPoker() {
@@ -92,27 +91,31 @@ function VideoPoker() {
 
   let screen =  <div className='w-full h-full bg-blue-700 absolute p-6'>
 
+    <div className='pt-5 text-white text-center'> {red('\u2665')} Video Poker  {normal('\u2660')} </div>
   <BettingTable
   dealt={dealt}
   bet={bet}
   outcome={outcome}/>
 
-  <div className={
-    `p-1 text-xl text-center text-white left-0 right-0 m-auto
-    ${outcome == 'Lose' || outcome == 'Undefined'? 'bg-red-600': 'bg-green-600' } w-fit text-white`}>
-    {dealt ? 'hold and/or draw': `Result: ${outcome}` }
+  <div className='relative w-full h-20'>
+
+    <div className='absolute left-0 p-1 text-lg bg-white w-fit inline text-black rounded-r-2xl'>
+      {dealt ? '...' : (won == 0 ? 'You lost!':`You won: ${won}`) }
+    </div>
+
+    <div className={
+      `p-1 text-xl text-center text-white left-0 right-0 m-auto absolute
+      ${outcome == 'Lose' || outcome == 'Undefined'? 'bg-red-600': 'bg-green-600' } w-fit text-white`}>
+      {dealt ? 'hold and/or draw': `Result: ${outcome}` }
+    </div>
+
+    <div className='p-1 absolute right-0 text-lg inline bg-white text-black rounded-l-2xl'>
+      <div>Credits: {user_bal}</div>
+      <div>position: <span className={dcasino.pos_this_session < 0 ? 'text-red-600':'text-green-600'}>{dcasino.pos_this_session}</span></div>
+    </div>
   </div>
 
-  <div className='p-2 text-lg bg-white w-fit inline text-black rounded-r-2xl'>
-    {dealt ? '...' : (won == 0 ? 'You lost!':`You won: ${won}`) }
-  </div>
-
-  <div className='p-2 float-right text-lg inline bg-white text-black rounded-l-2xl'>
-    <div>Credits: {user_bal}</div>
-    <div>position: <span className={dcasino.pos_this_session < 0 ? 'text-red-600':'text-green-600'}>{dcasino.pos_this_session}</span></div>
-  </div>
-
-  <div className='w-2/3 left-0 right-0 m-auto py-2'>
+  <div className='relative w-2/3 h-fit left-0 right-0 m-auto py-2'>
       <Hand 
       hand={hand}
       dealt={dealt}
@@ -136,17 +139,15 @@ function VideoPoker() {
       <audio id="lose" className="display-none" src={`/audio/lose.wav`}/>
       <audio id="select" className="display-none" src={`/audio/select.wav`}/>
 
-      <div id='crt-screen' className='screen m-auto top-10 left-0 right-0 relative w-[60%] h-[85%] relative'>
+      <div id='crt-screen' className='screen m-auto top-10 left-0 right-0 relative w-[65%] h-[90%] max-h-[750px] max-w-[1000px] relative font-ibm text-2xl'>
         {screen}
-        <div className='screen_overlay w-full h-full absolute pointer-events-none'></div>
+        <div className='screen_overlay w-full h-full absolute pointer-events-none backdrop-blur-[1.25px]'></div>
         <div className='scan-bar w-full h-full absolute pointer-events-none'><div className='scan'></div></div>
         <img className='bezel w-full h-full absolute pointer-events-none' src='/images/bezel.png'/>
-        
       </div>
-      
 
 
-
+    
       <Controls 
       bet={bet}
       setBet={setBet} 
@@ -159,7 +160,6 @@ function VideoPoker() {
       setOutcome={setOutcome}
       setUpdated={setUpdated}/>
                 
-      <Link className='top-4 right-4 absolute hover:invert' href="/">{home}</Link>
     </motion.div>
   )
 }

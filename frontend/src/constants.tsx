@@ -8,6 +8,7 @@ import { QueryCodeHashResponse } from "secretjs/src/grpc_gateway/secret/compute/
 import { MsgExecuteContract, MsgGrantAllowance, SecretNetworkClient, TxResponse, Wallet, stringToCoins } from "secretjs";
 import { random_string, swal_confirm, swal_error } from "@/src/helpers";
 import { send_tx } from "@/src/transactions";
+import { IUser } from "@/src/interfaces";
 
 export class Dcasino {
 
@@ -26,9 +27,11 @@ export class Dcasino {
   dcasino_code_hash   : string      = '';
   ready        : boolean = false;
   enable_alias : boolean = false;
+  vk_valid : boolean = false;
   viewing_key         : string      = '';
   pos_this_session : number = 0;
   video_poker_code_hash   : string      = '';
+  user_info : IUser | undefined = undefined;
 
 
   constructor () {};
