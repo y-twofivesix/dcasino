@@ -57,3 +57,12 @@ export function isUser(object: any): object is IAliasInfo {
     'credits' in object
 }
 
+export interface IAliasMnem{
+    mnem : String,
+} 
+
+export function isAliasMnem(object: any): object is IAliasMnem {
+    return !(object instanceof String) &&
+    typeof(object) !== "string" &&
+    'mnem' in object
+}

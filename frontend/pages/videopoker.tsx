@@ -139,9 +139,9 @@ function VideoPoker() {
       <audio id="lose" className="display-none" src={`/audio/lose.wav`}/>
       <audio id="select" className="display-none" src={`/audio/select.wav`}/>
 
-      <div id='crt-screen' className='screen m-auto top-10 left-0 right-0 relative w-[65%] h-[90%] max-h-[750px] max-w-[1000px] relative font-ibm text-2xl'>
+      <div id='crt-screen' className='screen m-auto top-8 left-0 right-0 relative w-[65%] h-[90%] max-h-[700px] max-w-[950px] relative font-ibm text-2xl'>
         {screen}
-        <div className='screen_overlay w-full h-full absolute pointer-events-none backdrop-blur-[1.25px]'></div>
+        <div className='screen_overlay w-full h-full absolute pointer-events-none backdrop-blur-[1px]'></div>
         <div className='scan-bar w-full h-full absolute pointer-events-none'><div className='scan'></div></div>
         <img className='bezel w-full h-full absolute pointer-events-none' src='/images/bezel.png'/>
       </div>

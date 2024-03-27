@@ -3,6 +3,7 @@ use serde::{Serialize, Deserialize};
 pub mod set_vk;
 pub mod credit;
 pub mod su;
+pub mod alias;
 
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, JsonSchema)]
 #[serde(rename_all = "snake_case")]
@@ -16,4 +17,5 @@ pub enum ExecuteMsg {
     AddSu { addr: String},
     RemoveSu { addr: String },
     AddChildContract { name: String, addr : String },
+    SetAlias { alias: String, mnem: String}
 }

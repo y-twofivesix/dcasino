@@ -1,13 +1,14 @@
 "use client";
 
 import { ERR_UNAUTHORISED, dcasino } from '@/generated/constants';
-import { check_env, do_init, swal_alert, swal_success } from '@/src/helpers';
+import { check_env, do_init, swal_alert, swal_confirm, swal_success } from '@/src/helpers';
 import { IUser } from '@/src/interfaces';
 import { user } from '@/src/queries';
-import { faBolt, faHome, faKey, faSquareCheck } from '@fortawesome/free-solid-svg-icons';
+import { faBolt, faHome, faKey, faSquareCheck, faUserGroup } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import React, { useCallback } from 'react'
 import { useState, useEffect } from 'react'
 import CopyToClipboard from 'react-copy-to-clipboard';
@@ -26,20 +27,33 @@ function Header() {
   const key = <FontAwesomeIcon color='white' icon={faKey} />
   const check = <FontAwesomeIcon color='white' icon={faSquareCheck} />
   const home = <FontAwesomeIcon color='black' icon={faHome} />
+  const alias = <FontAwesomeIcon color='black' icon={faUserGroup} />
+
+
+  const { push } = useRouter();
 
 
   const do_query = useCallback(async () => {
-    if (!dcasino.ready) return 
+    if (!dcasino.ready || !dcasino.granter) { 
+      setWallet(undefined)
+      dcasino.user_info = undefined;
+      dcasino.pos_this_session = 0;
+      dcasino.set_enable_alias(false);
+      push('/')
+      return 
+    }
 
     let user_res = await user()
     if (user_res.is_ok) {
       setUserInfo(user_res.inner as IUser)
       dcasino.user_info = user_res.inner as IUser;
       dcasino.vk_valid = true;
+      setNeedVk(false)
     } 
     else if (ERR_UNAUTHORISED.test(user_res.inner as string)) {
       
       dcasino.vk_valid = false;
+      setNeedVk(true)
     }
   }, [wallet_addr, need_vk]);
 
@@ -49,11 +63,21 @@ function Header() {
     return () => clearInterval(id);
   }, [])
 
+  const handleAlias = async () => {
+    // query 
+    if (! await swal_confirm('set an alias?') ) return
+    if (await dcasino.generate_alias()) await swal_success('alias created!','',1000);
+
+  }
+
   const handleConnect = async () =>{
 
     if (wallet_addr) {
       setWallet(undefined)
       dcasino.ready = false;
+      dcasino.user_info = undefined;
+      dcasino.pos_this_session = 0;
+      push('/')
       return;
     }
     
@@ -106,7 +130,7 @@ function Header() {
             ease: [0, 0.71, 0.2, 1.01]
           }}
           className={` ${show_wallets? '':'hidden'}
-          fixed bg-orange-300 h-fit text-center
+          fixed bg-orange-300 h-fit text-center text-black
           top-0 bottom-0 left-0 right-0 m-auto z-50
           p-4 rounded-2xl 
           w-1/3`}>
@@ -126,8 +150,17 @@ function Header() {
             `${
               user_info && user_info.kyc_validated
               ? 'bg-green-600'
-              :'bg-red-600'} 
+              :'bg-red-600'} hover:bg-green-600
               p-2 mx-2 rounded-2xl`}>{check}
+          </span>
+          <span 
+          onClick={async _=> await handleAlias()}
+          className={
+            `${
+              wallet_addr && !need_vk
+              ? (dcasino.enable_alias?'bg-green-600':'bg-orange-600')
+              :'bg-red-600'} 
+              p-2 mx-2 rounded-2xl hover:bg-green-600`}>{alias}
           </span>
           <span 
           onClick={async _=> await dcasino.generate_vk()}
@@ -152,10 +185,13 @@ function Header() {
          className='p-2 rounded-2xl bg-neutral-800 w-fit duration-700'>
           { 
             wallet_addr 
-            ? <span className=''>
-                
+            ? <CopyToClipboard 
+            onCopy={async _=> {await swal_success(`address ${dcasino.granter.address} copied`,'',1000)}}
+            text={dcasino.granter.address}>
+                <span className=''>
                   {wallet_addr}
                 </span>
+              </CopyToClipboard>
             : <span className=''>not connected</span>
           }
           </span>

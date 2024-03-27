@@ -1,6 +1,6 @@
 use cosmwasm_std::{ to_binary, DepsMut, Env, MessageInfo, Response, StdError, StdResult, WasmMsg};
 
-use crate::{generated::state::{CONFIG, INSTANCES}, helpers::try_option};
+use crate::{generated::state::{CONFIG, INSTANCES}, helpers::try_option, query::alias::query_alias_of};
 
 use super::ContractMsg;
 
@@ -9,10 +9,16 @@ pub fn execute_draw(
     deps : DepsMut,
     env  : Env, 
     info : MessageInfo,
-    held : Vec<u8>) -> StdResult<Response> {
+    held : Vec<u8>,
+    sender_key: String,
+    as_alias: bool) -> StdResult<Response> {
         
-        let sender_addr = info.sender.to_string();
-        let mut inst = try_option(INSTANCES.get(deps.storage, &info.sender.to_string()))?;
+        let sender_addr = match as_alias {
+            false => info.sender.to_string(),
+            true => query_alias_of(deps.storage, &deps.querier, info.sender.to_string(), sender_key)?.alias_of
+        };
+        
+        let mut inst = try_option(INSTANCES.get(deps.storage, &sender_addr))?;
         if !inst.dealt { return Err(StdError::generic_err("Not yet dealt!")) }
 
         // reset dealt flag so that after draw result can play again.
@@ -43,6 +49,6 @@ pub fn execute_draw(
         }
 
         inst.last_win = 0;
-        INSTANCES.insert(deps.storage, &info.sender.to_string(), &inst)?;
+        INSTANCES.insert(deps.storage, &sender_addr, &inst)?;
         Ok(Response::new())
     }

@@ -1,6 +1,5 @@
 "use client";
 
-import { AnimatePresence } from "framer-motion";
 import Footer from "./footer";
 import Header from "./header";
 

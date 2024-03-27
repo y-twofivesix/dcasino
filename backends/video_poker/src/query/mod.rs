@@ -1,9 +1,10 @@
 pub mod instance_state;
+pub mod alias;
 use cosmwasm_std::{QuerierWrapper, StdResult, Storage, Timestamp};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-use crate::generated::state::VIEWING_KEYS;
+use crate::generated::state::Config;
 
 
 /******************************************************************************
@@ -14,6 +15,13 @@ use crate::generated::state::VIEWING_KEYS;
 pub struct AliasOf {
     pub alias_of: String,
 }
+
+#[derive(Serialize, Deserialize, Clone, Debug, JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub struct AliasMnem {
+    pub mnem: String,
+}
+
 
 #[derive(Serialize, Deserialize, Clone, Debug, JsonSchema)]
 #[serde(rename_all = "snake_case")]
@@ -37,22 +45,36 @@ pub struct InstanceState {
 }
 
 pub fn contract_query_user(
+    store: & dyn Storage,
     querier: &QuerierWrapper, 
-    sender_addr: &String, 
-    sender_key: &String,
-    hash: &String,
-    contract: &String)->
+    sender_addr: String, 
+    sender_key: String)->
 StdResult<User> {
+
+    let config = Config::load(store)?;
     querier.query_wasm_smart::<User>(
-        hash, 
-        contract, 
-        &QueryMsg::User { sender_key: sender_key.clone(), sender_addr: sender_addr.clone() }
+        config.parent_hash, 
+        config.parent_contract, 
+        &ParentQueryMsg::User { sender_key, sender_addr }
     )
 }
 
-pub fn querier_is_auth(store: &dyn Storage, sender_addr: &String, sender_key: &String) -> bool {
-    // TODO query dcasino smart contract viewing keys
-    VIEWING_KEYS.get(store, sender_addr) == Some(sender_key.to_owned())
+#[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, JsonSchema)]
+#[serde(rename_all = "snake_case")]
+enum ParentQueryMsg {
+    User {
+    sender_addr: String,
+    sender_key: String,
+    },
+   AliasOf { 
+    sender_addr : String,
+    sender_key: String,
+    },
+   AliasMnem {
+    sender_addr: String,
+    sender_key: String,
+    },
+
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, JsonSchema)]
@@ -65,12 +87,6 @@ pub enum QueryMsg {
     InstanceState{
         sender_addr: String,
         sender_key: String,
-        hash: String,
-        contract: String
     },
 
-    User {
-        sender_addr: String,
-        sender_key: String,
-    }
 }

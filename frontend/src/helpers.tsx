@@ -1,7 +1,8 @@
-import { SecretNetworkClient, MetaMaskWallet } from 'secretjs';
+import { SecretNetworkClient, MetaMaskWallet, TxResponse, MsgExecuteContract, Msg, Wallet } from 'secretjs';
 import { QueryBalanceResponse } from 'secretjs/dist/extensions/snip1155/msg/getBalance';
-import { dcasino } from '@/generated/constants';
+import { ERR_UNAUTHORISED, dcasino } from '@/generated/constants';
 import Swal from 'sweetalert2';
+import { alias_mnem_info, alias_of_info, user } from './queries';
 
 
 export function green(text : string) {
@@ -242,6 +243,75 @@ export const init_keplr = async (): Promise<SecretNetworkClient | null> => {
   return secretcli;
 }
 
+const validate_alias = async () : Promise<boolean> => {
+
+  let storage_cli_mnem = window.localStorage.getItem(`dcasino_${dcasino.granter.address}_alias_cli_mnem`);
+  if (storage_cli_mnem) {
+
+    let wallet = new Wallet(storage_cli_mnem); 
+    const local_store_grantee = new SecretNetworkClient({
+      url: dcasino.LCD_URL,
+      chainId: dcasino.CHAIN_ID,
+      wallet: wallet,
+      walletAddress: wallet.address,
+    });
+
+
+    let alias_of = await alias_of_info();
+    if (alias_of.is_ok && alias_of.inner.alias_of == dcasino.granter.address ) {
+      dcasino.set_cli(local_store_grantee);
+      dcasino.set_enable_alias(true);
+      return true;
+    }
+
+    // try to retrieve existing alias of any
+    let alias_mnem = await alias_mnem_info()
+    if (alias_mnem.is_ok) {
+
+      let mnem = alias_mnem.inner.mnem as string;
+      let wallet = new Wallet(mnem); 
+      const server_store_grantee = new SecretNetworkClient({
+        url: dcasino.LCD_URL,
+        chainId: dcasino.CHAIN_ID,
+        wallet: wallet,
+        walletAddress: wallet.address,
+      });
+
+      dcasino.set_cli(server_store_grantee);
+      dcasino.set_enable_alias(true);
+      window.localStorage.setItem(`dcasino_${dcasino.granter.address}_alias_cli_mnem`, mnem);
+
+      return true;
+    }
+    // wipe the old one
+    window.localStorage.removeItem(`dcasino_${dcasino.granter.address}_alias_cli_mnem`);
+    return false;
+
+  } else {
+
+        // try to retrieve existing alias from server
+    let alias_mnem = await alias_mnem_info()
+    if (alias_mnem.is_ok) {
+
+      let mnem = alias_mnem.inner.mnem as string;
+      let wallet = new Wallet(mnem); 
+      const server_store_grantee = new SecretNetworkClient({
+        url: dcasino.LCD_URL,
+        chainId: dcasino.CHAIN_ID,
+        wallet: wallet,
+        walletAddress: wallet.address,
+      });
+
+      dcasino.set_cli(server_store_grantee);
+      dcasino.set_enable_alias(true);
+      window.localStorage.setItem(`dcasino_${dcasino.granter.address}_alias_cli_mnem`, mnem);
+
+      return true;
+    }
+    return false
+  }
+}
+
 
 export const do_init = async (wallet: string) => {
   let secretcli = null;
@@ -270,7 +340,7 @@ export const do_init = async (wallet: string) => {
   }
   
   dcasino.ready = true;
-  document.title = `Black Jack${dcasino.CHAIN_ID.includes('pulsar') ? ' (testnet)' : ''}`
+  document.title = `dCasino${dcasino.CHAIN_ID.includes('pulsar') ? ' (testnet)' : ''}`
 
   return true;
 
@@ -279,7 +349,7 @@ export const do_init = async (wallet: string) => {
 export const check_env = async () => {
 
 
-  let storage_vk = window.localStorage.getItem('pvp_viewing_key');
+  let storage_vk = window.localStorage.getItem(`dcasino_${dcasino.granter.address}_vk`);
 
   if (storage_vk) {
     dcasino.set_viewing_key(storage_vk);
@@ -288,6 +358,8 @@ export const check_env = async () => {
   if (!dcasino.dcasino_code_hash && !dcasino.video_poker_code_hash) {
     await dcasino.set_code_hash();
   }
+
+  await validate_alias();
 
   return storage_vk;
 

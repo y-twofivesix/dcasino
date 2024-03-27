@@ -1,5 +1,5 @@
 
-use cosmwasm_std::{Deps, StdResult};
+use cosmwasm_std::{QuerierWrapper, StdResult, Storage};
 
 use crate::{helpers::try_option, generated::state::INSTANCES};
 
@@ -7,21 +7,19 @@ use super::contract_query_user;
 
 
 pub fn query_instance_state(
-    deps: Deps,
+    store: & dyn Storage,
+    querier: & QuerierWrapper,
     sender_addr: String,
-    sender_key: String,
-    hash: String,
-    contract: String,
+    sender_key: String
 ) -> StdResult<super::InstanceState> {
     
     let user = contract_query_user(
-        &deps.querier, 
-        &sender_addr, 
-        &sender_key,
-        &hash,
-        &contract)?;
+        store,
+        querier, 
+        sender_addr.clone(), 
+        sender_key)?;
 
-    let inst = try_option(INSTANCES.get(deps.storage, &sender_addr))?;
+    let inst = try_option(INSTANCES.get(store, &sender_addr))?;
 
     Ok(super::InstanceState { 
         hand: inst.hand, 

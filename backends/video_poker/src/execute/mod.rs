@@ -22,8 +22,7 @@ pub enum ExecuteMsg {
     Deal {
         bet: u8,
         sender_key: String,
-        hash: String,
-        contract: String
+        as_alias: bool
     },
 
     /******************************************************************************
@@ -31,6 +30,8 @@ pub enum ExecuteMsg {
     *******************************************************************************/
     Draw {
         held: Vec<u8>, // cards to hold
+        sender_key: String,
+        as_alias: bool
     },
 
     /******************************************************************************

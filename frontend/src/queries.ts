@@ -55,3 +55,43 @@ export async function user():  Promise<Result<i.IUser | string>>  {
 
     return { inner: user_info, is_ok: i.isUser(user_info) };
 }
+
+
+export async function alias_of_info(): 
+Promise<Result<i.IAliasInfo>> {
+    
+    let use_cli = dcasino.granter;
+    let alias_of : i.IAliasInfo | any = await use_cli.query.compute.queryContract({
+        contract_address: dcasino.DCASINO_CONTRACT_ADDRESS,
+        code_hash: dcasino.dcasino_code_hash,
+        query: { alias_of : { 
+            sender_addr: use_cli.address, 
+            sender_key: dcasino.viewing_key
+        } },
+    }).catch(async (e) => {
+        console.log(`query alias info failed:${JSON.stringify(e)}`)
+        return {inner: {}, is_ok: false};
+    });
+
+    return { inner: alias_of, is_ok: i.isAliasInfo(alias_of)};
+}
+
+export async function alias_mnem_info(): 
+Promise<Result<i.IAliasMnem>> {
+    
+    let use_cli = dcasino.granter;
+    let alias_mnem : i.IAliasInfo | any = await use_cli.query.compute.queryContract({
+        contract_address: dcasino.DCASINO_CONTRACT_ADDRESS,
+        code_hash: dcasino.dcasino_code_hash,
+        query: { alias_mnem : { 
+            sender_addr: use_cli.address,
+            sender_key: dcasino.viewing_key
+        } },
+    }).catch(async (e) => {
+        console.log(`query alias info failed:${JSON.stringify(e)}`)
+        return {inner: {}, is_ok: false};
+    });
+
+
+    return { inner: alias_mnem, is_ok : i.isAliasMnem(alias_mnem) };
+}

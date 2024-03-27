@@ -56,7 +56,7 @@ export class Dcasino {
 
   set_viewing_key( vk : string) {
     this.viewing_key = vk;
-    window.localStorage.setItem('pvp_viewing_key', dcasino.viewing_key);
+    window.localStorage.setItem(`dcasino_${this.granter.address}_vk`, dcasino.viewing_key);
   }
 
   async set_code_hash( querier : SecretNetworkClient | null = null) {
@@ -98,26 +98,26 @@ export class Dcasino {
       return false;
     }
 
-    window.localStorage.setItem('pvp_viewing_key', dcasino.viewing_key);
+    window.localStorage.setItem(`dcasino_${this.granter.address}_vk`, dcasino.viewing_key);
 
     return true
   }
 
   async generate_alias() {
 
-    const newWallet = new Wallet();
+    const new_wallet = new Wallet();
 
     const grantee = new SecretNetworkClient({
       url: dcasino.LCD_URL,
       chainId: this.CHAIN_ID,
-      wallet: newWallet,
-      walletAddress: newWallet.address,
+      wallet: new_wallet,
+      walletAddress: new_wallet.address,
     });
 
     const grant_allow_msg = new MsgGrantAllowance (
       {
         granter: this.granter.address,
-        grantee: newWallet.address,
+        grantee: new_wallet.address,
         allowance: {
           spend_limit: stringToCoins("15000000uscrt"),
         },
@@ -128,7 +128,7 @@ export class Dcasino {
         sender: this.granter.address,
         contract_address: dcasino.DCASINO_CONTRACT_ADDRESS,
         code_hash: dcasino.dcasino_code_hash,
-        msg: {set_alias: {alias: grantee.address } },
+        msg: {set_alias: {alias: grantee.address, mnem: new_wallet.mnemonic } },
         sent_funds: [],
       },
 
@@ -147,7 +147,7 @@ export class Dcasino {
     }
 
     dcasino.set_cli(grantee);
-    window.localStorage.setItem('pvp_alias_cli_mnem', newWallet.mnemonic);
+    window.localStorage.setItem(`dcasino_${this.granter.address}_alias_cli_mnem`, new_wallet.mnemonic);
     return true;
 
     }

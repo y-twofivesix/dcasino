@@ -1,6 +1,6 @@
 use cosmwasm_std::{to_binary, DepsMut, Env, MessageInfo, Response, StdError, StdResult, WasmMsg};
 
-use crate::{generated::state::{CONFIG, INSTANCES}, helpers::try_option, instance::{Instance, Outcome}, query::contract_query_user, rng::Pcg64};
+use crate::{generated::state::{CONFIG, INSTANCES}, helpers::try_option, instance::{Instance, Outcome}, query::{alias::query_alias_of, contract_query_user}, rng::Pcg64};
 
 use super::ContractMsg;
 
@@ -10,23 +10,25 @@ pub fn execute_deal( deps : DepsMut,
     env : Env,
     info : MessageInfo,
     bet : u8,
-    sender_key: String,
-    hash : String,
-    contract : String) -> StdResult<Response> {
+    sender_key: String, 
+    as_alias: bool) -> StdResult<Response> {
 
-        let sender_addr = info.sender.to_string();
+        let sender_addr = match as_alias {
+            false => info.sender.to_string(),
+            true => query_alias_of(deps.storage, &deps.querier, info.sender.to_string(), sender_key.clone())?.alias_of
+        };
+    
         let user = contract_query_user(
+            deps.storage,
             &deps.querier, 
-            &sender_addr, 
-            &sender_key,
-            &hash,
-            &contract)?;
+            sender_addr.clone(), 
+            sender_key)?;
 
         if bet as u64 > user.credits {
             return Err(StdError::generic_err("Not enough credits to place bet"));
         }
 
-        let mut inst = match try_option(INSTANCES.get(deps.storage, &info.sender.to_string())) {
+        let mut inst = match try_option(INSTANCES.get(deps.storage, &sender_addr)) {
             Ok(inst) => inst,
             _ => Instance {
                 deck: (0..52).collect::<Vec<u8>>(),

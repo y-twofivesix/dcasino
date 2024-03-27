@@ -1,13 +1,10 @@
 "use client";
 
-import { check_env, do_init, swal_alert, swal_error, swal_input, swal_success } from '@/src/helpers';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBolt, faKey, faSquareCheck } from '@fortawesome/free-solid-svg-icons'
+import { swal_alert, swal_error, swal_input, swal_success } from '@/src/helpers';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { useState, useEffect, useCallback } from 'react';
-import { ERR_UNAUTHORISED, dcasino } from '@/generated/constants'
-import { user } from '@/src/queries';
+import { useState, useEffect } from 'react';
+import {  dcasino } from '@/generated/constants'
 import { IUser } from '@/src/interfaces';
 import { send_tx } from '@/src/transactions';
 
@@ -24,7 +21,7 @@ export default function Home() {
   const [user_info, setInfo] = useState(undefined as IUser | undefined)
 
   useEffect(function () {
-    
+
   }, [dcasino.user_info])
 
   const cards : Card[] = [

@@ -21,6 +21,7 @@ pub fn translate_card(value: u8) -> (u8, u8) {
     (suit, rem)
 }
 
+/*
 pub fn make_payment(env: &Env, info: &MessageInfo, value: u128, denom: String) -> StdResult<()> {
     // check user can pay entry fee
     if let Some(coin) = info
@@ -51,6 +52,7 @@ pub fn make_payment(env: &Env, info: &MessageInfo, value: u128, denom: String) -
 
     Ok(())
 }
+ */
 
 #[inline(always)]
 pub fn try_option<T>(option: Option<T>) -> StdResult<T> {

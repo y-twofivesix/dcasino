@@ -20,7 +20,15 @@ pub static NATIVE: &'static str = "uscrt";
 pub static VIEWING_KEYS: Keymap<String, String, Json, WithoutIter> = KeymapBuilder::new(b"viewing_keys").without_iter().build();
 pub static SU: Keymap<String, u8,  Json, WithoutIter> = KeymapBuilder::new(b"su").without_iter().build();
 pub static CHILD_CONTRACTS: Keymap<String, String,  Json, WithoutIter> = KeymapBuilder::new(b"child_contracts").without_iter().build();
+
 pub static CONFIG: Item<Config, Json> = Item::new(b"config");
+
+pub static ADDR_TO_ALIAS_MNEM: Keymap<String, String, Json, WithoutIter> =
+KeymapBuilder::new(b"addr_to_alias_mnem").without_iter().build();
+
+pub static ALIASES: Keymap<String, String, Json, WithoutIter> =
+KeymapBuilder::new(b"aliases").without_iter().build();
+
 
 #[derive(Serialize, Debug, Deserialize, Clone, JsonSchema)]
 pub struct Config {

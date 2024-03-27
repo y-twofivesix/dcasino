@@ -37,11 +37,12 @@ function Controls( props : ControlsProps) {
             { deal : { 
                         bet: props.bet, 
                         sender_key: dcasino.viewing_key,
-                        hash: dcasino.dcasino_code_hash,
-                        contract: dcasino.DCASINO_CONTRACT_ADDRESS
+                        as_alias: dcasino.enable_alias
                      }
             },
-            [{ amount: String(props.bet * 1_000_000), denom: 'uscrt' }], 150_000);
+            [], 
+            150_000, 
+            dcasino.enable_alias? dcasino.cli: dcasino.granter);
 
         if (typeof tx === 'string') {
             swal_error (tx);
@@ -57,11 +58,16 @@ function Controls( props : ControlsProps) {
 
     const handleDraw = async () => {
         play('dealordraw');
+
         let tx = await send_tx(
             dcasino.VIDEO_POKER_CONTRACT_ADDRESS,
             dcasino.video_poker_code_hash, 
-            { draw : { held: Array.from(props.held) }},
-            [], 150_000);
+            { draw : { 
+                held: Array.from(props.held),
+                sender_key: dcasino.viewing_key,
+                as_alias: dcasino.enable_alias
+            }},
+            [], 150_000, dcasino.enable_alias? dcasino.cli: dcasino.granter);
 
         if (typeof tx === 'string') {
 
@@ -79,16 +85,16 @@ function Controls( props : ControlsProps) {
     }
     
   return (
-    <div className='absolute select-none text-white m-auto bottom-2 p-4 left-0 right-0 w-full h-fit'>
-
-        <div className='px-10 py-2 rainbow'>{props.dealt?'':'Place your bet and then deal!'}</div>
+    <div className='absolute bottom-8 w-full'>
+    <div className='rainbow text-center w-full'>{props.dealt?'':'Place your bet and then deal!'}</div>
+    <div className=' select-none text-white w-full h-fit flex justify-center items-center'>
         <div 
         onClick={async _ => { 
             if (props.need_vk) {
                 await handleSetVk()
             }
         }} 
-        className={`float-left bg-neutral-800 p-4 rounded-l-2xl hover:bg-red-600 ${props.need_vk ? 'rainbow-bg' :'opacity-50'}`}>
+        className={`bg-neutral-800 p-4 rounded-l-2xl hover:bg-red-600 ${props.need_vk ? 'rainbow-bg' :'opacity-50'}`}>
             {props.need_vk ? 'set viewing key' : 'viewing!'}
         </div>
 
@@ -101,12 +107,12 @@ function Controls( props : ControlsProps) {
             }
         }
         } 
-        className={`${props.dealt || props.bet==1  ?'opacity-50':''} float-left bg-neutral-800 p-4 hover:bg-red-800 select-none`}>
+        className={`${props.dealt || props.bet==1  ?'opacity-50':''} bg-neutral-800 p-4 hover:bg-red-800 select-none`}>
             down bet
         </div>
 
         <div 
-        className={`float-left bg-neutral-800 ${props.dealt? 'opacity-50' :''} p-4 select-none`}>
+        className={`bg-neutral-800 ${props.dealt? 'opacity-50' :''} p-4 select-none`}>
             bet {props.bet}
         </div>
 
@@ -118,15 +124,16 @@ function Controls( props : ControlsProps) {
                 play('bet');
             } 
         }} 
-        className={`${props.dealt || props.bet==5 ?'opacity-50':''} float-left bg-neutral-800 p-4 hover:bg-green-800 select-none`}>
+        className={`${props.dealt || props.bet==5 ?'opacity-50':''} bg-neutral-800 p-4 hover:bg-green-800 select-none`}>
             up bet
         </div>
 
         <div 
         onClick={async _ => {  if (!props.need_vk) {props.dealt? await handleDraw() : await handleDeal()} }}
-        className={`float-left bg-blue-600 rounded-r-2xl p-4 hover:bg-green-800 ${props.need_vk? 'opacity-50': ''}`}>
+        className={`bg-blue-600 rounded-r-2xl p-4 hover:bg-green-800 ${props.need_vk? 'opacity-50': ''}`}>
             {props.dealt? 'draw':'deal'}
         </div>
+    </div>
     </div>
   )
 }

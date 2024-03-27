@@ -16,7 +16,6 @@ export async function send_tx (
     return msg;
   }
   
-
   let tx_resp = await  cli.tx.compute.executeContract(
     {
       sender: cli.address,
@@ -34,7 +33,6 @@ export async function send_tx (
   ).catch(e => {
       return `send tx failed: ${JSON.stringify(e)}`
   });
-  
 
   // gas manangement
   if ((tx_resp as TxResponse).code != 0) {
