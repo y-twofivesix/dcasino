@@ -33,8 +33,13 @@ function Hand(props : HandProps) {
   
   function play(id: string) {
     var audio = document.getElementById(id);
-    //@ts-ignore
-    if (audio) audio.play();
+    
+    if (audio) { 
+      //@ts-ignore
+      audio.volume = 0.2;
+      //@ts-ignore
+      audio.play();
+    }
   }
   
   return (
@@ -47,7 +52,7 @@ function Hand(props : HandProps) {
           entries.push(
             <div
             onClick={_ => handleClickCard(card)}
-            className={`float-left w-1/5 relative p-2`}>
+            className={`float-left w-1/5 relative px-2`}>
               <motion.img
               initial={{ opacity: 0 }}
               animate={{ opacity: hold || !props.dealt? 1:0.5  }}

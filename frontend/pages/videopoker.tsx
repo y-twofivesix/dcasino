@@ -66,7 +66,12 @@ function VideoPoker() {
             }
             var audio = document.getElementById(id);
             //@ts-ignore
-            if (audio) audio.play();
+            if (audio) { 
+              //@ts-ignore
+              audio.volume = 0.2;
+              //@ts-ignore
+              audio.play();
+            }
             setLastTimeStamp(inst_state.timestamp)
           }
 
@@ -85,9 +90,9 @@ function VideoPoker() {
     do_query();
 
     // check state every 7 seconds
-    //const id = setInterval(do_query, 7000);
-    //return () => clearInterval(id);
-  },[dealt, outcome]);
+    const id = setInterval(do_query, 7000);
+    return () => clearInterval(id);
+  },[dealt, outcome, updated]);
 
   let screen =  <div className='w-full h-full bg-blue-700 absolute p-6'>
 
@@ -97,7 +102,7 @@ function VideoPoker() {
   bet={bet}
   outcome={outcome}/>
 
-  <div className='relative w-full h-20'>
+  <div className='relative w-full h-16'>
 
     <div className='absolute left-0 p-1 text-lg bg-white w-fit inline text-black rounded-r-2xl'>
       {dealt ? '...' : (won == 0 ? 'You lost!':`You won: ${won}`) }

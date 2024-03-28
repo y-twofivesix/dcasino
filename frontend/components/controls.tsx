@@ -1,8 +1,7 @@
 import { dcasino } from '@/generated/constants'
 import { swal_error } from '@/src/helpers'
 import { send_tx } from '@/src/transactions'
-import React, { useCallback } from 'react'
-import { stringToCoin } from 'secretjs'
+import React, { useState } from 'react'
 
 
 interface ControlsProps {
@@ -19,18 +18,35 @@ interface ControlsProps {
 }
 function Controls( props : ControlsProps) {
 
+    const [tx_lock, setTxLock] = useState(false)
+
     const handleSetVk = async () => {
+
+        if (tx_lock) return
+        setTxLock(true)
+
         props.setNeedVk(!(await dcasino.generate_vk()));
+
+        setTxLock(false)
     }
 
     function play(id: string) {
         var audio = document.getElementById(id);
-        //@ts-ignore
-        if (audio) audio.play();
+        
+        if (audio) { 
+            //@ts-ignore
+            audio.volume = 0.2;
+            //@ts-ignore
+            audio.play();
+        }
       }
 
     const handleDeal = async () => {
         play('dealordraw');
+
+        if (tx_lock) return
+        setTxLock(true)
+
         let tx = await send_tx(
             dcasino.VIDEO_POKER_CONTRACT_ADDRESS,
             dcasino.video_poker_code_hash, 
@@ -49,6 +65,9 @@ function Controls( props : ControlsProps) {
             return;
         }
 
+        setTxLock(false)
+
+
         props.setDealt(true);
         props.setHeld(new Set<number>([]));
         props.setOutcome('Undefined');
@@ -58,6 +77,9 @@ function Controls( props : ControlsProps) {
 
     const handleDraw = async () => {
         play('dealordraw');
+
+        if (tx_lock) return
+        setTxLock(true)
 
         let tx = await send_tx(
             dcasino.VIDEO_POKER_CONTRACT_ADDRESS,
@@ -74,6 +96,8 @@ function Controls( props : ControlsProps) {
             swal_error (tx);
             return;
         }
+
+        setTxLock(false)
 
         props.setDealt(false);
         props.setUpdated('drawn');
@@ -131,7 +155,7 @@ function Controls( props : ControlsProps) {
         <div 
         onClick={async _ => {  if (!props.need_vk) {props.dealt? await handleDraw() : await handleDeal()} }}
         className={`bg-blue-600 rounded-r-2xl p-4 hover:bg-green-800 ${props.need_vk? 'opacity-50': ''}`}>
-            {props.dealt? 'draw':'deal'}
+            { tx_lock ? '...' : (props.dealt? 'draw':'deal')}
         </div>
     </div>
     </div>

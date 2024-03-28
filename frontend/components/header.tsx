@@ -22,7 +22,6 @@ function Header() {
   const [need_vk, setNeedVk] = useState(false);
   const [show_wallets, setShowWallets] = useState(false);
 
-
   const bolt = <FontAwesomeIcon color='white' icon={faBolt} />
   const key = <FontAwesomeIcon color='white' icon={faKey} />
   const check = <FontAwesomeIcon color='white' icon={faSquareCheck} />
@@ -64,10 +63,22 @@ function Header() {
   }, [])
 
   const handleAlias = async () => {
+
+    if (!dcasino.ready){ 
+      await swal_alert(`Please connect a wallet first`,'')
+      return 
+    }
+    if (!dcasino.vk_valid) {
+      await swal_alert(`Please set a viewing key in the top left corner`,'Viewing key not set')
+      return
+    }
+
     // query 
     if (! await swal_confirm('set an alias?') ) return
-    if (await dcasino.generate_alias()) await swal_success('alias created!','',1000);
-
+    if (await dcasino.generate_alias()) { 
+      await swal_success('alias created!','',1000);
+      dcasino.set_enable_alias(true);
+    }
   }
 
   const handleConnect = async () =>{
@@ -163,7 +174,16 @@ function Header() {
               p-2 mx-2 rounded-2xl hover:bg-green-600`}>{alias}
           </span>
           <span 
-          onClick={async _=> await dcasino.generate_vk()}
+          onClick={async _=> {
+
+            if (!dcasino.ready || !wallet_addr) {
+              await swal_alert(`Please connect a wallet first`,'')
+              return
+            }
+        
+            await dcasino.generate_vk()
+
+          }}
           className={
             `${
               wallet_addr && !need_vk

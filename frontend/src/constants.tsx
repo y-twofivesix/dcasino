@@ -89,7 +89,7 @@ export class Dcasino {
       this.DCASINO_CONTRACT_ADDRESS,
       this.dcasino_code_hash as string,
       {set_viewing_key: { key: entropy }}, 
-      [], 55_000, (dcasino.enable_alias? dcasino.cli: dcasino.granter)) as TxResponse;
+      [], 55_000 ) as TxResponse;
     
     if (set_vk_result.arrayLog) {
       this.viewing_key = set_vk_result.arrayLog[6].value;
