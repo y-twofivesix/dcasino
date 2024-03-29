@@ -94,9 +94,9 @@ function VideoPoker() {
     return () => clearInterval(id);
   },[dealt, outcome, updated]);
 
-  let screen =  <div className='w-full h-full bg-blue-700 absolute p-6'>
+  let screen =  <div className='w-full h-full bg-blue-700 absolute p-6 screen-jerk'>
 
-    <div className='pt-5 text-white text-center'> {red('\u2665')} Video Poker  {normal('\u2660')} </div>
+    <div className='pt-5 text-white text-center screen-glitch screen-glitch2'><span>{red('\u2665')} Video Poker  {normal('\u2660')}</span></div>
   <BettingTable
   dealt={dealt}
   bet={bet}
@@ -144,9 +144,9 @@ function VideoPoker() {
       <audio id="lose" className="display-none" src={`/audio/lose.wav`}/>
       <audio id="select" className="display-none" src={`/audio/select.wav`}/>
 
-      <div id='crt-screen' className='screen m-auto top-8 left-0 right-0 relative w-[65%] h-[90%] max-h-[700px] max-w-[950px] relative font-ibm text-2xl'>
+      <div id='crt-screen' className='screen m-auto top-8 left-0 right-0 relative w-[65%] h-[90%] max-h-[700px] max-w-[950px] relative text-2xl'>
         {screen}
-        <div className='screen_overlay w-full h-full absolute pointer-events-none backdrop-blur-[1px]'></div>
+        <div className='screen_overlay w-full h-full absolute pointer-events-none backdrop-blur-[1.25px]'></div>
         <div className='scan-bar w-full h-full absolute pointer-events-none'><div className='scan'></div></div>
         <img className='bezel w-full h-full absolute pointer-events-none' src='/images/bezel.png'/>
       </div>

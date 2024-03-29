@@ -62,6 +62,7 @@ function Controls( props : ControlsProps) {
 
         if (typeof tx === 'string') {
             swal_error (tx);
+            setTxLock(false)
             return;
         }
 
@@ -94,6 +95,7 @@ function Controls( props : ControlsProps) {
         if (typeof tx === 'string') {
 
             swal_error (tx);
+            setTxLock(false)
             return;
         }
 

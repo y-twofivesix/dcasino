@@ -33,7 +33,7 @@ function Hand(props : HandProps) {
   
   function play(id: string) {
     var audio = document.getElementById(id);
-    
+
     if (audio) { 
       //@ts-ignore
       audio.volume = 0.2;

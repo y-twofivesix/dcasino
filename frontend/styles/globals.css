@@ -534,3 +534,84 @@ html, body {
   }
   
 }
+
+@keyframes glitch {
+	30% {
+	}
+	40% {
+		opacity: 1;
+		transform: scale(1, 1);
+		transform: skew(0, 0);
+	}
+	41% {
+		opacity: 0.8;
+		transform: scale(1, 1.2);
+		transform: skew(80deg, 0);
+	}
+	42% {
+		opacity: 0.8;
+		transform: scale(1, 1.2);
+		transform: skew(-50deg, 0);
+	}
+	43% {
+		opacity: 1;
+		transform: scale(1, 1);
+		transform: skew(0, 0);
+	}
+	65% {
+	}
+}
+@keyframes jerkup {
+	0% {
+		transform: translateY(1px);
+	}
+	100% {
+		transform: translateY(0);
+	}
+}
+
+
+.screen-glitch {
+  animation: 5s ease 2000ms normal none infinite running glitch;
+}
+
+.screen-glitch2 {
+  animation: 5s ease 2000ms normal none infinite running glitch2;
+}
+
+.screen-jerk {
+  animation: jerkup 100ms infinite;
+  font-family: "Sys";
+
+}
+
+@keyframes glitch2 {
+	0% {
+		transform: translateX(0);
+	}
+	30% {
+		transform: translateX(0);
+	}
+	31% {
+		transform: translateX(-10px);
+	}
+	32% {
+		transform: translateX(0);
+	}
+	98% {
+		transform: translateX(0);
+	}
+	100% {
+		transform: translateX(-10px);
+	}
+}
+
+@font-face {
+	src: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/86186/terminal_copy.ttf);
+	font-family: 'Terminal';
+}
+@font-face {
+	src: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/86186/sys.ttf)
+		format('truetype');
+	font-family: 'Sys';
+}
