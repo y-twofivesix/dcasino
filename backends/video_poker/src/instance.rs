@@ -230,50 +230,44 @@ impl Instance {
         let suit_of_single = translate_card(self.hand[0]).0;
         let all_same_suit = self.hand.iter().all(|i| { translate_card(*i).0 == suit_of_single });
 
-        let is_consecutive_from_ace = 
+        let is_consecutive_from_high_ace = 
         self.hand.iter().any(|i|  translate_card(*i).1 == 0 /*Ace*/) &&
         self.hand.iter().any(|i|  translate_card(*i).1 == 12 /*King*/) &&
         self.hand.iter().any(|i|  translate_card(*i).1 == 11 /*Queen*/) &&
         self.hand.iter().any(|i|  translate_card(*i).1 == 10 /*Jack*/) &&
         self.hand.iter().any(|i|  translate_card(*i).1 == 9 /*10*/);
 
-        all_same_suit && is_consecutive_from_ace
+        all_same_suit && is_consecutive_from_high_ace
     }
 
     fn is_straight_flush(&self) -> bool {
 
-        // we only need to check here that the hand when sorted are
-        // consecutive numbers.
-        let mut sorted_hand = self.hand.clone();
-        sorted_hand.sort();
-        let mut is_consecutive = true;
-
-        for i in 1..5 /*len of hand*/ {
-            if sorted_hand[i] - sorted_hand[i-1] != 1 { is_consecutive = false}
-        }
-
-        is_consecutive
+        self.is_straight() && self.is_flush()
     }
 
     fn is_straight(&self) -> bool {
 
         // we need to extract the numbers only and check 
         // they are consecutive.
-        let mut nums_only : Vec<u8> = vec![]; 
-
-        for i in self.hand.iter() /* len of hand */ {
-            nums_only.push(translate_card(*i).1);
-        }
-
+        let nums_only : Vec<u8> = self.hand.iter().map(|i| translate_card(*i).1 ).collect::<Vec<u8>>();
         let mut sorted_hand = nums_only.clone();
         sorted_hand.sort();
+        
         let mut is_consecutive = true;
 
         for i in 1..5 /*len of hand*/ {
             if sorted_hand[i] - sorted_hand[i-1] != 1 { is_consecutive = false}
         }
 
-        is_consecutive
+        // need to consider high ace too
+        let is_consecutive_from_high_ace = 
+        nums_only.iter().any(|i|  *i == 0 /*Ace*/) &&
+        nums_only.iter().any(|i|  *i == 12 /*King*/) &&
+        nums_only.iter().any(|i|  *i == 11 /*Queen*/) &&
+        nums_only.iter().any(|i|  *i == 10 /*Jack*/) &&
+        nums_only.iter().any(|i|  *i == 9 /*10*/);
+
+        is_consecutive || is_consecutive_from_high_ace
 
     }
 
@@ -367,6 +361,28 @@ mod test_instance {
         inst.hand = vec![40, 41, 42, 43, 44];
         inst.dealt = true;
         assert_eq!(inst.draw(&inst.hand.clone()).unwrap(), Outcome::StraightFlush.value());
+
+    }
+
+    #[test]
+    fn test_identify_straight() {
+
+        let mut inst = mock_inst();
+
+        // 2c 3d 4c 5d 6c
+        inst.hand = vec![1,15,3,17,5];
+        inst.dealt = true;
+        assert_eq!(inst.draw(&inst.hand.clone()).unwrap(), Outcome::Straight.value());
+
+        // qd kc high-ac jh 10c
+        inst.hand = vec![24,12,0,49,9];
+        inst.dealt = true;
+        assert_eq!(inst.draw(&inst.hand.clone()).unwrap(), Outcome::Straight.value()); 
+
+        // high-ac jh qs 10d kd
+        inst.hand = vec![0,49,37,22,25];
+        inst.dealt = true;
+        assert_eq!(inst.draw(&inst.hand.clone()).unwrap(), Outcome::Straight.value()); 
 
     }
 

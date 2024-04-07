@@ -340,7 +340,7 @@ export const do_init = async (wallet: string) => {
   }
   
   dcasino.ready = true;
-  document.title = `dCasino${dcasino.CHAIN_ID.includes('pulsar') ? ' (testnet)' : ''}`
+  //document.title = `dCasino${dcasino.CHAIN_ID.includes('pulsar') ? ' (testnet)' : ''}`
 
   return true;
 

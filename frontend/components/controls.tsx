@@ -1,8 +1,12 @@
 import { dcasino } from '@/generated/constants'
 import { swal_error } from '@/src/helpers'
 import { send_tx } from '@/src/transactions'
+import { faHome } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { useRouter } from 'next/router'
 import React, { useState } from 'react'
 
+const home = <FontAwesomeIcon color='black' icon={faHome} />
 
 interface ControlsProps {
     bet: number,
@@ -19,16 +23,7 @@ interface ControlsProps {
 function Controls( props : ControlsProps) {
 
     const [tx_lock, setTxLock] = useState(false)
-
-    const handleSetVk = async () => {
-
-        if (tx_lock) return
-        setTxLock(true)
-
-        props.setNeedVk(!(await dcasino.generate_vk()));
-
-        setTxLock(false)
-    }
+    const { push } = useRouter()
 
     function play(id: string) {
         var audio = document.getElementById(id);
@@ -46,7 +41,8 @@ function Controls( props : ControlsProps) {
 
         if (tx_lock) return
         setTxLock(true)
-
+        
+        props.setUpdated('dealt');
         let tx = await send_tx(
             dcasino.VIDEO_POKER_CONTRACT_ADDRESS,
             dcasino.video_poker_code_hash, 
@@ -68,20 +64,20 @@ function Controls( props : ControlsProps) {
 
         setTxLock(false)
 
-
         props.setDealt(true);
         props.setHeld(new Set<number>([]));
         props.setOutcome('Undefined');
-        props.setUpdated('dealt');
         dcasino.update_position(-props.bet);
     }
 
     const handleDraw = async () => {
         play('dealordraw');
+       
 
         if (tx_lock) return
         setTxLock(true)
 
+        props.setUpdated('drawn');
         let tx = await send_tx(
             dcasino.VIDEO_POKER_CONTRACT_ADDRESS,
             dcasino.video_poker_code_hash, 
@@ -102,7 +98,6 @@ function Controls( props : ControlsProps) {
         setTxLock(false)
 
         props.setDealt(false);
-        props.setUpdated('drawn');
         let tx_arr_log = tx.arrayLog;
         if ( tx_arr_log && tx_arr_log[7] && tx_arr_log[7].key =='credits' ) {
             dcasino.update_position(Number(tx_arr_log[7].value));
@@ -111,17 +106,15 @@ function Controls( props : ControlsProps) {
     }
     
   return (
-    <div className='absolute bottom-8 w-full'>
-    <div className='rainbow text-center w-full'>{props.dealt?'':'Place your bet and then deal!'}</div>
-    <div className=' select-none text-white w-full h-fit flex justify-center items-center'>
+    <div className='absolute bottom-5 w-full'>
+    <div className='rainbow text-center w-full'>{props.dealt?'Choose cards to hold and then draw!':'Place your bet and then deal!'}</div>
+    <div className='select-none text-white w-full flex justify-center items-center'>
         <div 
         onClick={async _ => { 
-            if (props.need_vk) {
-                await handleSetVk()
-            }
+            push('/')
         }} 
-        className={`bg-neutral-800 p-4 rounded-l-2xl hover:bg-red-600 ${props.need_vk ? 'rainbow-bg' :'opacity-50'}`}>
-            {props.need_vk ? 'set viewing key' : 'viewing!'}
+        className={`bg-neutral-800 p-4 rounded-l-2xl hover:bg-red-600`}>
+            {home}
         </div>
 
         <div 

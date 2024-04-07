@@ -26,10 +26,26 @@ function VideoPoker() {
   const [held, setHeld] = useState(new Set<number>([]));
   const [user_bal, setBalance] = useState('-');
   const [updated, setUpdated] = useState('-');
-  const [dark, setDark] = useState(false);
   const [last_timestamp, setLastTimeStamp] = useState(0);
   
 
+  useEffect(function () {
+    if (updated=='drawn'|| updated=='dealt') {
+      let hand_cpy = [...hand];
+      if (updated=='drawn') {
+        if (!held.has(hand_cpy[0])) hand_cpy[0] = 255
+        if (!held.has(hand_cpy[1])) hand_cpy[1] = 255
+        if (!held.has(hand_cpy[2])) hand_cpy[2] = 255
+        if (!held.has(hand_cpy[3])) hand_cpy[3] = 255
+        if (!held.has(hand_cpy[4])) hand_cpy[4] = 255
+        setHand([...hand_cpy])
+      } else {
+        setHand([255, 255, 255, 255, 255])
+      }
+
+    }
+
+  }, [held, updated])
 
   useEffect(function () {
 
@@ -47,16 +63,20 @@ function VideoPoker() {
 
       if (inst_state_result.is_ok) {
         let inst_state = inst_state_result.inner as IInstanceState;
+
         // sync state with backend
-        setHand(inst_state.hand);
-        setDealt(inst_state.dealt);
-        setBalance(String(inst_state.credits))
-        setWon(Number(inst_state.last_win))
+        if (inst_state.timestamp!== last_timestamp) {
 
-        if (!inst_state.dealt) {
-          
-          if (inst_state.timestamp!== last_timestamp) {
+          setHand([...inst_state.hand]);
+          setDealt(inst_state.dealt);
+          setBalance(String(inst_state.credits))
+          setWon(Number(inst_state.last_win))
+          setUpdated('-');
+          setWon(inst_state.last_win);
 
+
+          if (!inst_state.dealt) {
+            
             setOutcome(inst_state.last_outcome);
             let this_outcome = inst_state.last_outcome;
             if (this_outcome == 'Undefined') return
@@ -72,15 +92,16 @@ function VideoPoker() {
               //@ts-ignore
               audio.play();
             }
-            setLastTimeStamp(inst_state.timestamp)
+            
           }
+          
+          setLastTimeStamp(inst_state.timestamp)
 
         };
 
-        setWon(inst_state.last_win);
 
       } else if (ERR_UNAUTHORISED.test(inst_state_result.inner as string)){
-        setNeedVk(true);
+        dcasino.vk_valid = false
       } else {
         console.log(inst_state_result.inner);
       }
@@ -92,42 +113,44 @@ function VideoPoker() {
     // check state every 7 seconds
     const id = setInterval(do_query, 7000);
     return () => clearInterval(id);
-  },[dealt, outcome, updated]);
+  },[dealt, outcome, last_timestamp]);
 
   let screen =  <div className='w-full h-full bg-blue-700 absolute p-6 screen-jerk'>
 
-    <div className='pt-5 text-white text-center screen-glitch screen-glitch2'><span>{red('\u2665')} Video Poker  {normal('\u2660')}</span></div>
-  <BettingTable
-  dealt={dealt}
-  bet={bet}
-  outcome={outcome}/>
+    <div className='pt-2 text-white text-center screen-glitch screen-glitch2'><span>{red('\u2665')} Video Poker {normal('\u2660')}</span></div>
+    <div className='relative max-h-[50%] overflow-auto'>
+    <BettingTable
+    dealt={dealt}
+    bet={bet}
+    outcome={outcome}/>
+    </div>
 
-  <div className='relative w-full h-16'>
+  <div className='relative w-full h-[10%] max-h-[10%] overflow-hidden'>
 
-    <div className='absolute left-0 p-1 text-lg bg-white w-fit inline text-black rounded-r-2xl'>
+    <div className='absolute left-0 p-1 text-base bg-white w-fit inline text-black rounded-r-2xl'>
       {dealt ? '...' : (won == 0 ? 'You lost!':`You won: ${won}`) }
     </div>
 
     <div className={
-      `p-1 text-xl text-center text-white left-0 right-0 m-auto absolute
+      `p-1 text-lg text-center text-white left-0 right-0 m-auto absolute
       ${outcome == 'Lose' || outcome == 'Undefined'? 'bg-red-600': 'bg-green-600' } w-fit text-white`}>
       {dealt ? 'hold and/or draw': `Result: ${outcome}` }
     </div>
 
-    <div className='p-1 absolute right-0 text-lg inline bg-white text-black rounded-l-2xl'>
+    <div className='p-1 absolute right-0 text-base inline bg-white text-black rounded-l-2xl'>
       <div>Credits: {user_bal}</div>
       <div>position: <span className={dcasino.pos_this_session < 0 ? 'text-red-600':'text-green-600'}>{dcasino.pos_this_session}</span></div>
     </div>
   </div>
 
-  <div className='relative w-2/3 h-fit left-0 right-0 m-auto py-2'>
+  <div className='relative w-[80%] h-[30%] left-0 right-0 m-auto py-2'>
       <Hand 
       hand={hand}
       dealt={dealt}
       held={held}
       setHeld={setHeld}
       updated={updated}
-      dark={dark}/>
+      dark={false}/>
   </div>
 
                 
@@ -136,7 +159,7 @@ function VideoPoker() {
   return (
     <motion.div 
     exit={{ opacity: 0 }}
-    className={`w-screen h-screen relative p-5 bg-blue-800 ${dark?'invert':''} overflow-hidden`}>
+    className={`w-full h-full relative p-1 bg-blue-800 overflow-hidden invert-0`}>
 
       <audio id="bet" className="display-none" src={`/audio/bet.wav`}/>
       <audio id="dealordraw" className="display-none" src={`/audio/dealordraw2.wav`}/>
@@ -144,16 +167,15 @@ function VideoPoker() {
       <audio id="lose" className="display-none" src={`/audio/lose.wav`}/>
       <audio id="select" className="display-none" src={`/audio/select.wav`}/>
 
-      <div id='crt-screen' className='screen m-auto top-8 left-0 right-0 relative w-[65%] h-[90%] max-h-[700px] max-w-[950px] relative text-2xl'>
+      <div id='crt-screen' className='screen m-auto top-1 left-0 right-0 relative w-full h-full md:w-[90%] md:h-[85%] relative text-2xl'>
         {screen}
-        <div className='screen_overlay w-full h-full absolute pointer-events-none backdrop-blur-[1.25px]'></div>
+        <div className='screen_overlay w-full h-full absolute pointer-events-none backdrop-blur-[1px]'></div>
         <div className='scan-bar w-full h-full absolute pointer-events-none'><div className='scan'></div></div>
         <img className='bezel w-full h-full absolute pointer-events-none' src='/images/bezel.png'/>
       </div>
 
 
-    
-      <Controls 
+    <Controls 
       bet={bet}
       setBet={setBet} 
       dealt={dealt} 
@@ -163,8 +185,7 @@ function VideoPoker() {
       held={held}
       setHeld={setHeld}
       setOutcome={setOutcome}
-      setUpdated={setUpdated}/>
-                
+      setUpdated={setUpdated}/>    
     </motion.div>
   )
 }

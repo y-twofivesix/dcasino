@@ -32,6 +32,8 @@ export class Dcasino {
   pos_this_session : number = 0;
   video_poker_code_hash   : string      = '';
   user_info : IUser | undefined = undefined;
+  reclaim_code_hash : string = 'db17efceec7a8d2c464af53e142dda38de5ea0665b5c548928d5243b21a624b4';
+  reclaim_contract  : string = 'secret18u22df5dan6cyl6xuyjn9wsa3gauf53567ej90';
 
 
   constructor () {};

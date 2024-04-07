@@ -2,9 +2,11 @@ import '@/styles/globals.css'
 
 import type { AppProps } from 'next/app'
 import dynamic from 'next/dynamic'
-import Layout from '../components/layout'
+import Layout from '@/components/layout'
 import localFont from 'next/font/local'
 import Head from 'next/head'
+import { Metadata } from 'next';
+
 
 const CASINO = localFont({
   src: [
@@ -27,6 +29,13 @@ const IBM = localFont({
 })
 
 
+export const metadata: Metadata = {
+  title: 'Secret dCasino',
+  description:
+    'The Industry first private dCasino!',
+};
+
+
 function NoSSRApp({ Component, pageProps }: AppProps) {
 
   return( 
@@ -39,8 +48,8 @@ function NoSSRApp({ Component, pageProps }: AppProps) {
     lang="en" className={`${CASINO.variable} ${IBM.variable}`} >
 
     <Head>
-      <link rel="shortcut icon" href="/images/logo.png" />
-      <link rel="apple-touch-icon" sizes="180x180" href="/images/roundedspade.png" />
+      <link rel="shortcut icon" href="/images/spade.png" />
+      <link rel="apple-touch-icon" sizes="180x180" href="/images/spade.png" />
     </Head>
 
     <Layout>

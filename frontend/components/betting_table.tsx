@@ -16,8 +16,8 @@ interface ITableRowrops {
 
 function TableRow(props: ITableRowrops ) {
     return (
-    <div className={`table-row text-xl screen-glitch ${ props.outcome == props.title ? ' bg-green-600 text-white': 'bg-neutral-800'}`}>
-        <div className={`table-cell border-2 border-dotted border-black select-none px-4 ${props.outcome != props.title ? 'text-red-600 bg-blue-800': ''}  text-left`}>{props.title}</div>
+    <div className={`table-row text-lg screen-glitch ${ props.outcome == props.title ? ' bg-green-600 text-white': 'bg-neutral-800'}`}>
+        <div className={`table-cell border-1 border-dotted border-black select-none px-4 ${props.outcome != props.title ? 'text-red-600 bg-blue-800': ''}  text-left`}>{props.title}</div>
         <div className={`table-cell select-none px-4 text-white  text-left ${props.bet == 1 ? (props.outcome==props.title? 'rainbow-bg':'bg-red-600'): ''}`}>{props.rewards[0]}</div>
         <div className={`table-cell select-none px-4 text-white  text-left ${props.bet == 2 ? (props.outcome==props.title? 'rainbow-bg':'bg-red-600'): ''}`}>{props.rewards[1]}</div>
         <div className={`table-cell select-none px-4 text-white  text-left ${props.bet == 3 ? (props.outcome==props.title? 'rainbow-bg':'bg-red-600'): ''}`}>{props.rewards[2]}</div>
@@ -32,9 +32,9 @@ function BettingTable( props : IBettingTableProps) {
 
 
   return (
-    <div className='p-1'>
+    <div className=''>
         
-        <div className={`table w-full text-lg rounded-lg p-2`}>
+        <div className={`table w-full text-base rounded-lg p-1`}>
 
             <div className="table-row-group">
 

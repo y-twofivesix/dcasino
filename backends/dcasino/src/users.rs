@@ -1,4 +1,4 @@
-use cosmwasm_std::{BankMsg, Coin, CosmosMsg, Env, MessageInfo, Response, StdResult, Storage};
+use cosmwasm_std::{BankMsg, Coin, CosmosMsg, Env, MessageInfo, Response, StdError, StdResult, Storage};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -23,11 +23,16 @@ impl User {
         }
     }
 
-    pub fn pay_out (store: &mut dyn Storage, addr: &String) -> StdResult<Response> {
+    pub fn pay_out (store: &mut dyn Storage, addr: &String, amount: u64) -> StdResult<Response> {
 
         let mut user = Self::get(store, addr)?;
-        let pay_out_amount = user.credits as u128 * 1_000_000;
-        user.credits = 0;
+        
+        if amount > user.credits {
+            return Err(StdError::generic_err("payout exceeds credit balance"))
+        }
+
+        let pay_out_amount = amount as u128 * 1_000_000;
+        user.credits -= amount ;
         user.save(store, addr)?;
 
         let msg = CosmosMsg::Bank(BankMsg::Send {

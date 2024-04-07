@@ -18,6 +18,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts","audio.d.ts", "**/*.ts", "**/*.tsx", "components/layout.tsx", "components/spectrum.js", "components/audio_player.js"],
+  "include": ["next-env.d.ts","audio.d.ts", "**/*.ts", "**/*.tsx", "components/layout.js", "components/spectrum.js", "components/audio_player.js"],
   "exclude": ["node_modules"]
 }

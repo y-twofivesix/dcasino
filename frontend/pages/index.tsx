@@ -1,179 +1,171 @@
-"use client";
+"use client"
+import { motion } from "framer-motion"
+import { useEffect, useState } from 'react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faMoon, faSun } from '@fortawesome/free-solid-svg-icons'
 
-import { swal_alert, swal_error, swal_input, swal_success } from '@/src/helpers';
-import { motion } from 'framer-motion';
-import { useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react';
-import {  dcasino } from '@/generated/constants'
-import { IUser } from '@/src/interfaces';
-import { send_tx } from '@/src/transactions';
+import 'swiper/css';
+import 'swiper/css/pagination';
+import Credits from '@/components/credits'
+import Games from '@/components/games'
+import About from '@/components/about'
+import DappViewer from "@/components/dappviewer"
 
-interface Card {
-  name: string,
-  icon: string,
-  route: string
-}
+
+import { dcasino } from '@/generated/constants'
+import { swal_alert } from '@/src/helpers'
+import { IUser } from '@/src/interfaces'
+import Swal from "sweetalert2"
+
+const moon = <FontAwesomeIcon color='black' icon={faMoon} />
+const sun = <FontAwesomeIcon color='black' icon={faSun} />
 
 export default function Home() {
 
-  const { push } = useRouter();
-  const [hovered, setHovered] = useState('')
-  const [user_info, setInfo] = useState(undefined as IUser | undefined)
+  const hours = (new Date()).getHours();
+  const [dark, setDark] = useState( hours >= 18 || hours < 6 );
+  const [show_about, setShowAbout] = useState(false);
+  const [show_credit, setShowCredits] = useState(false);
+  const [show_games, setShowGames] = useState(false);
 
-  useEffect(function () {
+  const [user_state, setUserInfo] = useState(undefined as undefined | IUser)
 
+  useEffect(function() {
+    setUserInfo(dcasino.user_info)
   }, [dcasino.user_info])
 
-  const cards : Card[] = [
-    {name: 'Video Poker', icon: 'arcade.png', route:'videopoker'},
-    {name: 'BlackJack (Vingt et un) COMING SOON', icon: 'spade.png', route:''},
-  ]
-
   return (
+  <div className={`${dark?'invert':''} select-none`}>
 
-    <motion.div
-    exit={{ opacity: 0 }}
-    className='w-screen h-screen bg-orange-100 relative p-3'>
+    <main
+    className={`flex min-h-screen flex-col items-center justify-between p-5 bg-orange-100 text-neutral-800 duration-700`}>
 
-
-      <div className='text-center text-9xl px-32 py-10 font-casino text-black'>
-        SCRT CASINO
+      <div
+      onClick={e=>setDark(!dark)}
+      className='fixed text-xl opacity-25 z-50 hover:opacity-100 duration-700 top-5 right-16'>
+        {dark ? sun : moon}
       </div>
 
-
-      <div className='h-fit w-fit absolute left-0 right-0 bottom-15 m-auto'>
-        <div className={'grid grid-cols-3 gap-4'}>
-          {
-            (()=>{
-              let entries = []
-              for (let i=0; i<cards.length; i++) {
-                entries.push(
-                  <motion.div
-                  key={i}
-                  onHoverStart={_=>setHovered(cards[i].name)}
-                  onHoverEnd={_=>setHovered('')}
-                  onClick={async _=>{
-                    if (!dcasino.ready) return 
-                    if (!dcasino.vk_valid) {
-                      await swal_alert(`Please set a viewing key in the top left corner`,'Viewing key not set')
-                      return
-                    }
-                    push(cards[i].route);
-                  }}
-                  initial={{ opacity: 0, height: "375px", width: "250px", }}
-                  animate={{ 
-                    opacity: dcasino.ready?1: 0.1,
-                  }}
-                  transition={{duration: 1}}
-                  className={`
-                  bg-orange-200 relative hover:bg-green-600
-                  rounded-xl duration-700 shadow-retro`}>
-
-                      {
-                        <motion.img
-                        animate={{opacity:0.75, scale: 0.75}}
-                        transition={{duration: 1}}
-                        whileHover={{ opacity: 1 }}
-                        className='absolute m-auto left-0 right-0 top-0 bottom-0'
-                        src={`/images/${cards[i].icon}`}
-                        />
-                      }
-                      
-                  </motion.div>
-                );
-              }
-              return entries;
-            })()
-          }
+      <motion.div
+          initial={{ opacity: 0, translateY: 0}}
+          animate={{ opacity: 1, translateY: -100 }}
+          transition={{ duration: 1 }}
+          className="relative z-40  justify-between m-auto top-28 bottom-0">
+       
+        <div className='relative items-center justify-center'>
+        <motion.img
+          className="relative m-auto"
+          draggable={false}
+          onContextMenu={e=>e.preventDefault()}
+          src="/images/spade.png"
+          alt="spade Logo"
+          width={180}
+          height={180}
+        />
         </div>
+        <div className='font-casino text-8xl w-full'>{`d'CASINO`}</div>
 
-        <div className={`${ dcasino.ready?'':'opacity-10'} py-10 text-black font-casino text-4xl`}>
-          <div className='p-1'>credits: {dcasino.user_info?dcasino.user_info.credits:'-'}</div>
-          <div>
-            <span 
-            onClick={async _=>{
 
-              if (!dcasino.ready) return 
+      </motion.div>
 
-              let amount = parseInt(await swal_input('enter amount in SCRT'));
-              if( isNaN(amount)) {
-                await swal_error('invalid number')
-                return;
-              }
-
-              let tx = await send_tx(
-                dcasino.DCASINO_CONTRACT_ADDRESS,
-                dcasino.dcasino_code_hash, 
-                { pay_in : { amount }},
-                [{ amount: String(amount * 1_000_000), denom: 'uscrt' }], 
-                66_000);
-    
-            if (typeof tx === 'string') {
-                await swal_error (tx);
-                return;
-            } else {
-              await swal_success('transaction complete!', '',1500)
+      <div className='flex text-center py-4 w-full md:w-[35%]'>
+        <motion.div
+          initial={{ width: '33%' }}
+          animate={{ width: show_games?'100vw':'33%' }}
+          transition={{ duration: 1 }}
+          onClick={
+          async e=>{
+            if (!dcasino.ready) {
+                await swal_alert('please connect your wallet!')
+                setShowGames(false);
+                setShowCredits(false);
+                setShowAbout(true);
+                return
             }
 
-            }}
-            className={`
-            p-2 mx-1 w-[200px] text-center 
-            text-black font-casino text-4xl 
-            bg-orange-200 hover:bg-yellow-400
-            hover:text-yellow-100 rounded-xl`}>Pay In</span>
-            <span 
-            onClick={async _=>{
+            if (!dcasino.vk_valid) {
+                await swal_alert('please set a viewing key!')
+                setShowGames(false);
+                setShowCredits(false);
+                setShowAbout(true);
+                return
+            }
+          //setShowPartners(false);
+          setShowCredits(false);
+          setShowAbout(false);
+          setShowGames(!show_games);
+          }}
+          className={`opacity-50 ${show_games?'invert':''} ${dcasino.ready?'hover:opacity-100':''} hover:invert bg-orange-100 p-1 duration-700 text-sm md:text-base`}>
+            {`d'Apps`}
+        </motion.div>
 
-              if (!dcasino.ready) return 
-              let tx = await send_tx(
-                dcasino.DCASINO_CONTRACT_ADDRESS,
-                dcasino.dcasino_code_hash, 
-                { pay_out : {  } },
-                [], 
-                66_000);
-    
-            if (typeof tx === 'string') {
-                await swal_error (tx);
-                return;
-            } else {
-              await swal_success('transaction complete!', '',1500)
+        <div className=''>{'|'}</div>
+
+        <motion.div
+          initial={{ width: '33%' }}
+          animate={{ width: show_about?'100vw':'33%' }}
+          transition={{ duration: 1 }}
+         onClick={
+        e=>{
+          setShowGames(false);
+          setShowCredits(false);
+          setShowAbout(!show_about);
+        }
+          
+        }
+        className={`opacity-50 hover:opacity-100 hover:invert ${show_about?'invert':''} bg-orange-100 p-1 duration-700 text-sm md:text-base`}>
+            About
+        </motion.div>
+
+        <div className=''>{'|'}</div>
+
+        <motion.div
+          initial={{ width: '33%' }}
+          animate={{ width: show_credit?'100vw':'33%' }}
+          transition={{ duration: 1 }}
+         onClick={
+          async e=>{
+            if (!dcasino.ready) {
+                await swal_alert('please connect your wallet!')
+                setShowCredits(false);
+                setShowGames(false);
+                setShowAbout(true);
+
+                return
             }
 
-            }}
-            className={`
-            p-2 mx-1 w-[200px] text-center 
-            text-black font-casino text-4xl 
-            bg-orange-200 hover:bg-yellow-400
-            hover:text-yellow-100 rounded-xl`}>Pay out</span>
-          </div>
+            if (!dcasino.vk_valid) {
+                await swal_alert('please set a viewing key!')
+                setShowCredits(false);
+                setShowGames(false);
+                setShowAbout(true);
 
-        </div>
+                return
+            }
+          //setShowPartners(false);
+          setShowGames(false);
+          setShowAbout(false);
+          setShowCredits(!show_credit);
+        }
+          
+        }
+        className={`opacity-50 ${show_credit?'invert':''} hover:opacity-100 hover:invert bg-orange-100 p-1 duration-700 text-sm md:text-base`}>
+            Credits
+        </motion.div>
 
-        <div className='w-full h-10 text-neutral-800 text-center p-4'>{hovered}</div>
       </div>
-    </motion.div>
 
+      <div className='text-xs md:text-sm lg:text-sm text-center'>
+        <span className='opacity-25 '>{`d'casino v${dcasino.DCASINO_VERSION}. © 2024. Powered by AART Labs`}</span>
+      </div>
+
+        
+        <Games show_games={show_games} setShowGames={setShowGames} dark={dark}/>
+        <Credits show_credits={show_credit} setShowCredits={setShowCredits} dark={dark}/>
+        <About show_about={show_about} setShowAbout={setShowAbout} dark={dark}/>
+
+    </main>
+
+  </div>
   )
 }
-
-/*
-        <motion.div
-        animate={{ opacity: show_wallets ? 1: 0, scale: show_wallets ? 1: 0}}
-        transition={{
-          duration: 0.8,
-          delay: 0.5,
-          ease: [0, 0.71, 0.2, 1.01]
-        }}
-        className={` ${show_wallets ? '':'hidden'}
-        absolute bg-red-600 h-fit text-center
-         top-0 bottom-0 left-0 right-0 m-auto z-50
-         p-4 rounded-2xl w-1/3`}>
-          <h1 className='px-2 py-4 text-base rounded-2xl'>Choose your wallet</h1>
-          <ul>
-            <li className='py-4 hoverrainbow hover:bg-indigo-900 rounded-2xl' onClick={async _ => await try_enter_game('Keplr')}>Keplr</li>
-            <li className='py-4 hoverrainbow hover:bg-indigo-900 rounded-2xl' onClick={async _ => await try_enter_game('MetaMask')}>MetaMask</li>
-            <li className='py-4 hoverrainbow hover:bg-indigo-900 rounded-2xl' onClick={async _ => await try_enter_game('Fina')}>Fina</li>
-            <li className='py-4 hoverrainbow hover:bg-indigo-900 rounded-2xl' onClick={async _ => await try_enter_game('Leap')}>Leap</li>
-          </ul>
-        </motion.div>
-*/
