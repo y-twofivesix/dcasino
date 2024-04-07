@@ -581,8 +581,12 @@ html, body {
 
 .screen-jerk {
   animation: jerkup 100ms infinite;
-  font-family: "Sys";
+  
 
+}
+
+.vp-sys-font {
+  font-family: "Sys";
 }
 
 @keyframes glitch2 {

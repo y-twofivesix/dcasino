@@ -32,7 +32,7 @@ function About(props: ConsultProps) {
           <div className='p-2'>step 1. Connect your wallet ({wallet}), be sure to have enough tokens for gas fees!</div>
           <div className='p-2'>step 2. Create a viewing key ({key}), this is how you view your private onchain data.</div>
           <div className='p-2'>step 3. (recommended) create an alias ({alias}). This will greatly improve your dapp experience</div>
-          <div className='p-2'>step 4. (recommended) generate a zk-proof of your humanity ({check}) for KYC, using {`reclaim's`} Zero-knowledge solution</div>
+          <div className='p-2'>step 4. (recommended) generate a zk-proof of your humanity ({check}) for KYC, using {`Reclaim Protocol's`} Zero-knowledge solution</div>
          
         </div>),
         slide3('What is a dCasino?',

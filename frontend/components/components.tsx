@@ -5,13 +5,13 @@ import { Dispatch, SetStateAction, useState } from 'react';
 import Link from 'next/link';
 
 
-export function slide ( title: string, content_1: any, content_2: any, setDapp?: Dispatch<SetStateAction<string | undefined>> ) {
+export function slide ( title_font: [string, string], content_1: any, content_2: any, setDapp?: Dispatch<SetStateAction<string | undefined>> ) {
 
   return (
     <>
-    <SwiperSlide key={title}>
+    <SwiperSlide key={title_font[0]}>
     <div className='relative w-full h-full'>
-      <h1 className='bg-neutral-200 text-neutral-800 p-1 text-4xl font-casino'>{title}</h1>
+      <h1 className={`bg-neutral-200 text-neutral-800 p-1 text-4xl ${title_font[1]}`}>{title_font[0]}</h1>
 
       <div className='grid md:grid-cols-2 pt-4'>
 
@@ -24,7 +24,7 @@ export function slide ( title: string, content_1: any, content_2: any, setDapp?:
       </div>
 
         <div 
-        onClick={_=>{setDapp ? setDapp(title): ''}}
+        onClick={_=>{setDapp ? setDapp(title_font[0]): ''}}
         className='absolute bottom-16 w-full p-1 cursor-pointer text-orange-600 bg-neutral-900'>
           {`let's go!`}
         </div>
@@ -164,7 +164,7 @@ interface ViewerProps {
     return (
       <motion.div
       initial={{ opacity: 0, scale: 0}}
-      animate={{ opacity: 0.98, scale: props.show?1:0}}
+      animate={{ opacity: 1, scale: props.show?1:0}}
       transition={{ duration: 0.3 }}
       className={`
       rounded-lg ${props.dark? 'invert':''}

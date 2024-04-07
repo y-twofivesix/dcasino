@@ -1,5 +1,6 @@
 import { dcasino } from '@/generated/constants'
-import { swal_error } from '@/src/helpers'
+import { swal_alert, swal_error } from '@/src/helpers'
+import { IUser } from '@/src/interfaces'
 import { send_tx } from '@/src/transactions'
 import { faHome } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -18,7 +19,10 @@ interface ControlsProps {
     held: Set<number>,
     setHeld: React.Dispatch<React.SetStateAction<Set<number>>>,
     setOutcome: React.Dispatch<React.SetStateAction<string>>,
-    setUpdated: React.Dispatch<React.SetStateAction<string>>
+    setUpdated: React.Dispatch<React.SetStateAction<string>>,
+    user_bal: number | undefined,
+    crt: boolean,
+    setCrt: React.Dispatch<React.SetStateAction<boolean>>,
 }
 function Controls( props : ControlsProps) {
 
@@ -37,11 +41,18 @@ function Controls( props : ControlsProps) {
       }
 
     const handleDeal = async () => {
+        if (props.user_bal==undefined) return
+
         play('dealordraw');
+
+        if (props.user_bal < props.bet) {
+            await swal_alert('You dont have enough credits for this bet!');
+            return
+        }
 
         if (tx_lock) return
         setTxLock(true)
-        
+
         props.setUpdated('dealt');
         let tx = await send_tx(
             dcasino.VIDEO_POKER_CONTRACT_ADDRESS,
@@ -111,10 +122,10 @@ function Controls( props : ControlsProps) {
     <div className='select-none text-white w-full flex justify-center items-center'>
         <div 
         onClick={async _ => { 
-            push('/')
+            props.setCrt(!props.crt);
         }} 
-        className={`bg-neutral-800 p-4 rounded-l-2xl hover:bg-red-600`}>
-            {home}
+        className={`bg-neutral-800 p-4 rounded-l-2xl hover:bg-red-600 ${props.crt?'text-white':'text-neutral-500'}`}>
+            CRT
         </div>
 
         <div 

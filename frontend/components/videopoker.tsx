@@ -12,9 +12,11 @@ import { faHome } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Link from 'next/link';
 
+interface VideoPokerProps {
+  active: boolean
+}
 
-
-function VideoPoker() {
+function VideoPoker(props: VideoPokerProps) {
 
   const { push } = useRouter();
   const [hand, setHand] = useState([255,255,255,255,255]);
@@ -24,9 +26,10 @@ function VideoPoker() {
   const [won, setWon] = useState(0);
   const [need_vk, setNeedVk] = useState(false);
   const [held, setHeld] = useState(new Set<number>([]));
-  const [user_bal, setBalance] = useState('-');
+  const [user_bal, setBalance] = useState(undefined as number | undefined);
   const [updated, setUpdated] = useState('-');
   const [last_timestamp, setLastTimeStamp] = useState(0);
+  const [crt, setCrt] = useState(true);
   
 
   useEffect(function () {
@@ -49,27 +52,25 @@ function VideoPoker() {
 
   useEffect(function () {
 
-    if (!dcasino.ready ) {
-      push('/')
-      return;
-    }
-
 
    let do_query = async function() {
 
-      //let bal = await balance();
-      //setBalance(`${bal[0]} ${bal[1]}`);
+      if (!props.active ) {
+        return;
+      }
+
       let inst_state_result = await vp_instance_state();
 
       if (inst_state_result.is_ok) {
         let inst_state = inst_state_result.inner as IInstanceState;
 
         // sync state with backend
+        setBalance(inst_state.credits)
+
         if (inst_state.timestamp!== last_timestamp) {
 
           setHand([...inst_state.hand]);
           setDealt(inst_state.dealt);
-          setBalance(String(inst_state.credits))
           setWon(Number(inst_state.last_win))
           setUpdated('-');
           setWon(inst_state.last_win);
@@ -110,19 +111,19 @@ function VideoPoker() {
 
     do_query();
 
-    // check state every 7 seconds
-    const id = setInterval(do_query, 7000);
+    const id = setInterval(do_query, 4000);
     return () => clearInterval(id);
-  },[dealt, outcome, last_timestamp]);
+  },[dealt, outcome, last_timestamp, props.active]);
 
-  let screen =  <div className='w-full h-full bg-blue-700 absolute p-6 screen-jerk'>
+  let screen =  <div className={`w-full h-full bg-blue-700 absolute p-6 vp-sys-font ${crt?'screen-jerk':''}`}>
 
-    <div className='pt-2 text-white text-center screen-glitch screen-glitch2'><span>{red('\u2665')} Video Poker {normal('\u2660')}</span></div>
+    <div className={`pt-2 text-white text-center ${crt?'screen-glitch screen-glitch2':''}`}><span>{red('\u2665')} Video Poker {normal('\u2660')}</span></div>
     <div className='relative max-h-[50%] overflow-auto'>
     <BettingTable
     dealt={dealt}
     bet={bet}
-    outcome={outcome}/>
+    outcome={outcome}
+    crt={crt}/>
     </div>
 
   <div className='relative w-full h-[10%] max-h-[10%] overflow-hidden'>
@@ -138,7 +139,7 @@ function VideoPoker() {
     </div>
 
     <div className='p-1 absolute right-0 text-base inline bg-white text-black rounded-l-2xl'>
-      <div>Credits: {user_bal}</div>
+      <div>Credits: {user_bal!=undefined? user_bal: '-'}</div>
       <div>position: <span className={dcasino.pos_this_session < 0 ? 'text-red-600':'text-green-600'}>{dcasino.pos_this_session}</span></div>
     </div>
   </div>
@@ -169,8 +170,8 @@ function VideoPoker() {
 
       <div id='crt-screen' className='screen m-auto top-1 left-0 right-0 relative w-full h-full md:w-[90%] md:h-[85%] relative text-2xl'>
         {screen}
-        <div className='screen_overlay w-full h-full absolute pointer-events-none backdrop-blur-[1px]'></div>
-        <div className='scan-bar w-full h-full absolute pointer-events-none'><div className='scan'></div></div>
+        <div className={`screen_overlay w-full h-full absolute pointer-events-none ${crt?'backdrop-blur-[0.5px]':''}`}></div>
+        <div className={`${crt?'':'hidden'} scan-bar w-full h-full absolute pointer-events-none`}><div className='scan'></div></div>
         <img className='bezel w-full h-full absolute pointer-events-none' src='/images/bezel.png'/>
       </div>
 
@@ -185,7 +186,10 @@ function VideoPoker() {
       held={held}
       setHeld={setHeld}
       setOutcome={setOutcome}
-      setUpdated={setUpdated}/>    
+      setUpdated={setUpdated}
+      user_bal={user_bal}
+      crt={crt}
+      setCrt={setCrt}/>    
     </motion.div>
   )
 }

@@ -23,7 +23,7 @@ function Games(props: ConsultProps) {
         {[
 
         slide(
-          'Video Poker', 
+          ['Video Poker', 'vp-sys-font'], 
           <>
           {`Our Video Poker game is a retro CRT styled classic. It's easy to play, place a bet, and
           hit deal, you will be dealt 5 randonly generated cards using Secret Network's verifiable random 
@@ -50,7 +50,7 @@ function Games(props: ConsultProps) {
               </motion.div>, setDapp ),
 
         slide(
-          'Black Jack (AKA 21)', 
+          ['Black Jack (AKA 21)', ''], 
           <>
           {`The classic Casino game to reach the perfect 21! Coming soon!`}
           <br/><br/>
@@ -78,7 +78,7 @@ function Games(props: ConsultProps) {
       dark={props.dark} 
       vert={true}
       dims={{x:500, y: 500}}>
-        <VideoPoker/>
+        <VideoPoker active={Boolean(dapp)}/>
       </PlainViewer2>
     </>
    

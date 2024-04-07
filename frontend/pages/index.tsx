@@ -16,6 +16,7 @@ import { dcasino } from '@/generated/constants'
 import { swal_alert } from '@/src/helpers'
 import { IUser } from '@/src/interfaces'
 import Swal from "sweetalert2"
+import Header from "@/components/header"
 
 const moon = <FontAwesomeIcon color='black' icon={faMoon} />
 const sun = <FontAwesomeIcon color='black' icon={faSun} />
@@ -36,7 +37,7 @@ export default function Home() {
 
   return (
   <div className={`${dark?'invert':''} select-none`}>
-
+    <Header dark={dark}/>
     <main
     className={`flex min-h-screen flex-col items-center justify-between p-5 bg-orange-100 text-neutral-800 duration-700`}>
 

@@ -7,7 +7,6 @@ import { user } from '@/src/queries';
 import { faWallet, faKey, faMoon, faSquareCheck, faSun, faUserGroup } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { motion } from 'framer-motion';
-import { useRouter } from 'next/router';
 import React, { Dispatch, SetStateAction, useCallback, useRef } from 'react'
 import { useState, useEffect } from 'react'
 import CopyToClipboard from 'react-copy-to-clipboard';
@@ -17,7 +16,7 @@ import { send_tx } from '@/src/transactions';
 import Swal from 'sweetalert2';
 
 interface HeaderProps {
-
+  dark: boolean
 }
 
 function Header(props: HeaderProps) {
@@ -35,7 +34,6 @@ function Header(props: HeaderProps) {
   const check = <FontAwesomeIcon color='white' icon={faSquareCheck} />
   const alias = <FontAwesomeIcon color='black' icon={faUserGroup} />
 
-  const { push } = useRouter();
   const { Canvas } = useQRCode();
 
   let accepted_terms = false;
@@ -191,9 +189,7 @@ function Header(props: HeaderProps) {
       }
 
 
-};
-
-
+  };
 
   const do_query = useCallback(async () => {
     if (!dcasino.ready || !dcasino.granter) { 
@@ -201,7 +197,6 @@ function Header(props: HeaderProps) {
       dcasino.user_info = undefined;
       dcasino.pos_this_session = 0;
       dcasino.set_enable_alias(false);
-      push('/')
       return 
     }
 
@@ -256,7 +251,6 @@ function Header(props: HeaderProps) {
       dcasino.ready = false;
       dcasino.user_info = undefined;
       dcasino.pos_this_session = 0;
-      push('/');
       return;
     }
     
@@ -295,9 +289,8 @@ function Header(props: HeaderProps) {
     }
   }
 
-  
   return (
-    <div id='header' className={`top-0 w-fit no-select fixed z-50 px-5 py-3`}>
+    <div id='header' className={`top-0 w-fit no-select fixed z-50 px-5 py-3 ${props.dark?'invert':''}`}>
 
         <div className={`
         absolute top-0 left-0 
