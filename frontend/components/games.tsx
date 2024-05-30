@@ -2,6 +2,7 @@ import React, { Dispatch, SetStateAction, useState } from 'react'
 import { motion } from "framer-motion"
 import { PlainViewer2, Viewer, slide } from './components'
 import VideoPoker from './videopoker'
+import BlackJack21 from './blackjack_21'
 
 interface ConsultProps {
     show_games: boolean
@@ -68,17 +69,26 @@ function Games(props: ConsultProps) {
                   width={150}
                   height={150}
                 />
-              </motion.div>,)
+              </motion.div>, setDapp )
       ]}
       </Viewer>
 
       <PlainViewer2 
-      show={Boolean(dapp)} 
+      show={ dapp == 'Video Poker' } 
       setShow={setDapp} 
       dark={props.dark} 
       vert={true}
       dims={{x:500, y: 500}}>
         <VideoPoker active={Boolean(dapp)}/>
+      </PlainViewer2>
+
+      <PlainViewer2 
+      show={dapp == 'Black Jack (AKA 21)'} 
+      setShow={setDapp} 
+      dark={props.dark} 
+      vert={true}
+      dims={{x:500, y: 500}}>
+        <BlackJack21 active={Boolean(dapp)}/>
       </PlainViewer2>
     </>
    

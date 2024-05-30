@@ -66,6 +66,6 @@ pub fn verify_proof(
     };
 
     Ok(Response::new()
-        //.add_message(cosmos_msg)
+        .add_message(cosmos_msg)
         .add_attribute("action", "verify"))
 }

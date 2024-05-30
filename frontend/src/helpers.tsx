@@ -11,10 +11,10 @@ export function green(text : string) {
 
 
 // maps a cad number to the corresponding image name
-export function numberToImg(num : number): string {
+export function numberToImg(num : number | undefined): string {
 
   if ( num == undefined || num == 255) {
-    return 'back';
+    return '/images/dcasinotiledbordered.png';
   }
 
   let [suit, rank] = translate_card(num);
@@ -58,7 +58,7 @@ export function numberToImg(num : number): string {
           break;
   }
       
-  return rank_str.concat(suit_str);
+  return `/deck2/${rank_str.concat(suit_str)}.png`;
 }
 
 export function translate_card(value : number): [number, number] {

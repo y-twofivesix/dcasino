@@ -1,6 +1,6 @@
 [package]
 name = "videopoker-backend"
-version = "0.2.7"
+version = "0.1.1"
 authors = [ "YAESHA256 (AART)",]
 edition = "2021"
 exclude = [ "contract.wasm", "hash.txt",]

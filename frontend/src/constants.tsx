@@ -13,13 +13,15 @@ import { IUser } from "@/src/interfaces";
 export class Dcasino {
 
   /// BEGIN AUTOGEN METADATA 
-  declare DCCASINO_VERSION : string;
-  declare DCASINO_CONTRACT_ADDRESS  : string;
-  declare DCASINO_CODE_ID           : number;
-  declare VIDEO_POKER_CONTRACT_ADDRESS  : string;
-  declare VIDEO_POKER_CODE_ID           : number;
-  declare CHAIN_ID          : string;
-  declare LCD_URL           : string;
+  declare DCCASINO_VERSION                : string;
+  declare DCASINO_CONTRACT_ADDRESS        : string;
+  declare DCASINO_CODE_ID                 : number;
+  declare VIDEO_POKER_CONTRACT_ADDRESS    : string;
+  declare VIDEO_POKER_CODE_ID             : number;
+  declare BLACK_JACK_21_CONTRACT_ADDRESS  : string;
+  declare BLACK_JACK_21_CODE_ID           : number;
+  declare CHAIN_ID                        : string;
+  declare LCD_URL                         : string;
   /// END AUTOGEN
 
   cli         : SecretNetworkClient = {} as SecretNetworkClient;
@@ -31,6 +33,7 @@ export class Dcasino {
   viewing_key         : string      = '';
   pos_this_session : number = 0;
   video_poker_code_hash   : string      = '';
+  black_jack_21_code_hash : string = '';
   user_info : IUser | undefined = undefined;
   reclaim_code_hash : string = 'db17efceec7a8d2c464af53e142dda38de5ea0665b5c548928d5243b21a624b4';
   reclaim_contract  : string = 'secret18u22df5dan6cyl6xuyjn9wsa3gauf53567ej90';
@@ -72,6 +75,12 @@ export class Dcasino {
 
 
     this.video_poker_code_hash = (await cli?.query.compute.codeHashByCodeId({code_id: String(this.VIDEO_POKER_CODE_ID)})
+    .catch(async (e: any) => { 
+        console.log(`failed to get code hash:\n${JSON.stringify(e)}`);
+      return ""
+    }) as QueryCodeHashResponse).code_hash as string;
+
+    this.black_jack_21_code_hash = (await cli?.query.compute.codeHashByCodeId({code_id: String(this.BLACK_JACK_21_CODE_ID)})
     .catch(async (e: any) => { 
         console.log(`failed to get code hash:\n${JSON.stringify(e)}`);
       return ""

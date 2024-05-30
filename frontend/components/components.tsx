@@ -113,7 +113,7 @@ interface ViewerProps {
       transition={{ duration: 0.3 }}
       className={`
       rounded-lg
-      fixed z-40 top-10 md:top-0 md:bottom-0 left-0 
+      fixed z-40 top-20 md:top-0 md:bottom-0 left-0 
       right-0 m-auto w-4/5 h-3/4 lg:h-2/3 md:w-[730px] 
       lg:w-[800px] bg-neutral-800 text-neutral-200`}>
         <div
@@ -144,7 +144,7 @@ interface ViewerProps {
       transition={{ duration: 0.3 }}
       className={`
       rounded-lg
-      fixed z-40 top-10 md:top-0 md:bottom-0 left-0 
+      fixed z-40 top-20 md:top-0 md:bottom-0 left-0 
       right-0 m-auto w-4/5 h-3/4 lg:h-2/3 md:w-[730px] 
       lg:w-[800px] bg-neutral-800 text-neutral-200`}>
         <div
@@ -168,13 +168,13 @@ interface ViewerProps {
       transition={{ duration: 0.3 }}
       className={`
       rounded-lg ${props.dark? 'invert':''}
-      fixed z-40 top-5 left-0 
+      fixed z-40 top-20 left-0 
       right-0 m-auto w-4/5 md:w-1/2 h-[85%] 
-      bg-neutral-800 text-neutral-200`}>
+      bg-neutral-800 text-neutral-200 overflow-hidden`}>
         <div
         onClick={e=>props.setShow(false)}
         className='absolute items-center justify-center z-50 top-2 right-2 bg-red-900 hover:bg-red-600 px-2 py-1'>x</div>
-        <div className='p-5  h-full text-center break-words text-white items-center justify-center'>
+        <div className='p-5 overflow-hidden h-full text-center break-words text-white items-center justify-center'>
 
           {props.children}
   

@@ -372,7 +372,7 @@ function Header(props: HeaderProps) {
             top-0 bottom-0 left-0 right-0 m-auto z-50
             p-4 rounded-2xl 
             w-1/3`}>
-              <h1 className=' px-2 py-4 text-4xl rounded-2xl font-casino'>Choose your wallet</h1>
+              <h1 className=' px-2 py-4 text-2xl rounded-2xl font-casino'>Choose your wallet</h1>
               <ul>
                 <li className='py-4 hoverrainbow hover:bg-indigo-900 rounded-2xl' onClick={async _ => await connect('Keplr')}>Keplr</li>
                 <li className='py-4 hoverrainbow hover:bg-indigo-900 rounded-2xl' onClick={async _ => await connect('MetaMask')}>MetaMask</li>
@@ -439,7 +439,7 @@ function Header(props: HeaderProps) {
           </span>
 
           <span 
-         className='p-2 rounded-2xl bg-neutral-800 w-fit duration-700'>
+         className={`p-2 rounded-2xl bg-neutral-800 w-fit duration-700 hidden`}>
           { 
             wallet_addr 
             ? <CopyToClipboard 

@@ -1,5 +1,5 @@
 [package]
-name = "dcasino-backend"
+name = "blackjack21-backend"
 version = "0.1.1"
 authors = [ "YAESHA256 (AART)",]
 edition = "2021"

@@ -1,7 +1,7 @@
 import BettingTable from '@/components/betting_table'
 import Controls from '@/components/controls';
 import Hand from '@/components/hand'
-import { IInstanceState } from '@/src/interfaces';
+import { VPIInstanceState } from '@/src/interfaces';
 import { balance, vp_instance_state } from '@/src/queries';
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation';
@@ -62,16 +62,15 @@ function VideoPoker(props: VideoPokerProps) {
       let inst_state_result = await vp_instance_state();
 
       if (inst_state_result.is_ok) {
-        let inst_state = inst_state_result.inner as IInstanceState;
+        let inst_state = inst_state_result.inner as VPIInstanceState;
 
         // sync state with backend
         setBalance(inst_state.credits)
 
-        if (inst_state.timestamp!== last_timestamp) {
+        if (inst_state.timestamp > last_timestamp) {
 
           setHand([...inst_state.hand]);
           setDealt(inst_state.dealt);
-          setWon(Number(inst_state.last_win))
           setUpdated('-');
           setWon(inst_state.last_win);
 

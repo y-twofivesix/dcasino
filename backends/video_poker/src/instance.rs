@@ -2,7 +2,7 @@
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-use crate::{rng::Pcg64, helpers::translate_card};
+use crate::{helpers::translate_card, rng::Pcg64, state::INSTANCES};
 use cosmwasm_std::{StdResult, Timestamp};
 
 #[derive(Serialize, Debug, Deserialize, Clone, JsonSchema)]
@@ -33,6 +33,7 @@ pub enum Outcome {
 }
 
 impl Outcome {
+
     fn value(&self) -> u8 {
         match *self {
             Outcome::Lose | Outcome::Undefined => 0,
@@ -385,7 +386,6 @@ mod test_instance {
         assert_eq!(inst.draw(&inst.hand.clone()).unwrap(), Outcome::Straight.value()); 
 
     }
-
 
     # [test]
     fn test_identify_four_of_a_kind() {

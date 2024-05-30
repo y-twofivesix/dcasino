@@ -18,9 +18,9 @@ export async function balance() : Promise<[string, string]> {
     return [balance_amount, balance_denom]
 }
 
-export async function vp_instance_state():  Promise<Result<i.IInstanceState | string>>  {
+export async function vp_instance_state():  Promise<Result<i.VPIInstanceState | string>>  {
 
-    let handInfo : i.IInstanceState | any = await dcasino.granter?.query.compute.queryContract({
+    let handInfo : i.VPIInstanceState | any = await dcasino.granter?.query.compute.queryContract({
         contract_address: dcasino.VIDEO_POKER_CONTRACT_ADDRESS,
         code_hash: dcasino.video_poker_code_hash,
         query: 
@@ -35,7 +35,7 @@ export async function vp_instance_state():  Promise<Result<i.IInstanceState | st
         return {inner: e, is_ok: false};
     });
 
-    return { inner: handInfo, is_ok: i.isInstanceState(handInfo) };
+    return { inner: handInfo, is_ok: i.isVPInstanceState(handInfo) };
 }
 
 export async function user():  Promise<Result<i.IUser | string>>  {
@@ -94,4 +94,26 @@ Promise<Result<i.IAliasMnem>> {
 
 
     return { inner: alias_mnem, is_ok : i.isAliasMnem(alias_mnem) };
+}
+
+// blackjack
+
+export async function bj_instance_state():  Promise<Result<i.BJIInstanceState | string>>  {
+
+    let handInfo : i.BJIInstanceState | any = await dcasino.granter?.query.compute.queryContract({
+        contract_address: dcasino.BLACK_JACK_21_CONTRACT_ADDRESS,
+        code_hash: dcasino.black_jack_21_code_hash,
+        query: 
+        { instance_state : { 
+            sender_addr : dcasino.granter.address, 
+            sender_key: dcasino.viewing_key,
+            hash: dcasino.dcasino_code_hash,
+            contract: dcasino.DCASINO_CONTRACT_ADDRESS
+        }},
+    }).catch(async (e: any) => {
+        //console.error(e)
+        return {inner: e, is_ok: false};
+    });
+
+    return { inner: handInfo, is_ok: i.isBJInstanceState(handInfo) };
 }

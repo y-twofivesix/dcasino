@@ -67,13 +67,12 @@ function Controls( props : ControlsProps) {
             150_000, 
             dcasino.enable_alias? dcasino.cli: dcasino.granter);
 
+        setTxLock(false)
+
         if (typeof tx === 'string') {
             swal_error (tx);
-            setTxLock(false)
             return;
         }
-
-        setTxLock(false)
 
         props.setDealt(true);
         props.setHeld(new Set<number>([]));
@@ -99,14 +98,12 @@ function Controls( props : ControlsProps) {
             }},
             [], 150_000, dcasino.enable_alias? dcasino.cli: dcasino.granter);
 
+        setTxLock(false)
         if (typeof tx === 'string') {
 
             swal_error (tx);
-            setTxLock(false)
             return;
         }
-
-        setTxLock(false)
 
         props.setDealt(false);
         let tx_arr_log = tx.arrayLog;

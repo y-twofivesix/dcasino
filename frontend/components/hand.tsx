@@ -59,10 +59,10 @@ function Hand(props : HandProps) {
               width="0"
               height="0"
               sizes="100vw"
-              className={`${props.dark?'invert':''} w-full h-full select-none left-0 right-0 m-auto p-2`}
+              className={`${props.dark?'invert':''} w-full h-full select-none left-0 right-0 m-auto rounded-lg bg-white`}
               alt='hand'
               //src={`/deck2/as.svg`}
-              src={`/deck2/${numberToImg(card)}.png`}
+              src={numberToImg(card)}
               />
 
               <div className={`

@@ -1,7 +1,7 @@
 
 use cosmwasm_std::{QuerierWrapper, StdResult, Storage, Timestamp};
 
-use crate::{generated::state::INSTANCES, helpers::try_option, instance::{Instance, Outcome}};
+use crate::{generated::state::INSTANCES, instance::Outcome};
 
 use super::contract_query_user;
 
@@ -23,9 +23,10 @@ pub fn query_instance_state(
         Some(inst) => {
             Ok(super::InstanceState { 
                 hand: inst.hand, 
+                dealer: inst.dealer, 
                 bet: inst.bet, 
                 dealt: inst.dealt,
-                last_outcome: inst.last_outcome,
+                outcome: inst.outcome,
                 last_win: inst.last_win,
                 timestamp: inst.timestamp,
                 credits: user.credits
@@ -33,10 +34,11 @@ pub fn query_instance_state(
         }
         None => {
             Ok(super::InstanceState { 
-                hand: vec![255, 255, 255, 255, 255], 
+                hand: vec![],
+                dealer: vec![],
+                outcome: Outcome::Undefined,
                 bet: 0, 
                 dealt: false,
-                last_outcome: "Undefined".to_string(),
                 last_win: 0,
                 timestamp: Timestamp::from_seconds(0),
                 credits: user.credits

@@ -1,6 +1,6 @@
 {
     "name": "dcasino",
-    "version": "0.2.7",
+    "version": "0.2.13",
     "private": true,
     "license": "UNLICENSED",
     "scripts": {
@@ -44,6 +44,7 @@
     },
     "devDependencies": {
         "@types/bluebird": "^3.5.42",
+        "@types/jquery": "^3.5.29",
         "@types/react-copy-to-clipboard": "^5.0.7",
         "tailwindcss": "^3.4.1",
         "typescript": "^5.0.4"

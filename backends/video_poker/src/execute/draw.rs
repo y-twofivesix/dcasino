@@ -33,12 +33,12 @@ pub fn execute_draw(
 
             // add credits
             let config = CONFIG.load(deps.storage)?;
-            let down_credit_msg = ContractMsg::UpCredit { addr: sender_addr.clone(), amount: prize as u64 };
+            let up_credit_msg = ContractMsg::UpCredit { addr: sender_addr.clone(), amount: prize as u64 };
 
             let cosmos_msg = WasmMsg::Execute {
                 contract_addr: config.parent_contract,
                 code_hash: config.parent_hash,
-                msg: to_binary(&down_credit_msg)?,
+                msg: to_binary(&up_credit_msg)?,
                 funds: vec![],
             };
 
