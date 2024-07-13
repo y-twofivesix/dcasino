@@ -52,21 +52,20 @@ function Hand(props : HandProps) {
           entries.push(
             <div
             onClick={_ => handleClickCard(card)}
-            className={`float-left w-1/5  relative px-2`}>
+            className={`float-left h-fit w-fit md:w-1/5 relative px-2`}>
               <motion.img
               initial={{ opacity: 0 }}
-              animate={{ opacity: hold || !props.dealt? 1:0.75 , translateY: hold? -10: 0 }}
+              animate={{ opacity: hold || !props.dealt? 1:0.75 , scale: hold? 1.05: 1 }}
               width="0"
               height="0"
               sizes="100vw"
-              className={`${props.dark?'invert':''} w-full h-full select-none left-0 right-0 m-auto rounded-lg bg-white`}
+              className={`${props.dark?'invert':''} justify-center w-auto h-[100px] md:w-full md:h-full select-none left-0 right-0 m-auto rounded-lg bg-white`}
               alt='hand'
-              //src={`/deck2/as.svg`}
               src={numberToImg(card)}
               />
 
               <div className={`
-              text-center w-full p-1 text-neutral-800 ${props.dealt? '':'hidden'}
+              text-center w-full p-1 text-sm text-neutral-800 ${props.dealt? '':'invisible'}
               ${hold ? 'bg-neutral-300' :''} `}>
                 {hold ? 'held!' : 'hold?'}
               </div>

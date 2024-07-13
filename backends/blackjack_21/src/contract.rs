@@ -61,13 +61,15 @@ pub fn execute(deps: DepsMut, env: Env, info: MessageInfo, msg: ExecuteMsg) -> S
         ),
         ExecuteMsg::Stand {
             sender_key,
-            as_alias
+            as_alias,
+            double_down
         } => execute::hit_or_stand::execute_stand(
             deps,
             env,
             info,
             sender_key,
-            as_alias
+            as_alias,
+            double_down
         ),
         ExecuteMsg::SetViewingKey { 
             key 
@@ -77,6 +79,7 @@ pub fn execute(deps: DepsMut, env: Env, info: MessageInfo, msg: ExecuteMsg) -> S
         } => execute::su::sudo_set_parent_contract(deps, info, hash, addr),
         ExecuteMsg::AddSu { addr } => execute::su::sudo_add_su(deps, info, addr),
         ExecuteMsg::RemoveSu { addr } => execute::su::sudo_remove_su(deps, info, addr),
+        ExecuteMsg::Insurance { sender_key, as_alias } => execute::insurance::execute_insurance(deps, env, info, sender_key, as_alias)
     }
 }
 

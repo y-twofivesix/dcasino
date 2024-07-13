@@ -2,9 +2,10 @@ import { BJIInstanceState } from '@/src/interfaces';
 import { bj_instance_state } from '@/src/queries';
 import React, { useCallback, useEffect, useState } from 'react'
 import { ERR_UNAUTHORISED, dcasino } from '@/generated/constants';
-import { numberToImg, swal_alert, swal_confirm, swal_error, translate_card } from '@/src/helpers';
+import { numberToImg, swal_alert, swal_error, translate_card } from '@/src/helpers';
 import { motion } from 'framer-motion';
 import { send_tx } from '@/src/transactions';
+import { Tooltip } from '@mui/material'
 
 interface BlackJack21Props {
   active: boolean
@@ -14,8 +15,7 @@ interface CardProps {
     value: number | undefined,
     hovered: boolean,
     reset: boolean,
-    setReset: React.Dispatch<React.SetStateAction<boolean>>,
-    dealt: boolean,
+    dealt: boolean | undefined,
     setHovered: React.Dispatch<React.SetStateAction<boolean>>,
     tx_lock: boolean,
     setTxLock: React.Dispatch<React.SetStateAction<boolean>>,
@@ -27,30 +27,22 @@ interface CardProps {
 interface DealerProps {
     pos: number
     value: number | undefined,
-    reset: boolean,
   }
 
 function DealerCard(props: DealerProps) {
-    return (<motion.img
+    return (
+    <motion.img
     animate={{ x: props.pos * 25 }}
         alt={`dealercard-${props.value}`} 
     src={numberToImg(props.value)}
     className={`
-    absolute top-5 w-[100px] 
-    h-[150px] duration-700 
+    absolute top-24 w-[90px] md:w-[100px] 
+    h-[125px] md:h-[150px] duration-700 
     ${ props.value==undefined?'opacity-0':''}`}
     />)
 }
 
 function Card (props: CardProps) {
-
-    const [removed, setRemoved] = useState(false);
-
-    useEffect(function(){
-        if (!props.reset) {
-            setRemoved(false);
-        }
-    }, [props.reset])
 
     const handleClick = useCallback(async () => {
 
@@ -111,50 +103,16 @@ function Card (props: CardProps) {
 function BlackJack21(props: BlackJack21Props) {
 
     const [last_timestamp, setLastTimeStamp] = useState(0);
-    const [dealt, setDealt] = useState(false);
-    const [hand, setHand] = useState([] as number[]);
-    const [dealer, setDealer] = useState([] as number[]);
-    const [won, setWon] = useState(0);
     const [user_bal, setBalance] = useState(undefined as number | undefined);
     const [tx_lock, setTxLock] = useState(false)
     const [cards_hovered, setCardHovered] = useState(false);
     const [reset, setReset] = useState(false);
     const [message, setMessage] = useState('');
-    const [bet, setBet] = useState(1);
+    const [bet, setBet] = useState(2);
 
-    const calculateScore = (hand: number[]) => {
-        let aces = 0;
-        let score = 0;
-        hand.forEach( card => {
-            let [_, value] = translate_card(card)
+    const [inst, setInst] = useState(undefined as BJIInstanceState | undefined)
 
-            if( value >= 9 ) {
-                value = 10;
-            } else if ( value == 0 ){
-                value = 11; 
-                aces=+1;               
-            } else {
-                value +=1
-            }
-            score+=(value);
-        })
-
-        if (score>21) {
-            let inter_value = score
-            
-            for (let i=0; i<aces; ++i) {
-                inter_value -= 10 // discount 10
-                if (inter_value <= 21) {
-                    score = inter_value
-                    break;
-                }
-            }
-        }
-
-        return score
-    }
-
-    const handleStand = useCallback(async ()=>{
+    const handleInsurance = useCallback(async ()=>{
         if (tx_lock) return
         setTxLock(true)
         setMessage('please wait...')
@@ -162,9 +120,9 @@ function BlackJack21(props: BlackJack21Props) {
         let tx = await send_tx(
             dcasino.BLACK_JACK_21_CONTRACT_ADDRESS,
             dcasino.black_jack_21_code_hash, 
-            { stand : { 
+            { insurance : { 
                 sender_key: dcasino.viewing_key,
-                as_alias: dcasino.enable_alias
+                as_alias: dcasino.enable_alias,
             }},
             [], 150_000, dcasino.enable_alias? dcasino.cli: dcasino.granter);
 
@@ -175,6 +133,35 @@ function BlackJack21(props: BlackJack21Props) {
             return;
         }
     },[])
+
+    const handleStand = useCallback(async ( double_down: boolean)=>{
+        console.log(inst)
+        if (!inst) return
+        if (double_down && inst.credits < inst.bet)  {
+            await swal_alert('Not enough credits!');
+            return
+        }
+        if (tx_lock) return
+        setTxLock(true)
+        setMessage('please wait...')
+
+        let tx = await send_tx(
+            dcasino.BLACK_JACK_21_CONTRACT_ADDRESS,
+            dcasino.black_jack_21_code_hash, 
+            { stand : { 
+                sender_key: dcasino.viewing_key,
+                as_alias: dcasino.enable_alias,
+                double_down: double_down
+            }},
+            [], 150_000, dcasino.enable_alias? dcasino.cli: dcasino.granter);
+
+        setTxLock(false)
+        if (typeof tx === 'string') {
+            swal_error (tx);
+            setMessage('')
+            return;
+        }
+    },[inst])
 
     useEffect(function() {
         let cards = document.getElementsByClassName('card')
@@ -201,22 +188,13 @@ function BlackJack21(props: BlackJack21Props) {
            if (inst_state_result.is_ok) {
              let inst_state = inst_state_result.inner as BJIInstanceState;
              // sync state with backend
-             setBalance(inst_state.credits)
-
-             console.log(inst_state_result.inner);
-             
+             setBalance(inst_state.credits)             
 
              if (inst_state.timestamp > last_timestamp) {
     
-                setHand([...inst_state.hand]);
-                setDealer([...inst_state.dealer]);
-                setDealt(inst_state.dealt);
-                setWon(inst_state.last_win);
-                setBalance(inst_state.credits);
-                let curr_score = calculateScore(inst_state.hand);
-                let dealer_score = calculateScore(inst_state.dealer);
+                setInst(inst_state);
                 let outcome = inst_state.outcome;
-                setMessage(`You: ${curr_score} vs House: ${dealer_score} ${inst_state.dealt? '' : `(${inst_state.outcome})`}`)
+                setMessage(`You: ${inst_state.score} vs House: ${inst_state.dealer_score} ${inst_state.dealt? '' : `(${inst_state.outcome})`}`)
                 setLastTimeStamp(inst_state.timestamp)
 
                 if (!inst_state.dealt) {
@@ -226,15 +204,13 @@ function BlackJack21(props: BlackJack21Props) {
                     else if (outcome == 'Lose') { message = 'You Lost!'}
                     else { message = `${outcome}!`}
                     
-                    await swal_alert(message).then(()=>{
-                        setReset(true);
-                        setMessage('');
-                        setHand([]);
-                        setDealer([]);
-                    });
+                    if (outcome != "Undefined") {
+                        await swal_alert(message);
+                    }
 
-                    
-
+                    setReset(true);
+                    setMessage('');
+                    setInst(undefined)
 
                 } else {
                     setBet(inst_state.bet);
@@ -255,41 +231,58 @@ function BlackJack21(props: BlackJack21Props) {
      
          const id = setInterval(do_query, 4000);
          return () => clearInterval(id);
-       },[dealt, last_timestamp, props.active]);
+       },[inst, last_timestamp, props.active]);
 
 
   return (
     <div className='bg-red-600 w-full h-full overflow-hidden relative'>
 
-        <DealerCard pos={1} reset={reset} value={dealer[0]}/>
-        <DealerCard pos={2} reset={reset} value={dealer[1]}/>
-        <DealerCard pos={3} reset={reset} value={dealer[2]}/>
-        <DealerCard pos={4} reset={reset} value={dealer[3]}/>
-        <DealerCard pos={5} reset={reset} value={dealer[4]}/>
-        <DealerCard pos={6} reset={reset} value={dealer[5]}/>
+        <DealerCard pos={1} value={inst?.dealer[0]}/>
+        <DealerCard pos={2} value={inst?.dealer[1]}/>
+        <DealerCard pos={3} value={inst?.dealer[2]}/>
+        <DealerCard pos={4} value={inst?.dealer[3]}/>
+        <DealerCard pos={5} value={inst?.dealer[4]}/>
+        <DealerCard pos={6} value={inst?.dealer[5]}/>
         
         
         <div className="cards">
-            <Card setMessage={setMessage} bet={bet} reset={reset} setReset={setReset} dealt={dealt} value={hand[4]} hovered={cards_hovered} setHovered={setCardHovered} tx_lock={tx_lock} setTxLock={setTxLock}/>
-            <Card setMessage={setMessage} bet={bet} reset={reset} setReset={setReset} dealt={dealt} value={hand[3]} hovered={cards_hovered} setHovered={setCardHovered} tx_lock={tx_lock} setTxLock={setTxLock}/>
-            <Card setMessage={setMessage} bet={bet} reset={reset} setReset={setReset} dealt={dealt} value={hand[2]} hovered={cards_hovered} setHovered={setCardHovered} tx_lock={tx_lock} setTxLock={setTxLock}/>
-            <Card setMessage={setMessage} bet={bet} reset={reset} setReset={setReset} dealt={dealt} value={hand[1]} hovered={cards_hovered} setHovered={setCardHovered} tx_lock={tx_lock} setTxLock={setTxLock}/>
-            <Card setMessage={setMessage} bet={bet} reset={reset} setReset={setReset} dealt={dealt} value={hand[0]} hovered={cards_hovered} setHovered={setCardHovered} tx_lock={tx_lock} setTxLock={setTxLock}/>
+            <Card setMessage={setMessage} bet={bet} reset={reset} dealt={inst?.dealt} value={inst?.hand[4]} hovered={cards_hovered} setHovered={setCardHovered} tx_lock={tx_lock} setTxLock={setTxLock}/>
+            <Card setMessage={setMessage} bet={bet} reset={reset} dealt={inst?.dealt} value={inst?.hand[3]} hovered={cards_hovered} setHovered={setCardHovered} tx_lock={tx_lock} setTxLock={setTxLock}/>
+            <Card setMessage={setMessage} bet={bet} reset={reset} dealt={inst?.dealt} value={inst?.hand[2]} hovered={cards_hovered} setHovered={setCardHovered} tx_lock={tx_lock} setTxLock={setTxLock}/>
+            <Card setMessage={setMessage} bet={bet} reset={reset} dealt={inst?.dealt} value={inst?.hand[1]} hovered={cards_hovered} setHovered={setCardHovered} tx_lock={tx_lock} setTxLock={setTxLock}/>
+            <Card setMessage={setMessage} bet={bet} reset={reset} dealt={inst?.dealt} value={inst?.hand[0]} hovered={cards_hovered} setHovered={setCardHovered} tx_lock={tx_lock} setTxLock={setTxLock}/>
         </div>
 
-        <div className='absolute top-0 left-0 text-center w-full'>
-            <div className='text-white p-8'>
-                <span className='p-2 rounded-lg'>CREDITS: {user_bal}</span>
-                <span onClick={async _=>{await handleStand()}} className={`p-2 rounded-lg ${hand.length>1?'bg-green-600 hover:bg-green-900':'opacity-50'}`}>STAND</span>
+        <div className='absolute top-10 right-0 text-right w-full'>
+            <div className='text-white p-1 w-[125px] absolute top-0 right-0'>
+                <div className='p-2 text-center w-full rounded-lg'>CR: {user_bal}</div>
+                <Tooltip title='Stand: hold your total and end your turn.' arrow={true}>
+                    <div onClick={async _=>{await handleStand(false)}} className={`p-2 text-center w-full rounded-lg ${inst&&inst.hand.length>1?'bg-green-600 hover:bg-green-900':'opacity-50'}`}>STAND</div>
+                </Tooltip>
+
+                <Tooltip title='Insurance: put up half your bet - receive double if house has 21.' arrow={true}>
+                <div onClick={async _=>{ if ( inst&&!inst.insured&&translate_card(inst&&inst.dealer[0])[1] == 0 ) await handleInsurance()}} 
+                className={`
+                p-2 rounded-lg text-center w-full
+                ${inst && inst.insured 
+                    ? 'bg-green-800' 
+                    : `${inst&&inst.dealer[0] && translate_card(inst&&inst.dealer[0])[1] == 0 ?'bg-orange-600 hover:bg-orange-900':'opacity-50'}`}
+                `}>INSURE</div>
+                </Tooltip>
+
+                <Tooltip title='Double Down: take one final card and double your bet.' arrow={true}>
+                    <div onClick={async _=>{await handleStand(true)}} 
+                    className={`p-2 text-center w-full rounded-lg ${inst&&(inst.credits>=inst.bet)&&inst.hand.length>1?'bg-red-700 hover:bg-red-800':'opacity-50'}`}>DOUBLE</div>
+                </Tooltip>
             </div>
-            <div>{cards_hovered?(!dealt?`deal?`:`${message} hit?`):message}</div>
+            <div className='p-4 text-left md:text-center'>{cards_hovered?(!(inst&&inst.dealt)?`deal?`:`${message} hit?`):message}</div>
         </div>
 
-        <div className='absolute bottom-0 left-0 text-right w-full'>
-            <div className='text-white p-8'>
-                <span onClick={async _=>{ if (!dealt && bet > 1) setBet( bet-1 )} } className='hover:bg-red-900 p-2 rounded-lg'>DOWN</span>
-                <span className='p-2 rounded-lg'>BET: {bet}</span>
-                <span onClick={async _=>{ if (!dealt && bet < 21) setBet( bet+1 )}} className='hover:bg-red-900 p-2 rounded-lg'>UP</span>
+        <div className='absolute bottom-0 right-0 text-right'>
+            <div className='text-white py-4 p-1 w-[125px]'>
+                <div onClick={async _=>{ if (!inst?.dealt && bet < 20) setBet( bet+2 )}} className='p-2 bg-green-900 md:hover:bg-red-900 rounded-lg text-center'>UP</div>
+                <div className='p-2 rounded-lg text-center'>BET: {bet}</div>
+                <div onClick={async _=>{ if (!inst?.dealt && bet > 2) setBet( bet-2 )} } className='p-2 bg-red-900 md:hover:bg-red-900 rounded-lg text-center'>DOWN</div>
             </div>
         </div>
     </div>

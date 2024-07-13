@@ -18,13 +18,13 @@ interface ITableRowrops {
 
 function TableRow(props: ITableRowrops ) {
     return (
-    <div className={`table-row text-lg ${props.crt?'screen-glitch':''} ${ props.outcome == props.title ? ' bg-green-600 text-white': 'bg-neutral-800'}`}>
-        <div className={`table-cell border-1 border-dotted border-black select-none px-4 ${props.outcome != props.title ? 'text-red-600 bg-blue-800': ''}  text-left`}>{props.title}</div>
-        <div className={`table-cell select-none px-4 text-white  text-left ${props.bet == 1 ? (props.outcome==props.title? 'rainbow-bg':'bg-red-600'): ''}`}>{props.rewards[0]}</div>
-        <div className={`table-cell select-none px-4 text-white  text-left ${props.bet == 2 ? (props.outcome==props.title? 'rainbow-bg':'bg-red-600'): ''}`}>{props.rewards[1]}</div>
-        <div className={`table-cell select-none px-4 text-white  text-left ${props.bet == 3 ? (props.outcome==props.title? 'rainbow-bg':'bg-red-600'): ''}`}>{props.rewards[2]}</div>
-        <div className={`table-cell select-none px-4 text-white  text-left ${props.bet == 4 ? (props.outcome==props.title? 'rainbow-bg':'bg-red-600'): ''}`}>{props.rewards[3]}</div>
-        <div className={`table-cell select-none px-4 text-white  text-left ${props.bet == 5 ? (props.outcome==props.title? 'rainbow-bg':'bg-red-600'): ''}`}>{props.rewards[4]}</div>
+    <div className={`table-row md:text-lg ${props.crt?'screen-glitch':''} ${ props.outcome == props.title ? ' bg-green-600 text-white': 'bg-neutral-800'}`}>
+        <div className={`table-cell md:border-1 border-dotted border-black select-none md:px-4 ${props.outcome != props.title ? 'text-red-600 bg-blue-800': ''}  text-left`}>{props.title}</div>
+        <div className={`table-cell select-none px-0.5 md:px-4 text-white  text-left ${props.bet == 1 ? (props.outcome==props.title? 'rainbow-bg':'bg-red-600'): ''}`}>{props.rewards[0]}</div>
+        <div className={`table-cell select-none px-0.5 md:px-4 text-white  text-left ${props.bet == 2 ? (props.outcome==props.title? 'rainbow-bg':'bg-red-600'): ''}`}>{props.rewards[1]}</div>
+        <div className={`table-cell select-none px-0.5 md:px-4 text-white  text-left ${props.bet == 3 ? (props.outcome==props.title? 'rainbow-bg':'bg-red-600'): ''}`}>{props.rewards[2]}</div>
+        <div className={`table-cell select-none px-0.5 md:px-4 text-white  text-left ${props.bet == 4 ? (props.outcome==props.title? 'rainbow-bg':'bg-red-600'): ''}`}>{props.rewards[3]}</div>
+        <div className={`table-cell select-none px-0.5 md:px-4 text-white  text-left ${props.bet == 5 ? (props.outcome==props.title? 'rainbow-bg':'bg-red-600'): ''}`}>{props.rewards[4]}</div>
     </div>
     )
 }
@@ -34,7 +34,7 @@ function BettingTable( props : IBettingTableProps) {
   return (
     <div className=''>
         
-        <div className={`table w-full text-base rounded-lg p-1 text-sm`}>
+        <div className={`table w-full rounded-lg md:p-1 text-sm`}>
 
             <div className="table-row-group">
 

@@ -5,6 +5,8 @@ pub mod deal;
 pub mod hit_or_stand;
 pub mod set_vk;
 pub mod su;
+pub mod insurance;
+
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum ContractMsg {
@@ -17,10 +19,18 @@ pub enum ContractMsg {
 pub enum ExecuteMsg {
 
     /******************************************************************************
-     start / restart a game instance by deailing cards
+     start / restart a game instance by dealing cards
     *******************************************************************************/
     Deal {
         bet: u8,
+        sender_key: String,
+        as_alias: bool
+    },
+
+    /******************************************************************************
+     start / restart a game instance by dealing cards
+    *******************************************************************************/
+    Insurance {
         sender_key: String,
         as_alias: bool
     },
@@ -38,7 +48,8 @@ pub enum ExecuteMsg {
     *******************************************************************************/
     Stand {
         sender_key: String,
-        as_alias: bool
+        as_alias: bool,
+        double_down: bool
     },
 
     /******************************************************************************

@@ -114,7 +114,7 @@ function Controls( props : ControlsProps) {
     }
     
   return (
-    <div className='absolute bottom-5 w-full'>
+    <div className='absolute bottom-8 w-full text-sm md:text-base'>
     <div className='rainbow text-center w-full'>{props.dealt?'Choose cards to hold and then draw!':'Place your bet and then deal!'}</div>
     <div className='select-none text-white w-full flex justify-center items-center'>
         <div 
@@ -134,12 +134,12 @@ function Controls( props : ControlsProps) {
             }
         }
         } 
-        className={`${props.dealt || props.bet==1  ?'opacity-50':''} bg-neutral-800 p-4 hover:bg-red-800 select-none`}>
-            down bet
+        className={`${props.dealt || props.bet==1  ?'md:opacity-50  ':''} bg-neutral-800 p-4 hover:bg-red-800 select-none`}>
+            down
         </div>
 
         <div 
-        className={`bg-neutral-800 ${props.dealt? 'opacity-50' :''} p-4 select-none`}>
+        className={`bg-neutral-800 ${props.dealt? 'md:opacity-50' :''} p-4 select-none`}>
             bet {props.bet}
         </div>
 
@@ -151,8 +151,8 @@ function Controls( props : ControlsProps) {
                 play('bet');
             } 
         }} 
-        className={`${props.dealt || props.bet==5 ?'opacity-50':''} bg-neutral-800 p-4 hover:bg-green-800 select-none`}>
-            up bet
+        className={`${props.dealt || props.bet==5 ?'md:opacity-50':''} bg-neutral-800 p-4 hover:bg-green-800 select-none`}>
+            up
         </div>
 
         <div 

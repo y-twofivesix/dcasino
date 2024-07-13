@@ -2,15 +2,12 @@ import BettingTable from '@/components/betting_table'
 import Controls from '@/components/controls';
 import Hand from '@/components/hand'
 import { VPIInstanceState } from '@/src/interfaces';
-import { balance, vp_instance_state } from '@/src/queries';
+import { vp_instance_state } from '@/src/queries';
 import React, { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation';
 import { ERR_UNAUTHORISED, dcasino } from '@/generated/constants';
-import { currency_str, normal, red, swal_alert } from '@/src/helpers';
+import { normal, red, } from '@/src/helpers';
 import { motion } from 'framer-motion';
-import { faHome } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import Link from 'next/link';
+
 
 interface VideoPokerProps {
   active: boolean
@@ -18,7 +15,6 @@ interface VideoPokerProps {
 
 function VideoPoker(props: VideoPokerProps) {
 
-  const { push } = useRouter();
   const [hand, setHand] = useState([255,255,255,255,255]);
   const [bet, setBet] = useState(1);
   const [dealt, setDealt] = useState(false);
@@ -114,10 +110,16 @@ function VideoPoker(props: VideoPokerProps) {
     return () => clearInterval(id);
   },[dealt, outcome, last_timestamp, props.active]);
 
-  let screen =  <div className={`w-full h-full bg-blue-700 absolute p-6 vp-sys-font ${crt?'screen-jerk':''}`}>
+  let screen =  <div className={`w-full h-full bg-blue-700 absolute p-3 md:p-6 vp-sys-font text-sm ${crt?'screen-jerk':''}`}>
 
-    <div className={`pt-2 text-white text-center ${crt?'screen-glitch screen-glitch2':''}`}><span>{red('\u2665')} Video Poker {normal('\u2660')}</span></div>
-    <div className='relative max-h-[50%] overflow-auto'>
+    <div className={`pt-4 text-lg text-white text-center ${crt?'screen-glitch screen-glitch2':''}`}><span>{red('\u2665')} Video Poker {normal('\u2660')}</span></div>
+
+    <div className='p-1 relative right-0 text-base inline bg-white text-black rounded-2xl'>
+      <span className='px-2'>CR: {user_bal!=undefined? user_bal: '-'}</span>
+      <span className='px-2'>pos: <span className={dcasino.pos_this_session < 0 ? 'text-red-600':'text-green-600'}>{dcasino.pos_this_session}</span></span>
+    </div>
+
+    <div className='relative md:max-h-[50%] max-h-[32%] overflow-auto'>
     <BettingTable
     dealt={dealt}
     bet={bet}
@@ -125,25 +127,21 @@ function VideoPoker(props: VideoPokerProps) {
     crt={crt}/>
     </div>
 
-  <div className='relative w-full h-[10%] max-h-[10%] overflow-hidden'>
+  <div className='relative w-full h-auto p-3 max-h-[10%] overflow-hidden'>
 
-    <div className='absolute left-0 p-1 text-base bg-white w-fit inline text-black rounded-r-2xl'>
+    <span className={
+      `p-1 text-base text-center text-white left-0 right-0 m-auto relative
+      ${dealt? 'bg-orange-600': (outcome == 'Lose' || outcome == 'Undefined'? 'bg-red-600': 'bg-green-600') } w-fit text-white`}>
+      {dealt ? 'hold and/or draw': `${outcome}` }
+    </span>
+
+    <span className='relative left-0 p-1 text-base bg-white w-fit inline text-black'>
       {dealt ? '...' : (won == 0 ? 'You lost!':`You won: ${won}`) }
-    </div>
+    </span>
 
-    <div className={
-      `p-1 text-lg text-center text-white left-0 right-0 m-auto absolute
-      ${outcome == 'Lose' || outcome == 'Undefined'? 'bg-red-600': 'bg-green-600' } w-fit text-white`}>
-      {dealt ? 'hold and/or draw': `Result: ${outcome}` }
-    </div>
-
-    <div className='p-1 absolute right-0 text-base inline bg-white text-black rounded-l-2xl'>
-      <div>Credits: {user_bal!=undefined? user_bal: '-'}</div>
-      <div>position: <span className={dcasino.pos_this_session < 0 ? 'text-red-600':'text-green-600'}>{dcasino.pos_this_session}</span></div>
-    </div>
   </div>
 
-  <div className='relative w-[80%] h-[30%] left-0 right-0 m-auto py-2'>
+  <div className='relative md:w-[80%] md:h-[30%] left-0 right-0 m-auto md:py-2'>
       <Hand 
       hand={hand}
       dealt={dealt}

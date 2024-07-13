@@ -16,6 +16,7 @@ pub struct Instance {
     pub last_win: u64,
     pub outcome: Outcome,
     pub timestamp: Timestamp,
+    pub insurance: bool,
 }
 
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize, JsonSchema)]
@@ -25,6 +26,7 @@ pub enum Outcome {
     Push, // aka draw
     Win,
     Lose,
+    Insurance
 }
 
 impl Instance {
@@ -36,17 +38,15 @@ impl Instance {
         }
         // do tidy up from previous game if 
         // present
-        if !self.hand.is_empty() {
-            self.deck.append(&mut self.hand);
-            self.deck.append(&mut self.dealer);
-        }
-
+        self.deck.append(&mut self.hand);
+        self.deck.append(&mut self.dealer);
+        self.insurance = false;
+    
         self.shuffle_deck(2);
 
         // deal out one card for self and dealer
         self.hand.push(self.deck.pop().unwrap());
         self.dealer.push(self.deck.pop().unwrap());
-        
         self.dealt = true;
 
         Ok(())
@@ -58,7 +58,6 @@ impl Instance {
             return Err(StdError::generic_err("Not dealt yet!"))
         }
         self.hand.push(self.deck.pop().unwrap());
-        // TODO: if bust set state to bust and reset instance
         if self.score() > 21 {
             self.dealt = false;
             self.outcome = Outcome::Bust;
@@ -70,7 +69,16 @@ impl Instance {
 
     pub fn stand (&mut self) -> StdResult<()> {
 
-        let mut score = self.score();
+        let score = self.score();
+
+        // this only occurs on a double down txn
+        // where the user went bust first.
+        if score > 21 { 
+
+            self.outcome = Outcome::Bust;
+            return Ok(())
+        }
+
         let mut dealer_score;
         let dealer_risk_tol = 17;
 
@@ -84,10 +92,9 @@ impl Instance {
 
             self.dealer.push(self.deck.pop().unwrap());
         }
-        
-        if dealer_score > 21 { dealer_score = 0 }
-        if score > 21 { score = 0}
 
+        if dealer_score > 21 { dealer_score = 0 }
+        
         if score == dealer_score {
             self.outcome = Outcome::Push;
         } else if score > dealer_score {
@@ -103,7 +110,7 @@ impl Instance {
         Self::internal_shuffle_deck(&mut self.deck, times, &mut self.rng);
     }
 
-    fn dealer_score(&self) -> u8 {
+    pub fn dealer_score(&self) -> u8 {
 
         let aces : u8 = self.dealer.iter().filter(|&card| translate_card(*card).1 == 0 ).count() as u8;
         let mut intermediate : u8 = self.dealer.iter().map(
@@ -111,7 +118,7 @@ impl Instance {
 
                 let raw_card = translate_card(*card).1;
                 match raw_card {
-                    10 | 11 | 12 => 10,
+                    10..=12 => 10,
                     0 => 11,
                     _ => raw_card + 1
                 }
@@ -130,7 +137,7 @@ impl Instance {
     }
 
 
-    fn score(&self) -> u8 {
+    pub fn score(&self) -> u8 {
 
         let aces : u8 = self.hand.iter().filter(|&card| translate_card(*card).1 == 0 ).count() as u8;
         let mut intermediate : u8 = self.hand.iter().map(
@@ -138,7 +145,7 @@ impl Instance {
 
                 let raw_card = translate_card(*card).1;
                 match raw_card {
-                    10 | 11 | 12 => 10,
+                    10..=12 => 10,
                     0 => 11,
                     _ => raw_card + 1
                 }
@@ -183,6 +190,7 @@ mod test_instance {
             last_win: 0,
             outcome: Outcome::Undefined,
             timestamp: Timestamp::from_seconds(0),
+            insurance: false,
         }
     }
 

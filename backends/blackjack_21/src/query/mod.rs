@@ -42,7 +42,10 @@ pub struct InstanceState {
     pub last_win: u64,
     pub outcome: Outcome,
     pub timestamp: Timestamp,
-    pub credits: u64
+    pub credits: u64,
+    pub score: u8,
+    pub dealer_score: u8,
+    pub insured: bool,
 }
 
 pub fn contract_query_user(

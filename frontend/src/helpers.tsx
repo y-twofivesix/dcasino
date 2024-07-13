@@ -438,7 +438,6 @@ export const swal_alert = async ( message : string, title : string = '',  timer 
       title: title,
       icon: "info",
       text: message,
-      backdrop: `rgba(0,0,123,0.4)`,
     });
   }
 }

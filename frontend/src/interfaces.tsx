@@ -39,7 +39,10 @@ export interface BJIInstanceState {
     outcome : string
     last_win : number
     timestamp: number
-    credits: number
+    credits: number,
+    score: number,
+    dealer_score: number,
+    insured: boolean
 
 }
 
@@ -53,7 +56,10 @@ export function isBJInstanceState(object : any) : object is BJIInstanceState {
     'outcome' in object &&
     'last_win' in object &&
     'timestamp' in object &&
-    'credits' in object
+    'credits' in object &&
+    'score' in object &&
+    'dealer_score' in object &&
+    'insured' in object
 
 }
 

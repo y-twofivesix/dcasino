@@ -1,9 +1,11 @@
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Pagination, Scrollbar, A11y } from 'swiper/modules';
+import { Navigation, Pagination, } from 'swiper/modules';
 import { motion } from "framer-motion"
-import { Dispatch, SetStateAction, useState } from 'react';
-import Link from 'next/link';
+import { Dispatch, SetStateAction } from 'react';
 
+import 'swiper/css';
+import 'swiper/css/pagination';
+import 'swiper/css/navigation';
 
 export function slide ( title_font: [string, string], content_1: any, content_2: any, setDapp?: Dispatch<SetStateAction<string | undefined>> ) {
 
@@ -11,9 +13,9 @@ export function slide ( title_font: [string, string], content_1: any, content_2:
     <>
     <SwiperSlide key={title_font[0]}>
     <div className='relative w-full h-full'>
-      <h1 className={`bg-neutral-200 text-neutral-800 p-1 text-4xl ${title_font[1]}`}>{title_font[0]}</h1>
+      <h1 className={`bg-neutral-200 text-neutral-800 p-1 text-xl ${title_font[1]}`}>{title_font[0]}</h1>
 
-      <div className='grid md:grid-cols-2 pt-4'>
+      <div className='grid md:grid-cols-2 pt-4 px-10'>
 
         <div className='text-left text-sm md:text-base py-4 h-full overflow-y-auto'>
           {content_1}
@@ -24,9 +26,8 @@ export function slide ( title_font: [string, string], content_1: any, content_2:
       </div>
 
         <div 
-        onClick={_=>{setDapp ? setDapp(title_font[0]): ''}}
         className='absolute bottom-16 w-full p-1 cursor-pointer text-orange-600 bg-neutral-900'>
-          {`let's go!`}
+          <span onClick={_=>{setDapp ? setDapp(title_font[0]): ''}} >{`let's go!`}</span>
         </div>
         
     </div>
@@ -42,7 +43,7 @@ export function slide3 ( title: string, content_1: any, external_link?: string) 
     <div className='relative w-full h-full'>
       <h1 className='bg-neutral-200 text-neutral-800 p-1'>{title}</h1>
 
-      <div className='px-4 pt-4'>
+      <div className='px-4 pt-4 px-10'>
 
         <div className='text-left text-sm md:text-base py-4 h-full overflow-y-auto'>
           {content_1}
@@ -119,11 +120,13 @@ interface ViewerProps {
         <div
         onClick={e=>props.setShow(false)}
         className='absolute items-center justify-center z-50 top-2 right-2 bg-red-900 hover:bg-red-600 px-2 py-1'>x</div>
-        <div className='pt-16 pb-5 px-10  h-full text-center break-words text-white items-center justify-center'>
+        <div className='pt-16 pb-5 px-2  h-full text-center break-words text-white items-center justify-center'>
           <Swiper
+          
           className='h-full relative overflow-y-auto'
-            modules={[Navigation, Pagination, Scrollbar, A11y]}
-            pagination={{ clickable: true , type: "bullets", }}
+            modules={[Navigation, Pagination]}
+            pagination={{ type: 'progressbar', }}
+            navigation= {true}
             spaceBetween={50}
             slidesPerView={1}
           >
@@ -168,13 +171,13 @@ interface ViewerProps {
       transition={{ duration: 0.3 }}
       className={`
       rounded-lg ${props.dark? 'invert':''}
-      fixed z-40 top-20 left-0 
-      right-0 m-auto w-4/5 md:w-1/2 h-[85%] 
+      fixed md:z-40 z-50 md:top-20 left-0 
+      right-0 m-auto w-full max-h-[750px] h-[95%] md:w-[900px] md:h-[800px] 
       bg-neutral-800 text-neutral-200 overflow-hidden`}>
         <div
         onClick={e=>props.setShow(false)}
         className='absolute items-center justify-center z-50 top-2 right-2 bg-red-900 hover:bg-red-600 px-2 py-1'>x</div>
-        <div className='p-5 overflow-hidden h-full text-center break-words text-white items-center justify-center'>
+        <div className='p-2 overflow-hidden h-full text-center break-words text-white items-center justify-center'>
 
           {props.children}
   

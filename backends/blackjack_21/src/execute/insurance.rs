@@ -1,15 +1,14 @@
 use cosmwasm_std::{to_binary, DepsMut, Env, MessageInfo, Response, StdError, StdResult, WasmMsg};
 
-use crate::{generated::state::{CONFIG, INSTANCES}, helpers::try_option, instance::{Instance, Outcome}, query::{alias::query_alias_of, contract_query_user}, rng::Pcg64};
+use crate::{generated::state::{CONFIG, INSTANCES}, helpers::{translate_card, try_option}, query::{alias::query_alias_of, contract_query_user}};
 
 use super::ContractMsg;
 
 
     // Ask contract to deal 4 cards to player
-pub fn execute_deal( deps : DepsMut,
+pub fn execute_insurance( deps : DepsMut,
     env : Env,
     info : MessageInfo,
-    bet : u8,
     sender_key: String, 
     as_alias: bool) -> StdResult<Response> {
 
@@ -24,38 +23,26 @@ pub fn execute_deal( deps : DepsMut,
             sender_addr.clone(), 
             sender_key)?;
 
-        if bet as u64 > user.credits {
+        let mut inst = try_option(INSTANCES.get(deps.storage, &sender_addr))?;
+
+        if (inst.bet / 2) as u64 > user.credits {
             return Err(StdError::generic_err("Not enough credits to place bet"));
         }
 
-        let mut inst = match try_option(INSTANCES.get(deps.storage, &sender_addr)) {
-            Ok(inst) => inst,
-            _ => Instance {
-                deck: (0..52).collect::<Vec<u8>>(),
-                hand: vec![],
-                dealer: vec![],
-                dealt: false,
-                rng: Pcg64::from_seed(try_option(env.block.random.clone())?.to_array::<32>()?),
-                bet,
-                last_win: 0,
-                outcome: Outcome::Undefined,
-                timestamp: env.block.time,
-                insurance: false,
-            }
-        };
+        if !inst.dealt { return Err(StdError::generic_err("Not yet dealt!")) }
 
-        if inst.dealt {
-            return Err(StdError::generic_err("already dealt"));
+
+        if translate_card (inst.dealer[0]).1 != 0 {
+            return Err(StdError::generic_err("Dealer has no ace!"));
         }
 
-        inst.deal()?;
-        inst.bet = bet;
+        inst.insurance = true;
         inst.timestamp = env.block.time;
         INSTANCES.insert(deps.storage, &sender_addr, &inst)?;
         
         // debit credits
         let config = CONFIG.load(deps.storage)?;
-        let down_credit_msg = ContractMsg::DownCredit { addr: sender_addr, amount: bet as u64 };
+        let down_credit_msg = ContractMsg::DownCredit { addr: sender_addr, amount: (inst.bet / 2) as u64 };
         let cosmos_msg = WasmMsg::Execute {
             contract_addr: config.parent_contract,
             code_hash: config.parent_hash,

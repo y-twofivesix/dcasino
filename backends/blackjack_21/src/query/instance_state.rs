@@ -22,14 +22,17 @@ pub fn query_instance_state(
     match INSTANCES.get(store, &sender_addr) {
         Some(inst) => {
             Ok(super::InstanceState { 
-                hand: inst.hand, 
-                dealer: inst.dealer, 
+                hand: inst.hand.clone(), 
+                dealer: inst.dealer.clone(), 
                 bet: inst.bet, 
                 dealt: inst.dealt,
-                outcome: inst.outcome,
+                outcome: inst.outcome.clone(),
                 last_win: inst.last_win,
                 timestamp: inst.timestamp,
-                credits: user.credits
+                credits: user.credits,
+                score: inst.score(),
+                dealer_score: inst.dealer_score(),
+                insured: inst.insurance
             })
         }
         None => {
@@ -41,7 +44,10 @@ pub fn query_instance_state(
                 dealt: false,
                 last_win: 0,
                 timestamp: Timestamp::from_seconds(0),
-                credits: user.credits
+                credits: user.credits,
+                score: 0,
+                dealer_score: 0,
+                insured: false
             })
         }
     }

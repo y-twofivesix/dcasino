@@ -47,29 +47,7 @@ export default function Home() {
         {dark ? sun : moon}
       </div>
 
-      <motion.div
-          initial={{ opacity: 0, translateY: 0}}
-          animate={{ opacity: 1, translateY: -100 }}
-          transition={{ duration: 1 }}
-          className="relative z-40  justify-between m-auto top-28 bottom-0">
-       
-        <div className='relative items-center justify-center'>
-        <motion.img
-          className="relative m-auto"
-          draggable={false}
-          onContextMenu={e=>e.preventDefault()}
-          src="/images/spade.png"
-          alt="spade Logo"
-          width={180}
-          height={180}
-        />
-        </div>
-        <div className='font-casino text-8xl w-full'>{`d'CASINO`}</div>
-
-
-      </motion.div>
-
-      <div className='flex text-center py-4 w-full md:w-[35%]'>
+      <div className='flex text-center py-16 w-full md:w-[35%]'>
         <motion.div
           initial={{ width: '33%' }}
           animate={{ width: show_games?'100vw':'33%' }}
@@ -84,13 +62,14 @@ export default function Home() {
                 return
             }
 
-            if (!dcasino.vk_valid) {
-                await swal_alert('please set a viewing key!')
-                setShowGames(false);
-                setShowCredits(false);
-                setShowAbout(true);
-                return
-            }
+            //if (!dcasino.vk_valid) {
+            //    await swal_alert('please set a viewing key!')
+            //    setShowGames(false);
+            //    setShowCredits(false);
+            //    setShowAbout(true);
+            //    return
+            //}
+            
           //setShowPartners(false);
           setShowCredits(false);
           setShowAbout(false);
@@ -155,6 +134,30 @@ export default function Home() {
         </motion.div>
 
       </div>
+
+      <motion.div
+          initial={{ opacity: 0, translateY: 0}}
+          animate={{ opacity: 1, translateY: -100 }}
+          transition={{ duration: 1 }}
+          className="relative z-40  justify-between m-auto top-28 bottom-0">
+       
+        <div className='relative items-center justify-center'>
+        <motion.img
+          className="relative m-auto"
+          draggable={false}
+          onContextMenu={e=>e.preventDefault()}
+          src="/images/spade.png"
+          alt="spade Logo"
+          width={180}
+          height={180}
+        />
+        </div>
+        <div className='font-casino text-6xl md:text-8xl w-full'>{`d'CASINO`}</div>
+
+
+      </motion.div>
+
+
 
       <div className='text-xs md:text-sm lg:text-sm text-center'>
         <span className='opacity-25 '>{`d'casino v${dcasino.DCASINO_VERSION}. © 2024. Powered by AART Labs`}</span>

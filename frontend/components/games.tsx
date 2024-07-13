@@ -51,9 +51,11 @@ function Games(props: ConsultProps) {
               </motion.div>, setDapp ),
 
         slide(
-          ['Black Jack (AKA 21)', ''], 
+          ['Black Jack (21)', ''], 
           <>
-          {`The classic Casino game to reach the perfect 21! Coming soon!`}
+          {`The classic casino game of luck and strategy! 
+          It is the most widely played casino banking game in the world. 
+          Also known as "twenty-one". `}
           <br/><br/>
 
           </>,
@@ -79,16 +81,16 @@ function Games(props: ConsultProps) {
       dark={props.dark} 
       vert={true}
       dims={{x:500, y: 500}}>
-        <VideoPoker active={Boolean(dapp)}/>
+        <VideoPoker active={dapp == 'Video Poker'}/>
       </PlainViewer2>
 
       <PlainViewer2 
-      show={dapp == 'Black Jack (AKA 21)'} 
+      show={dapp == 'Black Jack (21)'} 
       setShow={setDapp} 
       dark={props.dark} 
       vert={true}
       dims={{x:500, y: 500}}>
-        <BlackJack21 active={Boolean(dapp)}/>
+        <BlackJack21 active={dapp == 'Black Jack (21)'}/>
       </PlainViewer2>
     </>
    
