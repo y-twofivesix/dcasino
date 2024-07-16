@@ -3,16 +3,19 @@ import { Viewer, slide3 } from './components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faKey, faSquareCheck, faUserGroup, faWallet, faCaretRight, faCircleXmark, faCircle } from '@fortawesome/free-solid-svg-icons'
 import { motion } from 'framer-motion'
-import { check_env, do_init, swal_alert, swal_success } from '@/src/helpers'
+import { check_env, do_init, swal_alert, swal_error, swal_success } from '@/src/helpers'
 import { ERR_UNAUTHORISED, dcasino } from '@/generated/constants'
 import { user } from '@/src/queries'
 import { IUser } from '@/src/interfaces'
 import BounceLoader from "react-spinners/BounceLoader";
 
-interface ConsultProps {
+interface AboutProps {
     show_about: boolean
     setShowAbout: Dispatch<SetStateAction<boolean>>,
-    dark: boolean
+    dark: boolean,
+    wallet_addr: string,
+    setWallet: Dispatch<SetStateAction<string>>,
+    need_vk: boolean
 }
 
 const override: CSSProperties = {
@@ -22,7 +25,7 @@ const override: CSSProperties = {
 };
 
 
-function About(props: ConsultProps) {
+function About(props: AboutProps) {
 
   const wallet = <FontAwesomeIcon color='white' icon={faWallet} />
   const key = <FontAwesomeIcon color='white' icon={faKey} />
@@ -33,46 +36,13 @@ function About(props: ConsultProps) {
   const circle = <FontAwesomeIcon color='grey' icon={faCircle} />
 
   const [show_wallets, setShowWallets] = useState(false);
-  const [wallet_addr, setWallet] = useState(undefined as string | undefined);
-  const [user_info, setUserInfo] = useState(undefined as IUser | undefined);
-  const [need_vk, setNeedVk] = useState(false);
   const [show_kyc, setShowKYC] = useState(false);
   const [verification_link, setVerificationLink] = useState(undefined as string | undefined);
   const [loading, setLoading] = useState('');
 
-
-  const do_query = useCallback(async () => {
-    if (!dcasino.ready || !dcasino.granter) { 
-      setWallet(undefined)
-      dcasino.user_info = undefined;
-      dcasino.pos_this_session = 0;
-      dcasino.set_enable_alias(false);
-      return 
-    }
-
-    let user_res = await user()
-    if (user_res.is_ok) {
-      setUserInfo(user_res.inner as IUser)
-      dcasino.user_info = user_res.inner as IUser;
-      dcasino.vk_valid = true;
-      setNeedVk(false)
-    } 
-    else if (ERR_UNAUTHORISED.test(user_res.inner as string)) {
-      
-      dcasino.vk_valid = false;
-      setNeedVk(true)
-    }
-  }, [wallet_addr, need_vk]);
-
-  useEffect(function () {
-    do_query();
-    const id = setInterval(do_query, 5_000);
-    return () => clearInterval(id);
-  }, [])
-
   const handleAlias = async () => {
 
-    if (!dcasino.ready || !wallet_addr){ 
+    if (!dcasino.ready || !props.wallet_addr){ 
       await swal_alert(`Please connect a wallet first`,'')
       return 
     }
@@ -92,7 +62,7 @@ function About(props: ConsultProps) {
 
   const handleViewingKey = async () => {
 
-    if (!dcasino.ready || !wallet_addr){ 
+    if (!dcasino.ready || !props.wallet_addr){ 
       await swal_alert(`Please connect a wallet first`,'')
       return 
     }
@@ -111,8 +81,8 @@ function About(props: ConsultProps) {
     //   if (!accepted_terms) return
     // }
 
-    if (wallet_addr) {
-      setWallet(undefined);
+    if (props.wallet_addr) {
+      props.setWallet('');
       dcasino.ready = false;
       dcasino.user_info = undefined;
       dcasino.pos_this_session = 0;
@@ -147,10 +117,13 @@ function About(props: ConsultProps) {
     setShowWallets(false);
     if (await do_init(wallet)) {
       await check_env();
-      setWallet(`${wallet} wallet with address: ${dcasino.granter.address}`)
+      
+      let addr_pre = dcasino.granter.address.substring(0,6)
+      let addr_end = dcasino.granter.address.substring(40)
+
+      props.setWallet(`${wallet} address: ${addr_pre}...${addr_end}`)
     }
   }
-  
   
   return (
     <>
@@ -167,36 +140,36 @@ function About(props: ConsultProps) {
 
           <div 
           onClick={_=>handleConnect()}
-          className={`px-1 py-3 max-w-[500px] m-auto left-0 right-0 opacity-50 flex rounded-lg text-white ${props.dark?'invert':''} ${wallet_addr?'':'bg-green-900 hover:bg-blue-600'}`}>
-            <div className={`${wallet_addr?'':'leftandright'} p-3 h-full m-auto top-0 bottom-0`}>{wallet_addr?check:caret}</div>
+          className={`px-1 py-3 max-w-[500px] m-auto left-0 right-0 opacity-50 flex rounded-lg text-white ${props.wallet_addr?'':'bg-green-900 hover:bg-blue-600'}`}>
+            <div className={`${props.wallet_addr?'':'leftandright'} p-3 h-full m-auto top-0 bottom-0`}>{props.wallet_addr?check:caret}</div>
             <div className={`px-4`}>
-              {wallet} {wallet_addr?`${wallet_addr} connected! Click to disconnect.`:
+              {wallet} {props.wallet_addr?`${props.wallet_addr} connected! Click to disconnect.`:
               'Connect your wallet, be sure to have enough tokens for gas fees!'}
             </div>
           </div>
 
           <div 
           onClick={async _=> await handleViewingKey()}
-          className={`px-1 py-3 max-w-[500px] m-auto left-0 right-0 opacity-50 flex rounded-lg text-white ${props.dark?'invert':''} ${(wallet_addr&&!need_vk) || (!wallet_addr) ?'':'bg-green-900 md:hover:bg-blue-600'}`}>
-            <div className={`${(wallet_addr&&!need_vk) || !wallet_addr ?'':'leftandright'} p-3 h-full m-auto top-0 bottom-0`}>{wallet_addr?(need_vk?caret:check):circle}</div>
+          className={`px-1 py-3 max-w-[500px] m-auto left-0 right-0 opacity-50 flex rounded-lg text-white ${(props.wallet_addr&&!props.need_vk) || (!props.wallet_addr) ?'':'bg-green-900 md:hover:bg-blue-600'}`}>
+            <div className={`${(props.wallet_addr&&!props.need_vk) || !props.wallet_addr ?'':'leftandright'} p-3 h-full m-auto top-0 bottom-0`}>{props.wallet_addr?(props.need_vk?caret:check):circle}</div>
             <div className='p-2'>{key} Create a viewing key, this is how you view your private onchain data.</div>
           </div>
 
           <div 
           onClick={async _=>await handleAlias()}
-          className={`px-1 py-3 max-w-[500px] m-auto left-0 right-0 opacity-50 flex rounded-lg text-white ${props.dark?'invert':''} ${(wallet_addr&&!need_vk&&dcasino.enable_alias) || (!wallet_addr) || (need_vk) ?'':'bg-green-900 md:hover:bg-blue-600'}`}>
-            <div className={`${(wallet_addr&&!need_vk&&dcasino.enable_alias) || (!wallet_addr) || (need_vk)?'':'leftandright'} p-3 h-full m-auto top-0 bottom-0`}>{wallet_addr&&!need_vk?(dcasino.enable_alias?check:caret):circle}</div>
+          className={`px-1 py-3 max-w-[500px] m-auto left-0 right-0 opacity-50 flex rounded-lg text-white  ${(props.wallet_addr&&!props.need_vk&&dcasino.enable_alias) || (!props.wallet_addr) || (props.need_vk) ?'':'bg-green-900 md:hover:bg-blue-600'}`}>
+            <div className={`${(props.wallet_addr&&!props.need_vk&&dcasino.enable_alias) || (!props.wallet_addr) || (props.need_vk)?'':'leftandright'} p-3 h-full m-auto top-0 bottom-0`}>{props.wallet_addr&&!props.need_vk?(dcasino.enable_alias?check:caret):circle}</div>
             <div className='p-2'>{alias} Create an Alias; a dummy wallet for faster app interaction This will greatly improve your experience.</div>
           </div>
 
-          <div className={`hidden px-1 py-3 max-w-[500px] m-auto left-0 right-0 opacity-50 flex rounded-lg text-white ${props.dark?'invert':''} ${dcasino.enable_alias?'':'bg-green-900 md:hover:bg-blue-600'}`}>
+          <div className={`hidden px-1 py-3 max-w-[500px] m-auto left-0 right-0 opacity-50 flex rounded-lg text-white ${dcasino.enable_alias?'':'bg-green-900 md:hover:bg-blue-600'}`}>
             <div className={`p-3 h-full m-auto top-0 bottom-0`}>{circle}</div>
             <div className='p-2'>(recommended) generate a zk-proof of your humanity for KYC, using {`Reclaim Protocol's`} Zero-knowledge solution</div>
           </div>
 
         </div>),
         slide3('What is a dCasino?',
-        <div className='p-4'>
+        <div className='px-12'>
           {`A dCasino is simply a platform with a suite of casino games. Users can connect their wallets to the platform,
           onboard and cash in tokens, play casino games seamlessly with their tokens, then cash out again. 
           A dCasino is made possible by on-chain privacy and VRF, which would be necessary for a positive user 

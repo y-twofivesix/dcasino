@@ -1,6 +1,6 @@
 "use client"
 import { motion } from "framer-motion"
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMoon, faSun } from '@fortawesome/free-solid-svg-icons'
 
@@ -10,10 +10,11 @@ import Credits from '@/components/credits'
 import Games from '@/components/games'
 import About from '@/components/about'
 
-import { dcasino } from '@/generated/constants'
+import { ERR_UNAUTHORISED, dcasino } from '@/generated/constants'
 import { swal_alert } from '@/src/helpers'
 import { IUser } from '@/src/interfaces'
 import Header from "@/components/header"
+import { user } from "@/src/queries"
 
 const moon = <FontAwesomeIcon color='black' icon={faMoon} />
 const sun = <FontAwesomeIcon color='black' icon={faSun} />
@@ -26,10 +27,42 @@ export default function Home() {
   const [show_credit, setShowCredits] = useState(false);
   const [show_games, setShowGames] = useState(false);
   const [user_info, setUserInfo] = useState(undefined as undefined | IUser)
+  const [wallet_addr, setWallet] = useState('');
+  const [need_vk, setNeedVk] = useState(false);
 
-  useEffect(function() {
-    setUserInfo(dcasino.user_info)
-  }, [dcasino.user_info])
+
+  const do_query = useCallback(async () => {
+
+    if (!dcasino.ready || !dcasino.granter) { 
+      setWallet('')
+      dcasino.user_info = undefined;
+      dcasino.pos_this_session = 0;
+      dcasino.set_enable_alias(false);
+      return 
+    }
+
+    let user_res = await user()
+    if (user_res.is_ok) {
+      setUserInfo(user_res.inner as IUser)
+      dcasino.user_info = user_res.inner as IUser;
+      dcasino.vk_valid = true;
+      setNeedVk(false)
+    } 
+    else if (ERR_UNAUTHORISED.test(user_res.inner as string)) {
+      setUserInfo(undefined)
+      dcasino.vk_valid = false;
+      setNeedVk(true)
+    } else {
+      setUserInfo(undefined)
+    }
+  }, [wallet_addr, need_vk, user_info]);
+
+  useEffect(function () {
+    do_query();
+    const id = setInterval(do_query, 5_000);
+    return () => clearInterval(id);
+  }, [])
+
 
   return (
   <div className={`${dark?'invert':''} select-none`}>
@@ -49,7 +82,7 @@ export default function Home() {
           transition={{ duration: 1 }}
           onClick={
           async e=>{
-            if (!dcasino.ready) {
+            if (!wallet_addr) {
                 await swal_alert('please connect your wallet!')
                 setShowGames(false);
                 setShowCredits(false);
@@ -57,11 +90,15 @@ export default function Home() {
                 return
             }
 
+            if (!user_info?.credits) {
+              await swal_alert('You have zero credits! Convert SCRT to CR via the Bank module.')
+            }
+
           setShowCredits(false);
           setShowAbout(false);
           setShowGames(!show_games);
           }}
-          className={`${dcasino.ready && user_info?.credits ? '':'rainbow-bg'} opacity-50 ${show_games?'invert':''} ${dcasino.ready?'hover:opacity-100':''} hover:invert bg-orange-100 p-1 duration-700 text-sm md:text-base`}>
+          className={`${wallet_addr && user_info?.credits ? 'rainbow-bg':''} opacity-50 ${show_games?'invert':''} ${dcasino.ready?'hover:opacity-100':''} hover:invert bg-orange-100 p-1 duration-700 text-sm md:text-base`}>
             {`Play`}
         </motion.div>
 
@@ -79,8 +116,8 @@ export default function Home() {
         }
           
         }
-        className={`${dcasino.ready?'':'rainbow-bg'} opacity-50 hover:opacity-100 hover:invert ${show_about?'invert':''} bg-orange-100 p-1 duration-700 text-sm md:text-base`}>
-            {dcasino.ready?'Account':'Connect'}
+        className={`${wallet_addr?'':'rainbow-bg'} opacity-50 hover:opacity-100 hover:invert ${show_about?'invert':''} bg-orange-100 p-1 duration-700 text-sm md:text-base`}>
+            {wallet_addr?'Account':'Connect'}
         </motion.div>
 
         <div className=''>{'|'}</div>
@@ -115,10 +152,9 @@ export default function Home() {
         }
           
         }
-        className={`opacity-50 ${show_credit?'invert':''} hover:opacity-100 hover:invert bg-orange-100 p-1 duration-700 text-sm md:text-base`}>
+        className={`${!wallet_addr || user_info?.credits ?'':'rainbow-bg'} opacity-50 ${show_credit?'invert':''} hover:opacity-100 hover:invert bg-orange-100 p-1 duration-700 text-sm md:text-base`}>
             {'Bank'}
         </motion.div>
-
       </div>
 
       <motion.div
@@ -152,7 +188,13 @@ export default function Home() {
         
         <Games show_games={show_games} setShowGames={setShowGames} dark={dark}/>
         <Credits show_credits={show_credit} setShowCredits={setShowCredits} dark={dark}/>
-        <About show_about={show_about} setShowAbout={setShowAbout} dark={dark}/>
+        <About 
+        show_about={show_about} 
+        setShowAbout={setShowAbout} 
+        dark={dark} 
+        setWallet={setWallet} 
+        wallet_addr={wallet_addr}
+        need_vk={need_vk}/>
 
     </main>
 

@@ -12,10 +12,10 @@ export function slide ( title_font: [string, string], content_1: any, content_2:
   return (
     <>
     <SwiperSlide key={title_font[0]}>
-    <div className='relative w-full h-full'>
+    <div className='slide relative w-full h-full'>
       <h1 className={`bg-neutral-200 text-neutral-800 p-1 text-xl ${title_font[1]}`}>{title_font[0]}</h1>
 
-      <div className='grid md:grid-cols-2 pt-4 px-10'>
+      <div className='grid md:grid-cols-2 pt-4 px-12'>
 
         <div className='text-left text-sm md:text-base py-4 h-full overflow-y-auto'>
           {content_1}
@@ -40,10 +40,11 @@ export function slide ( title_font: [string, string], content_1: any, content_2:
 export function slide3 ( title: string, content_1: any, external_link?: string) {
   return (
     <SwiperSlide key={title}>
-    <div className='relative w-full h-full'>
+
+    <div className='slide3 relative w-full h-full'>
       <h1 className='bg-neutral-200 text-neutral-800 p-1'>{title}</h1>
 
-      <div className='px-4 pt-4 px-10'>
+      <div className='pt-4 px-2'>
 
         <div className='text-left text-sm md:text-base py-4 h-full overflow-y-auto'>
           {content_1}
@@ -65,10 +66,10 @@ export function slide3 ( title: string, content_1: any, external_link?: string) 
 export function slide2 ( title: string, content_1: any, content_2: any, external_link?: string) {
     return (
       <SwiperSlide key={title}>
-      <div className='relative w-full h-full'>
+      <div className='slide2 relative w-full h-full'>
         <h1 className='bg-neutral-200 text-neutral-800 p-1'>{title}</h1>
   
-        <div className='grid md:grid-cols-2 pt-4'>
+        <div className='grid md:grid-cols-2 pt-4 px-2'>
 
           <div className='text-left text-sm md:text-base py-4 h-full overflow-y-auto'>
             {content_1}
@@ -113,14 +114,15 @@ interface ViewerProps {
       animate={{ opacity: 0.98, [scaler]:props.show?1:0}}
       transition={{ duration: 0.3 }}
       className={`
-      rounded-lg
+      rounded-lg ${props.dark?'invert':''}
       fixed z-40 top-20 md:top-0 md:bottom-0 left-0 
       right-0 m-auto w-11/12 h-3/4 lg:h-2/3 md:w-[730px] 
       lg:w-[800px] bg-neutral-800 text-neutral-200`}>
+        
         <div
         onClick={e=>props.setShow(false)}
         className='absolute items-center justify-center z-50 top-2 right-2 bg-red-900 hover:bg-red-600 px-2 py-1'>x</div>
-        <div className='pt-16 pb-5 px-2  h-full text-center break-words text-white items-center justify-center'>
+        <div className={`viewer pt-16 pb-5 px-2 h-full text-center break-words items-center justify-center`}>
           <Swiper
           
           className='h-full relative overflow-y-auto'
@@ -146,14 +148,14 @@ interface ViewerProps {
       animate={{ opacity: 0.98, [scaler]:props.show?1:0}}
       transition={{ duration: 0.3 }}
       className={`
-      rounded-lg
+      rounded-lg ${props.dark?'invert':''}
       fixed z-40 top-20 md:top-0 md:bottom-0 left-0 
       right-0 m-auto w-4/5 h-3/4 lg:h-2/3 md:w-[730px] 
       lg:w-[800px] bg-neutral-800 text-neutral-200`}>
         <div
         onClick={e=>props.setShow(false)}
         className='absolute items-center justify-center z-50 top-2 right-2 bg-red-900 hover:bg-red-600 px-2 py-1'>x</div>
-        <div className='pt-16 pb-5 px-10  h-full text-center break-words text-white items-center justify-center'>
+        <div className={`plainviewer pt-16 pb-5 px-10  h-full text-center break-words text-white items-center justify-center`}>
 
           {props.children}
   
@@ -177,7 +179,7 @@ interface ViewerProps {
         <div
         onClick={e=>props.setShow(false)}
         className='absolute items-center justify-center z-50 top-2 right-2 bg-red-900 hover:bg-red-600 px-2 py-1'>x</div>
-        <div className='p-2 overflow-hidden h-full text-center break-words text-white items-center justify-center'>
+        <div className={`plainviewer2 p-2 overflow-hidden h-full text-center break-words text-white items-center justify-center`}>
 
           {props.children}
   

@@ -62,6 +62,7 @@ function Card (props: CardProps) {
                 as_alias: dcasino.enable_alias
             }},
             [], 150_000, dcasino.enable_alias? dcasino.cli: dcasino.granter)
+            .catch(async e=> {await swal_error(e)})
          : 
             
         await send_tx(
@@ -71,7 +72,8 @@ function Card (props: CardProps) {
                 sender_key: dcasino.viewing_key,
                 as_alias: dcasino.enable_alias
             }},
-            [], 150_000, dcasino.enable_alias? dcasino.cli: dcasino.granter);
+            [], 150_000, dcasino.enable_alias? dcasino.cli: dcasino.granter)
+            .catch(async e=> {await swal_error(e)});
 
         props.setTxLock(false)
         if (typeof tx === 'string') {
@@ -90,7 +92,7 @@ function Card (props: CardProps) {
                 props.setHovered(false)
                 if (!e.currentTarget.className.includes('removed'))
                 {
-                    await handleClick()
+                    await handleClick().catch(async e=> {await swal_error(e)});
                 }
                 
             }} 
@@ -135,12 +137,12 @@ function BlackJack21(props: BlackJack21Props) {
     },[])
 
     const handleStand = useCallback(async ( double_down: boolean)=>{
-        if (!inst) return
+        if (!inst) { console.log(inst); return}
         if (double_down && inst.credits < inst.bet)  {
             await swal_alert('Not enough credits!');
             return
         }
-        if (tx_lock) return
+        if (tx_lock) { console.log(inst); return}
         setTxLock(true)
         setMessage('please wait...')
 
@@ -152,7 +154,8 @@ function BlackJack21(props: BlackJack21Props) {
                 as_alias: dcasino.enable_alias,
                 double_down: double_down
             }},
-            [], 150_000, dcasino.enable_alias? dcasino.cli: dcasino.granter);
+            [], 150_000, dcasino.enable_alias? dcasino.cli: dcasino.granter)
+            .catch(async e=> {await swal_error(e)});
 
         setTxLock(false)
         if (typeof tx === 'string') {
@@ -225,7 +228,7 @@ function BlackJack21(props: BlackJack21Props) {
            }
      
          }
-     
+         setCardHovered(window.innerWidth < 700)
          do_query();
      
          const id = setInterval(do_query, 4000);
@@ -279,9 +282,9 @@ function BlackJack21(props: BlackJack21Props) {
 
         <div className='absolute bottom-0 right-0 text-right'>
             <div className='text-white py-4 p-1 w-[125px]'>
-                <div onClick={async _=>{ if (!inst?.dealt && bet < 20) setBet( bet+2 )}} className='p-2 bg-green-900 md:hover:bg-red-900 rounded-lg text-center'>UP</div>
+                <div onClick={async _=>{ if (!inst?.dealt && bet < 20) setBet( bet+2 )}} className={`p-2 ${inst?.dealt ? 'bg-green-900':'bg-green-600'} md:hover:bg-green-900 rounded-lg text-center`}>UP</div>
                 <div className='p-2 rounded-lg text-center'>BET: {bet}</div>
-                <div onClick={async _=>{ if (!inst?.dealt && bet > 2) setBet( bet-2 )} } className='p-2 bg-red-900 md:hover:bg-red-900 rounded-lg text-center'>DOWN</div>
+                <div onClick={async _=>{ if (!inst?.dealt && bet > 2) setBet( bet-2 )} } className={`p-2 ${inst?.dealt ? 'bg-red-900':'bg-red-600'} bg-red-900 md:hover:bg-red-900 rounded-lg text-center`}>DOWN</div>
             </div>
         </div>
     </div>
