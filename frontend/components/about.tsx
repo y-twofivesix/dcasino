@@ -1,7 +1,13 @@
-import React, { Dispatch, SetStateAction,} from 'react'
+import React, { CSSProperties, Dispatch, SetStateAction, useCallback, useEffect, useState,} from 'react'
 import { Viewer, slide3 } from './components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faKey, faSquareCheck, faUserGroup, faWallet } from '@fortawesome/free-solid-svg-icons'
+import { faKey, faSquareCheck, faUserGroup, faWallet, faCaretRight, faCircleXmark, faCircle } from '@fortawesome/free-solid-svg-icons'
+import { motion } from 'framer-motion'
+import { check_env, do_init, swal_alert, swal_success } from '@/src/helpers'
+import { ERR_UNAUTHORISED, dcasino } from '@/generated/constants'
+import { user } from '@/src/queries'
+import { IUser } from '@/src/interfaces'
+import BounceLoader from "react-spinners/BounceLoader";
 
 interface ConsultProps {
     show_about: boolean
@@ -9,17 +15,146 @@ interface ConsultProps {
     dark: boolean
 }
 
+const override: CSSProperties = {
+  display: "block",
+  margin: "0 auto",
+  borderColor: "red",
+};
+
 
 function About(props: ConsultProps) {
 
   const wallet = <FontAwesomeIcon color='white' icon={faWallet} />
   const key = <FontAwesomeIcon color='white' icon={faKey} />
-  const check = <FontAwesomeIcon color='white' icon={faSquareCheck} />
+  const check = <FontAwesomeIcon color='green' icon={faSquareCheck} />
   const alias = <FontAwesomeIcon color='white' icon={faUserGroup} />
+  const caret = <FontAwesomeIcon color='green' icon={faCaretRight} />
+  const cross = <FontAwesomeIcon color='red' icon={faCircleXmark} />
+  const circle = <FontAwesomeIcon color='grey' icon={faCircle} />
+
+  const [show_wallets, setShowWallets] = useState(false);
+  const [wallet_addr, setWallet] = useState(undefined as string | undefined);
+  const [user_info, setUserInfo] = useState(undefined as IUser | undefined);
+  const [need_vk, setNeedVk] = useState(false);
+  const [show_kyc, setShowKYC] = useState(false);
+  const [verification_link, setVerificationLink] = useState(undefined as string | undefined);
+  const [loading, setLoading] = useState('');
+
+
+  const do_query = useCallback(async () => {
+    if (!dcasino.ready || !dcasino.granter) { 
+      setWallet(undefined)
+      dcasino.user_info = undefined;
+      dcasino.pos_this_session = 0;
+      dcasino.set_enable_alias(false);
+      return 
+    }
+
+    let user_res = await user()
+    if (user_res.is_ok) {
+      setUserInfo(user_res.inner as IUser)
+      dcasino.user_info = user_res.inner as IUser;
+      dcasino.vk_valid = true;
+      setNeedVk(false)
+    } 
+    else if (ERR_UNAUTHORISED.test(user_res.inner as string)) {
+      
+      dcasino.vk_valid = false;
+      setNeedVk(true)
+    }
+  }, [wallet_addr, need_vk]);
+
+  useEffect(function () {
+    do_query();
+    const id = setInterval(do_query, 5_000);
+    return () => clearInterval(id);
+  }, [])
+
+  const handleAlias = async () => {
+
+    if (!dcasino.ready || !wallet_addr){ 
+      await swal_alert(`Please connect a wallet first`,'')
+      return 
+    }
+    if (!dcasino.vk_valid) {
+      await swal_alert(`Please set a viewing key in the top left corner`,'Viewing key not set')
+      return
+    }
+
+    // query 
+    setLoading('Generating an alias.')
+    if (await dcasino.generate_alias()) { 
+      await swal_success('alias created!','',1000);
+      dcasino.set_enable_alias(true);
+    }
+    setLoading('')
+  }
+
+  const handleViewingKey = async () => {
+
+    if (!dcasino.ready || !wallet_addr){ 
+      await swal_alert(`Please connect a wallet first`,'')
+      return 
+    }
+
+    setLoading('Generating a Viewing Key.')
+    if (await dcasino.generate_vk()) { 
+      await swal_success('viewing key created!','',1000);
+    }
+    setLoading('')
+  }
+  
+  const handleConnect = async () =>{
+
+    // if (!accepted_terms) {
+    //   await checkAcceptedTerms();
+    //   if (!accepted_terms) return
+    // }
+
+    if (wallet_addr) {
+      setWallet(undefined);
+      dcasino.ready = false;
+      dcasino.user_info = undefined;
+      dcasino.pos_this_session = 0;
+      return;
+    }
+    
+    //setRoute(route)
+    let wallets = [];
+      //@ts-ignore
+    if (window.keplr) wallets.push('Keplr');
+    //@ts-ignore
+    if (window.leap) wallets.push('Leap');
+     //@ts-ignore
+    if (window.ethereum) wallets.push('MetaMask');
+    //@ts-ignore
+    if (window.fina) wallets.push('Fina');
+
+    if (wallets.length==1) {
+      await swal_success(`${wallets[0]} wallet detected!`, '', 1500);
+      // do init
+      //await try_enter_game(wallets[0], route);
+      await connect(wallets[0]);
+
+    } else  {
+      //@ts-ignore
+      // show wallet options
+      setShowWallets(true);
+    }
+  }
+
+  const connect = async ( wallet: string,) => {
+    setShowWallets(false);
+    if (await do_init(wallet)) {
+      await check_env();
+      setWallet(`${wallet} wallet with address: ${dcasino.granter.address}`)
+    }
+  }
+  
   
   return (
     <>
-     <Viewer
+      <Viewer
     show={props.show_about}
     setShow={props.setShowAbout}
     dark={props.dark}
@@ -27,13 +162,38 @@ function About(props: ConsultProps) {
       >
       {[
         
-        slide3('Getting Started',
+        slide3('Connect',
         <div className='p-4'>
-          <div className='p-2'>step 1. Connect your wallet ({wallet}), be sure to have enough tokens for gas fees!</div>
-          <div className='p-2'>step 2. Create a viewing key ({key}), this is how you view your private onchain data.</div>
-          <div className='p-2'>step 3. (recommended) create an alias ({alias}). This will greatly improve your dapp experience</div>
-          <div className='p-2'>step 4. (recommended) generate a zk-proof of your humanity ({check}) for KYC, using {`Reclaim Protocol's`} Zero-knowledge solution</div>
-         
+
+          <div 
+          onClick={_=>handleConnect()}
+          className={`px-1 py-3 max-w-[500px] m-auto left-0 right-0 opacity-50 flex rounded-lg text-white ${props.dark?'invert':''} ${wallet_addr?'':'bg-green-900 hover:bg-blue-600'}`}>
+            <div className={`${wallet_addr?'':'leftandright'} p-3 h-full m-auto top-0 bottom-0`}>{wallet_addr?check:caret}</div>
+            <div className={`px-4`}>
+              {wallet} {wallet_addr?`${wallet_addr} connected! Click to disconnect.`:
+              'Connect your wallet, be sure to have enough tokens for gas fees!'}
+            </div>
+          </div>
+
+          <div 
+          onClick={async _=> await handleViewingKey()}
+          className={`px-1 py-3 max-w-[500px] m-auto left-0 right-0 opacity-50 flex rounded-lg text-white ${props.dark?'invert':''} ${(wallet_addr&&!need_vk) || (!wallet_addr) ?'':'bg-green-900 md:hover:bg-blue-600'}`}>
+            <div className={`${(wallet_addr&&!need_vk) || !wallet_addr ?'':'leftandright'} p-3 h-full m-auto top-0 bottom-0`}>{wallet_addr?(need_vk?caret:check):circle}</div>
+            <div className='p-2'>{key} Create a viewing key, this is how you view your private onchain data.</div>
+          </div>
+
+          <div 
+          onClick={async _=>await handleAlias()}
+          className={`px-1 py-3 max-w-[500px] m-auto left-0 right-0 opacity-50 flex rounded-lg text-white ${props.dark?'invert':''} ${(wallet_addr&&!need_vk&&dcasino.enable_alias) || (!wallet_addr) || (need_vk) ?'':'bg-green-900 md:hover:bg-blue-600'}`}>
+            <div className={`${(wallet_addr&&!need_vk&&dcasino.enable_alias) || (!wallet_addr) || (need_vk)?'':'leftandright'} p-3 h-full m-auto top-0 bottom-0`}>{wallet_addr&&!need_vk?(dcasino.enable_alias?check:caret):circle}</div>
+            <div className='p-2'>{alias} Create an Alias; a dummy wallet for faster app interaction This will greatly improve your experience.</div>
+          </div>
+
+          <div className={`hidden px-1 py-3 max-w-[500px] m-auto left-0 right-0 opacity-50 flex rounded-lg text-white ${props.dark?'invert':''} ${dcasino.enable_alias?'':'bg-green-900 md:hover:bg-blue-600'}`}>
+            <div className={`p-3 h-full m-auto top-0 bottom-0`}>{circle}</div>
+            <div className='p-2'>(recommended) generate a zk-proof of your humanity for KYC, using {`Reclaim Protocol's`} Zero-knowledge solution</div>
+          </div>
+
         </div>),
         slide3('What is a dCasino?',
         <div className='p-4'>
@@ -45,6 +205,58 @@ function About(props: ConsultProps) {
 
       ]}
       </Viewer>
+      <div className={`
+          fixed top-0 left-0 z-50 p-1
+          w-screen h-screen backdrop-blur-md 
+          ${show_wallets?'':'hidden'}`}>
+            <motion.div
+              animate={{ opacity: show_wallets ? 1: 0, scale: show_wallets ? 1: 0}}
+              transition={{
+                duration: 0.4,
+                delay: 0.2,
+                ease: [0, 0.71, 0.2, 1.01]
+              }}
+              className={` ${show_wallets? '':'hidden'}
+              ${props.dark?'invert':''}
+              absolute bg-black h-fit text-center text-white
+              top-0 bottom-0 left-3 right-3 m-auto z-50
+              p-4 rounded-2xl 
+              md:w-1/3`}>
+                <div 
+                onClick={_=>setShowWallets(false)}
+                className='p-2 absolute top-0 right-0 rounded-tr-lg bg-red-900 hover:bg-red-600'>x</div>
+                <h1 className=' px-2 py-4 text-2xl rounded-2xl'>Choose your wallet</h1>
+                <ul>
+                  <li className='py-4 hoverrainbow hover:bg-indigo-900 rounded-2xl' onClick={async _ => await connect('Keplr')}>Keplr</li>
+                  <li className='py-4 hoverrainbow hover:bg-indigo-900 rounded-2xl' onClick={async _ => await connect('MetaMask')}>MetaMask</li>
+                  <li className='py-4 hoverrainbow hover:bg-indigo-900 rounded-2xl' onClick={async _ => await connect('Fina')}>Fina</li>
+                  <li className='py-4 hoverrainbow hover:bg-indigo-900 rounded-2xl' onClick={async _ => await connect('Leap')}>Leap</li>
+                </ul>
+            </motion.div>
+      </div>
+
+      <div className={`
+          fixed top-0 left-0 z-50 p-1
+          w-screen h-screen backdrop-blur-md 
+          ${loading?'':'hidden'}`}>
+            <motion.div
+              animate={{ opacity: loading ? 1: 0, scale: loading ? 1: 0}}
+              transition={{
+                duration: 0.4,
+                delay: 0.2,
+                ease: [0, 0.71, 0.2, 1.01]
+              }}
+              className={` ${loading? '':'hidden'}
+              ${props.dark?'invert':''}
+              absolute bg-black opacity-[25%] h-40 text-center text-white
+              top-0 bottom-0 left-3 right-3 m-auto z-50
+              p-4 rounded-2xl 
+              md:w-1/3`}>
+                <div><BounceLoader cssOverride={override} color='blue'/></div>
+                <div>{loading}</div>
+
+            </motion.div>
+      </div>
     </>
    
     

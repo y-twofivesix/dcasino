@@ -135,7 +135,6 @@ function BlackJack21(props: BlackJack21Props) {
     },[])
 
     const handleStand = useCallback(async ( double_down: boolean)=>{
-        console.log(inst)
         if (!inst) return
         if (double_down && inst.credits < inst.bet)  {
             await swal_alert('Not enough credits!');

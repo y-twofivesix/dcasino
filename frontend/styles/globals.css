@@ -143,6 +143,11 @@ a {
   animation-iteration-count: infinite;
 }
 
+.leftandright{
+  animation: leftandright 1s linear;
+  animation-iteration-count: infinite;
+}
+
 
 @keyframes rainbow-bg{
   100%,0%{
@@ -222,6 +227,52 @@ a {
 		91%{
 			color: rgb(255,0,127);
 		}
+}
+
+@keyframes leftandright{
+  100%,0%{
+    transform: translate(0px, 0px);
+  }
+  8%{
+    transform: translate(2.5px, 0px);
+  }
+  16%{
+    transform: translate(5x, 0px);
+  }
+  25%{
+    transform: translate(6px, 0px);
+  }
+  33%{
+    transform: translate(10px, 0px);
+  }
+  41%{
+    transform: translate(12.5px, 0px);
+  }
+  50%{
+    transform: translate(15px, 0px);
+  }
+
+
+
+  58%{
+    transform: translate(15, 0px);
+  }
+  66%{
+    transform: translate(12.5px, 0px);
+  }
+  75%{
+    transform: translate(10px, 0px);
+  }
+  83%{
+    transform: translate(6px, 0px);
+  }
+  91%{
+    transform: translate(5px, 0px);
+  }
+  99%{
+    transform: translate(2.5px, 0px);
+  }
+
 }
 
 @keyframes bigandsmall{
@@ -582,7 +633,6 @@ html, body {
 
 .screen-jerk {
   animation: jerkup 100ms infinite;
-  
 
 }
 
@@ -680,8 +730,6 @@ html, body {
     width: auto;
   }
 
-
-
 @media only screen and (max-width: 600px) {
 
   .card.down:last-child {
@@ -713,19 +761,19 @@ html, body {
       z-index: 1;
     }
     &.is-removed:nth-child(4) {
-      transform: translateY(125%) translateX(-100%) rotateZ(0deg) !important;
+      transform: translateY(130%) translateX(-100%) rotateZ(0deg) !important;
       z-index: 2;
     }
     &.is-removed:nth-child(3) {
-      transform: translateY(135%) translateX(-100%) rotateZ(0deg) !important;
+      transform: translateY(145%) translateX(-100%) rotateZ(0deg) !important;
       z-index: 3;
     }
     &.is-removed:nth-child(2) {
-      transform: translateY(145%) translateX(-100%) rotateZ(0deg) !important;
+      transform: translateY(160%) translateX(-100%) rotateZ(0deg) !important;
       z-index: 4;
     }
     &.is-removed:nth-child(1) {
-      transform: translateY(155%) translateX(-100%) rotateZ(0deg) !important;
+      transform: translateY(175%) translateX(-100%) rotateZ(0deg) !important;
       z-index: 5;
     }
   }

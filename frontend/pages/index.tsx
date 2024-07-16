@@ -9,13 +9,10 @@ import 'swiper/css/pagination';
 import Credits from '@/components/credits'
 import Games from '@/components/games'
 import About from '@/components/about'
-import DappViewer from "@/components/dappviewer"
-
 
 import { dcasino } from '@/generated/constants'
 import { swal_alert } from '@/src/helpers'
 import { IUser } from '@/src/interfaces'
-import Swal from "sweetalert2"
 import Header from "@/components/header"
 
 const moon = <FontAwesomeIcon color='black' icon={faMoon} />
@@ -23,13 +20,12 @@ const sun = <FontAwesomeIcon color='black' icon={faSun} />
 
 export default function Home() {
 
-  const hours = (new Date()).getHours();
-  const [dark, setDark] = useState( hours >= 18 || hours < 6 );
+  //const hours = (new Date()).getHours();
+  const [dark, setDark] = useState( false );
   const [show_about, setShowAbout] = useState(false);
   const [show_credit, setShowCredits] = useState(false);
   const [show_games, setShowGames] = useState(false);
-
-  const [user_state, setUserInfo] = useState(undefined as undefined | IUser)
+  const [user_info, setUserInfo] = useState(undefined as undefined | IUser)
 
   useEffect(function() {
     setUserInfo(dcasino.user_info)
@@ -37,7 +33,6 @@ export default function Home() {
 
   return (
   <div className={`${dark?'invert':''} select-none`}>
-    <Header dark={dark}/>
     <main
     className={`flex min-h-screen flex-col items-center justify-between p-5 bg-orange-100 text-neutral-800 duration-700`}>
 
@@ -62,21 +57,12 @@ export default function Home() {
                 return
             }
 
-            //if (!dcasino.vk_valid) {
-            //    await swal_alert('please set a viewing key!')
-            //    setShowGames(false);
-            //    setShowCredits(false);
-            //    setShowAbout(true);
-            //    return
-            //}
-            
-          //setShowPartners(false);
           setShowCredits(false);
           setShowAbout(false);
           setShowGames(!show_games);
           }}
-          className={`opacity-50 ${show_games?'invert':''} ${dcasino.ready?'hover:opacity-100':''} hover:invert bg-orange-100 p-1 duration-700 text-sm md:text-base`}>
-            {`d'Apps`}
+          className={`${dcasino.ready && user_info?.credits ? '':'rainbow-bg'} opacity-50 ${show_games?'invert':''} ${dcasino.ready?'hover:opacity-100':''} hover:invert bg-orange-100 p-1 duration-700 text-sm md:text-base`}>
+            {`Play`}
         </motion.div>
 
         <div className=''>{'|'}</div>
@@ -93,8 +79,8 @@ export default function Home() {
         }
           
         }
-        className={`opacity-50 hover:opacity-100 hover:invert ${show_about?'invert':''} bg-orange-100 p-1 duration-700 text-sm md:text-base`}>
-            About
+        className={`${dcasino.ready?'':'rainbow-bg'} opacity-50 hover:opacity-100 hover:invert ${show_about?'invert':''} bg-orange-100 p-1 duration-700 text-sm md:text-base`}>
+            {dcasino.ready?'Account':'Connect'}
         </motion.div>
 
         <div className=''>{'|'}</div>
@@ -130,7 +116,7 @@ export default function Home() {
           
         }
         className={`opacity-50 ${show_credit?'invert':''} hover:opacity-100 hover:invert bg-orange-100 p-1 duration-700 text-sm md:text-base`}>
-            Credits
+            {'Bank'}
         </motion.div>
 
       </div>

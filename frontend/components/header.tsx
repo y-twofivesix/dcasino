@@ -4,16 +4,17 @@ import { ERR_UNAUTHORISED, dcasino } from '@/generated/constants';
 import { check_env, do_init, swal_alert, swal_confirm, swal_error, swal_success } from '@/src/helpers';
 import { IUser } from '@/src/interfaces';
 import { user } from '@/src/queries';
-import { faWallet, faKey, faMoon, faSquareCheck, faSun, faUserGroup } from '@fortawesome/free-solid-svg-icons';
+import { faWallet, faKey, faMoon, faSquareCheck, faSun, faUserGroup, faUser, faGear } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { motion } from 'framer-motion';
 import React, { Dispatch, SetStateAction, useCallback, useRef } from 'react'
 import { useState, useEffect } from 'react'
-import CopyToClipboard from 'react-copy-to-clipboard';
 import { Proof, Reclaim } from '@reclaimprotocol/js-sdk';
 import { useQRCode } from 'next-qrcode';
 import { send_tx } from '@/src/transactions';
 import Swal from 'sweetalert2';
+import About from '@/components/about'
+
 
 interface HeaderProps {
   dark: boolean
@@ -28,11 +29,15 @@ function Header(props: HeaderProps) {
   const [show_kyc, setShowKYC] = useState(false);
   const [verification_link, setVerificationLink] = useState(undefined as string | undefined);
   const [proof, setProof] = useState(undefined as undefined | Proof)
+  const [show_about, setShowAbout] = useState(false);
+
 
   const wallet = <FontAwesomeIcon color='white' icon={faWallet} />
   const key = <FontAwesomeIcon color='white' icon={faKey} />
   const check = <FontAwesomeIcon color='white' icon={faSquareCheck} />
   const alias = <FontAwesomeIcon color='black' icon={faUserGroup} />
+  const usericon = <FontAwesomeIcon color='white' icon={faUser}/>
+  const gear = <FontAwesomeIcon color='white' icon={faGear}/>
 
   const { Canvas } = useQRCode();
 
@@ -288,11 +293,29 @@ function Header(props: HeaderProps) {
       setWallet(`${wallet} ${addr_pre}...${addr_end}`)
     }
   }
-
+  
+  
   return (
     <div id='header' className={`top-0 w-fit no-select fixed z-50 px-5 py-3 ${props.dark?'invert':''}`}>
 
-        <div className={`
+      <div 
+      onClick={_=>setShowAbout(!show_about)}
+      className={`rounded-xl p-2 text-white`}>
+      {dcasino.ready?gear:usericon} {dcasino.ready?'ACCOUNT':'CONNECT'}
+      </div>
+      <About show_about={show_about} setShowAbout={setShowAbout} dark={true}/>
+
+    </div>
+
+  )
+
+}
+
+export default Header
+
+/**
+ *         
+ * <div className={`
         absolute top-0 left-0 
         w-screen h-screen backdrop-blur-md 
         ${show_kyc?'':'hidden'}`}>
@@ -322,8 +345,6 @@ function Header(props: HeaderProps) {
                 setShowKYC(!show_kyc);
               }}
               className='absolute top-0 right-0 px-4 py-2 hover:bg-red-900 bg-red-600 text-white rounded-tr-2xl'>X</div>
-
-
               {
                 !verification_link
               ?
@@ -453,11 +474,4 @@ function Header(props: HeaderProps) {
           }
           </span>
         </div>
-
-    </div>
-
-  )
-
-}
-
-export default Header
+ */

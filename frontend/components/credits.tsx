@@ -106,8 +106,8 @@ if (typeof tx === 'string') {
     dark={props.dark}
     vert={false}
       >
-      <div className='px-8'>
-        <table className='m-auto'>
+      <div className='px-2'>
+        <table className='m-auto w-full'>
           <tbody>
             <tr className='p-2 bg-black text-white'>
               <td className='p-2 text-left'>1CR = 1SCRT</td>
@@ -124,7 +124,7 @@ if (typeof tx === 'string') {
         </table>
 
         <div    
-        className='m-auto items-center justify-center py-2 px-10 text-neutral-800 flex justify-items'>
+        className='m-auto items-center justify-center py-2 px-4 text-neutral-800 flex justify-items'>
 
             <div className='p-1'>
                 <input
@@ -137,14 +137,14 @@ if (typeof tx === 'string') {
                 }} 
                 className={`
                 outline-none p-2 max-w-[150px] text-center text-black`}
-                placeholder='pay in'/>
+                placeholder='deposit'/>
             </div>
             
             <div className='p-1'>
               <div 
               onClick={async _=> { handlePayIn() }}
-              className="outline-none p-2 text-neutral-200 hover:bg-green-600 bg-green-800 w-[100px] text-center">
-                  Pay In 
+              className="outline-none p-2 text-sm text-neutral-200 hover:bg-green-600 bg-green-800 w-[100px] text-center">
+                  Deposit 
               </div>
             </div>
             
@@ -164,14 +164,14 @@ if (typeof tx === 'string') {
                 }} 
                 className={`
                 outline-none px-4 py-2 max-w-[150px] text-center text-black`}
-                placeholder='pay out'/>
+                placeholder='withdraw'/>
             </div>
 
             <div className='p-1'>
               <div 
               onClick={async _=> { handlePayOut() }}
-              className="outline-none px-4 py-2 text-neutral-200 hover:bg-green-600 bg-green-800 w-[100px] text-center">
-                  Pay Out
+              className="outline-none px-4 py-2 text-sm text-neutral-200 hover:bg-green-600 bg-green-800 w-[100px] text-center">
+                  Withdraw
               </div>
             </div>
             

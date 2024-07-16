@@ -115,7 +115,7 @@ interface ViewerProps {
       className={`
       rounded-lg
       fixed z-40 top-20 md:top-0 md:bottom-0 left-0 
-      right-0 m-auto w-4/5 h-3/4 lg:h-2/3 md:w-[730px] 
+      right-0 m-auto w-11/12 h-3/4 lg:h-2/3 md:w-[730px] 
       lg:w-[800px] bg-neutral-800 text-neutral-200`}>
         <div
         onClick={e=>props.setShow(false)}
