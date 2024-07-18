@@ -8,10 +8,11 @@ import { ERR_UNAUTHORISED, dcasino } from '@/generated/constants'
 import { user } from '@/src/queries'
 import { IUser } from '@/src/interfaces'
 import BounceLoader from "react-spinners/BounceLoader";
+import Swal from 'sweetalert2'
 
 interface AboutProps {
-    show_about: boolean
-    setShowAbout: Dispatch<SetStateAction<boolean>>,
+    show: boolean
+    setShow: Dispatch<SetStateAction<boolean>>,
     dark: boolean,
     wallet_addr: string,
     setWallet: Dispatch<SetStateAction<string>>,
@@ -25,20 +26,68 @@ const override: CSSProperties = {
 };
 
 
-function About(props: AboutProps) {
+function Connect(props: AboutProps) {
 
   const wallet = <FontAwesomeIcon color='white' icon={faWallet} />
   const key = <FontAwesomeIcon color='white' icon={faKey} />
   const check = <FontAwesomeIcon color='green' icon={faSquareCheck} />
   const alias = <FontAwesomeIcon color='white' icon={faUserGroup} />
   const caret = <FontAwesomeIcon color='green' icon={faCaretRight} />
-  const cross = <FontAwesomeIcon color='red' icon={faCircleXmark} />
   const circle = <FontAwesomeIcon color='grey' icon={faCircle} />
 
   const [show_wallets, setShowWallets] = useState(false);
-  const [show_kyc, setShowKYC] = useState(false);
-  const [verification_link, setVerificationLink] = useState(undefined as string | undefined);
+  //const [show_kyc, setShowKYC] = useState(false);
+  //const [verification_link, setVerificationLink] = useState(undefined as string | undefined);
   const [loading, setLoading] = useState('');
+
+  let accepted_terms = false;
+
+  const checkAcceptedTerms = async () => {
+
+      let from_storage = window.localStorage.getItem('accepted_terms_060424');
+      if (from_storage && from_storage == "true") {
+        accepted_terms = true;
+        return;
+      }
+
+      Swal.fire({
+        title: 'Hold it right there',
+        input: 'checkbox',
+        allowOutsideClick: false,
+        backdrop: `rgba(0,0,123,0.4)`,
+        footer: '<a href="/legal" target="_blank">view our Terms and Conditions</a>',
+        text: 
+        `
+        By agreeing to the Terms and Conditions, you acknowledge that dCasino is not designed 
+        for use in every legal jurisdiction and represent that you have investigated your 
+        personal legal situation and consulted with a legal representative in your 
+        jurisdiction if necessary.
+
+        Check the box below and click ok to confirm that you are not a citizen or 
+        resident of any banned jurisdictions as outlined in our Terms and Conditions.`,
+        inputPlaceholder: 'I accept the Terms and Conditions.'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          if (result.value) {
+
+            accepted_terms = true;
+            window.localStorage.setItem('accepted_terms_060424', 'true');
+
+          } else {
+            accepted_terms = false;
+            window.localStorage.removeItem('accepted_terms_060424');
+            Swal.fire({
+              icon: 'error', 
+              text: "Unfortunate :(", 
+              timer: 1500, 
+              backdrop: `rgba(0,0,123,0.4)`,
+          });
+          }
+        } else {
+          console.log(`modal was dismissed by ${result.dismiss}`)
+        }
+      })
+  };
 
   const handleAlias = async () => {
 
@@ -52,12 +101,17 @@ function About(props: AboutProps) {
     }
 
     // query 
-    setLoading('Generating an alias.')
-    if (await dcasino.generate_alias()) { 
-      await swal_success('alias created!','',1000);
-      dcasino.set_enable_alias(true);
+    try {
+      setLoading('Generating an alias...')
+      if (await dcasino.generate_alias()) { 
+        await swal_success('alias created!','',1000);
+        dcasino.set_enable_alias(true);
+      }
     }
-    setLoading('')
+    finally {
+      setLoading('')
+    }
+    
   }
 
   const handleViewingKey = async () => {
@@ -67,19 +121,24 @@ function About(props: AboutProps) {
       return 
     }
 
-    setLoading('Generating a Viewing Key.')
-    if (await dcasino.generate_vk()) { 
-      await swal_success('viewing key created!','',1000);
+    try {
+      setLoading('Generating a Viewing Key...')
+      if (await dcasino.generate_vk()) { 
+        await swal_success('viewing key created!','',1000);
+      }
     }
-    setLoading('')
+    finally {
+      setLoading('')
+    }
+
   }
   
   const handleConnect = async () =>{
 
-    // if (!accepted_terms) {
-    //   await checkAcceptedTerms();
-    //   if (!accepted_terms) return
-    // }
+    if (!accepted_terms) {
+      await checkAcceptedTerms();
+      if (!accepted_terms) return
+    }
 
     if (props.wallet_addr) {
       props.setWallet('');
@@ -128,8 +187,8 @@ function About(props: AboutProps) {
   return (
     <>
       <Viewer
-    show={props.show_about}
-    setShow={props.setShowAbout}
+    show={props.show}
+    setShow={props.setShow}
     dark={props.dark}
     vert={true}
       >
@@ -236,4 +295,4 @@ function About(props: AboutProps) {
   )
 }
 
-export default About
+export default Connect

@@ -47,39 +47,43 @@ function Card (props: CardProps) {
     const handleClick = useCallback(async () => {
 
         if (props.tx_lock) return
-        props.setTxLock(true)
 
-        props.setMessage('please wait...')
+        try {
+            props.setTxLock(true)
 
-        let tx = !props.dealt ? 
+            props.setMessage('please wait...')
 
-        await send_tx(
-            dcasino.BLACK_JACK_21_CONTRACT_ADDRESS,
-            dcasino.black_jack_21_code_hash, 
-            { deal : { 
-                bet: props.bet,
-                sender_key: dcasino.viewing_key,
-                as_alias: dcasino.enable_alias
-            }},
-            [], 150_000, dcasino.enable_alias? dcasino.cli: dcasino.granter)
-            .catch(async e=> {await swal_error(e)})
-         : 
-            
-        await send_tx(
-            dcasino.BLACK_JACK_21_CONTRACT_ADDRESS,
-            dcasino.black_jack_21_code_hash, 
-            { hit : { 
-                sender_key: dcasino.viewing_key,
-                as_alias: dcasino.enable_alias
-            }},
-            [], 150_000, dcasino.enable_alias? dcasino.cli: dcasino.granter)
-            .catch(async e=> {await swal_error(e)});
+            let tx = !props.dealt ? 
 
-        props.setTxLock(false)
-        if (typeof tx === 'string') {
-            swal_error (tx);
-            props.setMessage('')
-            return;
+            await send_tx(
+                dcasino.BLACK_JACK_21_CONTRACT_ADDRESS,
+                dcasino.black_jack_21_code_hash, 
+                { deal : { 
+                    bet: props.bet,
+                    sender_key: dcasino.viewing_key,
+                    as_alias: dcasino.enable_alias
+                }},
+                [], 150_000, dcasino.enable_alias? dcasino.cli: dcasino.granter)
+                .catch(async e=> {await swal_error(e)})
+            : 
+                
+            await send_tx(
+                dcasino.BLACK_JACK_21_CONTRACT_ADDRESS,
+                dcasino.black_jack_21_code_hash, 
+                { hit : { 
+                    sender_key: dcasino.viewing_key,
+                    as_alias: dcasino.enable_alias
+                }},
+                [], 150_000, dcasino.enable_alias? dcasino.cli: dcasino.granter)
+                .catch(async e=> {await swal_error(e)});
+
+            if (typeof tx === 'string') {
+                swal_error (tx);
+                props.setMessage('')
+                return;
+            }
+        } finally {
+            props.setTxLock(false)
         }
 
     },[props])
@@ -116,23 +120,27 @@ function BlackJack21(props: BlackJack21Props) {
 
     const handleInsurance = useCallback(async ()=>{
         if (tx_lock) return
-        setTxLock(true)
-        setMessage('please wait...')
 
-        let tx = await send_tx(
-            dcasino.BLACK_JACK_21_CONTRACT_ADDRESS,
-            dcasino.black_jack_21_code_hash, 
-            { insurance : { 
-                sender_key: dcasino.viewing_key,
-                as_alias: dcasino.enable_alias,
-            }},
-            [], 150_000, dcasino.enable_alias? dcasino.cli: dcasino.granter);
+        try {
+            setTxLock(true)
+            setMessage('please wait...')
 
-        setTxLock(false)
-        if (typeof tx === 'string') {
-            swal_error (tx);
-            setMessage('')
-            return;
+            let tx = await send_tx(
+                dcasino.BLACK_JACK_21_CONTRACT_ADDRESS,
+                dcasino.black_jack_21_code_hash, 
+                { insurance : { 
+                    sender_key: dcasino.viewing_key,
+                    as_alias: dcasino.enable_alias,
+                }},
+                [], 150_000, dcasino.enable_alias? dcasino.cli: dcasino.granter);
+
+            if (typeof tx === 'string') {
+                swal_error (tx);
+                setMessage('')
+                return;
+            }
+        } finally {
+            setTxLock(false)
         }
     },[])
 
@@ -142,26 +150,31 @@ function BlackJack21(props: BlackJack21Props) {
             await swal_alert('Not enough credits!');
             return
         }
-        if (tx_lock) { console.log(inst); return}
-        setTxLock(true)
-        setMessage('please wait...')
+        if (tx_lock) return
 
-        let tx = await send_tx(
-            dcasino.BLACK_JACK_21_CONTRACT_ADDRESS,
-            dcasino.black_jack_21_code_hash, 
-            { stand : { 
-                sender_key: dcasino.viewing_key,
-                as_alias: dcasino.enable_alias,
-                double_down: double_down
-            }},
-            [], 150_000, dcasino.enable_alias? dcasino.cli: dcasino.granter)
-            .catch(async e=> {await swal_error(e)});
+        try {
+            setTxLock(true)
+            setMessage('please wait...')
 
-        setTxLock(false)
-        if (typeof tx === 'string') {
-            swal_error (tx);
-            setMessage('')
-            return;
+            let tx = await send_tx(
+                dcasino.BLACK_JACK_21_CONTRACT_ADDRESS,
+                dcasino.black_jack_21_code_hash, 
+                { stand : { 
+                    sender_key: dcasino.viewing_key,
+                    as_alias: dcasino.enable_alias,
+                    double_down: double_down
+                }},
+                [], 150_000, dcasino.enable_alias? dcasino.cli: dcasino.granter)
+                .catch(async e=> {await swal_error(e)});
+
+            
+            if (typeof tx === 'string') {
+                swal_error (tx);
+                setMessage('')
+                return;
+            }
+        } finally{
+            setTxLock(false)
         }
     },[inst])
 
@@ -202,9 +215,10 @@ function BlackJack21(props: BlackJack21Props) {
                 if (!inst_state.dealt) {
 
                     let message = '';
-                    if (outcome == 'Win') { message = `You Won ${inst_state.last_win} Credits!`}
-                    else if (outcome == 'Lose') { message = 'You Lost!'}
-                    else { message = `${outcome}!`}
+                    let results = `You: ${inst_state.score} vs House: ${inst_state.dealer_score}`
+                    if (outcome == 'Win') { message = `You Won ${inst_state.last_win} Credits! ${results}`}
+                    else if (outcome == 'Lose') { message = `You Lost! ${results}`}
+                    else { message = `${outcome}! ${results}`}
                     
                     if (outcome != "Undefined") {
                         await swal_alert(message);

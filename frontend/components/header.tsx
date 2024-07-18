@@ -13,7 +13,7 @@ import { Proof, Reclaim } from '@reclaimprotocol/js-sdk';
 import { useQRCode } from 'next-qrcode';
 import { send_tx } from '@/src/transactions';
 import Swal from 'sweetalert2';
-import About from '@/components/about'
+import About from '@/components/connect'
 
 
 interface HeaderProps {
@@ -303,7 +303,6 @@ function Header(props: HeaderProps) {
       className={`rounded-xl p-2 text-white`}>
       {dcasino.ready?gear:usericon} {dcasino.ready?'ACCOUNT':'CONNECT'}
       </div>
-      <About show_about={show_about} setShowAbout={setShowAbout} dark={true}/>
 
     </div>
 

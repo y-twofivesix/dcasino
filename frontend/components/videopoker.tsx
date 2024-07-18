@@ -131,12 +131,12 @@ function VideoPoker(props: VideoPokerProps) {
 
     <span className={
       `p-1 text-base text-center text-white left-0 right-0 m-auto relative
-      ${dealt? 'bg-orange-600': (outcome == 'Lose' || outcome == 'Undefined'? 'bg-red-600': 'bg-green-600') } w-fit text-white`}>
-      {dealt ? 'hold and/or draw': `${outcome}` }
+      ${dealt? 'bg-orange-600': (outcome == 'Lose' ? 'bg-red-600':  outcome == 'Undefined' ? '' :'bg-green-600') } w-fit text-white`}>
+      {dealt ? 'hold and/or draw': `${outcome == 'Undefined'? '...': outcome}` }
     </span>
 
     <span className='relative left-0 p-1 text-base bg-white w-fit inline text-black'>
-      {dealt ? '...' : (won == 0 ? 'You lost!':`You won: ${won}`) }
+      {dealt || outcome == 'Undefined'  ? '...' : (won == 0 ? 'You lost!':`You won: ${won}`) }
     </span>
 
   </div>

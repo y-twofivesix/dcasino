@@ -4,7 +4,6 @@ import { ERR_UNAUTHORISED, dcasino } from '@/generated/constants';
 import Swal from 'sweetalert2';
 import { alias_mnem_info, alias_of_info, user } from './queries';
 
-
 export function green(text : string) {
   return (<p className="inline text-green-600 font-ibm">{text}</p>)
 }
@@ -187,7 +186,6 @@ export const init_fina = async (): Promise<SecretNetworkClient | null> => {
   //@ts-ignore
   if (window.fina) {
     //@ts-ignore
-    dcasino.set_mobile(true);
     return await init_keplr();
   } else {
     await swal_error('Fina wallet not detected!', '', 2000);

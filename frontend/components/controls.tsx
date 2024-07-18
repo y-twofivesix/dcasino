@@ -51,6 +51,8 @@ function Controls( props : ControlsProps) {
         }
 
         if (tx_lock) return
+
+        try {
         setTxLock(true)
 
         props.setUpdated('dealt');
@@ -67,13 +69,15 @@ function Controls( props : ControlsProps) {
             150_000, 
             dcasino.enable_alias? dcasino.cli: dcasino.granter);
 
-        setTxLock(false)
-
-        if (typeof tx === 'string') {
-            swal_error (tx);
-            return;
+            if (typeof tx === 'string') {
+                await swal_error (tx);
+                return;
+            }
         }
-
+        finally {
+            setTxLock(false)
+        }
+    
         props.setDealt(true);
         props.setHeld(new Set<number>([]));
         props.setOutcome('Undefined');
@@ -85,30 +89,35 @@ function Controls( props : ControlsProps) {
        
 
         if (tx_lock) return
-        setTxLock(true)
 
-        props.setUpdated('drawn');
-        let tx = await send_tx(
-            dcasino.VIDEO_POKER_CONTRACT_ADDRESS,
-            dcasino.video_poker_code_hash, 
-            { draw : { 
-                held: Array.from(props.held),
-                sender_key: dcasino.viewing_key,
-                as_alias: dcasino.enable_alias
-            }},
-            [], 150_000, dcasino.enable_alias? dcasino.cli: dcasino.granter);
+        try {
+            setTxLock(true)
 
-        setTxLock(false)
-        if (typeof tx === 'string') {
+            props.setUpdated('drawn');
+            let tx = await send_tx(
+                dcasino.VIDEO_POKER_CONTRACT_ADDRESS,
+                dcasino.video_poker_code_hash, 
+                { draw : { 
+                    held: Array.from(props.held),
+                    sender_key: dcasino.viewing_key,
+                    as_alias: dcasino.enable_alias
+                }},
+                [], 150_000, dcasino.enable_alias? dcasino.cli: dcasino.granter);
 
-            swal_error (tx);
-            return;
-        }
+            
+            if (typeof tx === 'string') {
+                swal_error (tx);
+                return;
+            }
 
-        props.setDealt(false);
-        let tx_arr_log = tx.arrayLog;
-        if ( tx_arr_log && tx_arr_log[7] && tx_arr_log[7].key =='credits' ) {
-            dcasino.update_position(Number(tx_arr_log[7].value));
+            props.setDealt(false);
+            let tx_arr_log = tx.arrayLog;
+            if ( tx_arr_log && tx_arr_log[7] && tx_arr_log[7].key =='credits' ) {
+                dcasino.update_position(Number(tx_arr_log[7].value));
+            }
+
+        } finally {
+            setTxLock(false)
         }
 
     }

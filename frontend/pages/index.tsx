@@ -8,7 +8,7 @@ import 'swiper/css';
 import 'swiper/css/pagination';
 import Credits from '@/components/credits'
 import Games from '@/components/games'
-import About from '@/components/about'
+import Connect from '@/components/connect'
 
 import { ERR_UNAUTHORISED, dcasino } from '@/generated/constants'
 import { swal_alert } from '@/src/helpers'
@@ -23,12 +23,13 @@ export default function Home() {
 
   //const hours = (new Date()).getHours();
   const [dark, setDark] = useState( false );
-  const [show_about, setShowAbout] = useState(false);
+  const [show_connect, setShowConnect] = useState(false);
   const [show_credit, setShowCredits] = useState(false);
   const [show_games, setShowGames] = useState(false);
   const [user_info, setUserInfo] = useState(undefined as undefined | IUser)
   const [wallet_addr, setWallet] = useState('');
   const [need_vk, setNeedVk] = useState(false);
+  const [need_alias, setNeedAlias] = useState(false);
 
 
   const do_query = useCallback(async () => {
@@ -55,6 +56,7 @@ export default function Home() {
     } else {
       setUserInfo(undefined)
     }
+    setNeedAlias(!dcasino.enable_alias)
   }, [wallet_addr, need_vk, user_info]);
 
   useEffect(function () {
@@ -86,8 +88,25 @@ export default function Home() {
                 await swal_alert('please connect your wallet!')
                 setShowGames(false);
                 setShowCredits(false);
-                setShowAbout(true);
+                setShowConnect(true);
                 return
+            }
+
+            if (need_vk) {
+              await swal_alert('Please complete the connection steps! You have not created a Viewing Key.')
+              setShowGames(false);
+              setShowCredits(false);
+              setShowConnect(true);
+              return
+            }
+
+
+            if (need_alias) {
+              await swal_alert('Please complete the connection steps! You have not created an Alias.')
+              setShowGames(false);
+              setShowCredits(false);
+              setShowConnect(true);
+              return
             }
 
             if (!user_info?.credits) {
@@ -95,10 +114,13 @@ export default function Home() {
             }
 
           setShowCredits(false);
-          setShowAbout(false);
+          setShowConnect(false);
           setShowGames(!show_games);
           }}
-          className={`${wallet_addr && user_info?.credits ? 'rainbow-bg':''} opacity-50 ${show_games?'invert':''} ${dcasino.ready?'hover:opacity-100':''} hover:invert bg-orange-100 p-1 duration-700 text-sm md:text-base`}>
+          className={`
+          ${wallet_addr && user_info?.credits && !need_alias && !need_vk? 'rainbow-bg':''} 
+          opacity-50 ${show_games?'invert':''} ${dcasino.ready?'hover:opacity-100':''} 
+          hover:invert bg-orange-100 p-1 duration-700 text-sm md:text-base`}>
             {`Play`}
         </motion.div>
 
@@ -106,18 +128,18 @@ export default function Home() {
 
         <motion.div
           initial={{ width: '33%' }}
-          animate={{ width: show_about?'100vw':'33%' }}
+          animate={{ width: show_connect?'100vw':'33%' }}
           transition={{ duration: 1 }}
          onClick={
         e=>{
           setShowGames(false);
           setShowCredits(false);
-          setShowAbout(!show_about);
+          setShowConnect(!show_connect);
         }
           
         }
-        className={`${wallet_addr?'':'rainbow-bg'} opacity-50 hover:opacity-100 hover:invert ${show_about?'invert':''} bg-orange-100 p-1 duration-700 text-sm md:text-base`}>
-            {wallet_addr?'Account':'Connect'}
+        className={`${wallet_addr && !need_vk && !need_alias?'':'rainbow-bg'} opacity-50 hover:opacity-100 hover:invert ${show_connect?'invert':''} bg-orange-100 p-1 duration-700 text-sm md:text-base`}>
+            {wallet_addr && !need_vk && !need_alias?'Account':'Connect'}
         </motion.div>
 
         <div className=''>{'|'}</div>
@@ -132,7 +154,7 @@ export default function Home() {
                 await swal_alert('please connect your wallet!')
                 setShowCredits(false);
                 setShowGames(false);
-                setShowAbout(true);
+                setShowConnect(true);
 
                 return
             }
@@ -141,18 +163,18 @@ export default function Home() {
                 await swal_alert('please set a viewing key!')
                 setShowCredits(false);
                 setShowGames(false);
-                setShowAbout(true);
+                setShowConnect(true);
 
                 return
             }
           //setShowPartners(false);
           setShowGames(false);
-          setShowAbout(false);
+          setShowConnect(false);
           setShowCredits(!show_credit);
         }
           
         }
-        className={`${!wallet_addr || user_info?.credits ?'':'rainbow-bg'} opacity-50 ${show_credit?'invert':''} hover:opacity-100 hover:invert bg-orange-100 p-1 duration-700 text-sm md:text-base`}>
+        className={`${!wallet_addr || user_info?.credits || need_alias || need_vk ?'':'rainbow-bg'} opacity-50 ${show_credit?'invert':''} hover:opacity-100 hover:invert bg-orange-100 p-1 duration-700 text-sm md:text-base`}>
             {'Bank'}
         </motion.div>
       </div>
@@ -188,9 +210,9 @@ export default function Home() {
         
         <Games show_games={show_games} setShowGames={setShowGames} dark={dark}/>
         <Credits show_credits={show_credit} setShowCredits={setShowCredits} dark={dark}/>
-        <About 
-        show_about={show_about} 
-        setShowAbout={setShowAbout} 
+        <Connect 
+        show={show_connect} 
+        setShow={setShowConnect} 
         dark={dark} 
         setWallet={setWallet} 
         wallet_addr={wallet_addr}
