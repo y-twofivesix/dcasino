@@ -11,7 +11,7 @@ import { Metadata } from 'next';
 const CASINO = localFont({
   src: [
     {
-      path: '../public/fonts/casino_filled.ttf',
+      path: '../public/fonts/casino.ttf',
       weight: '400'
     },
   ],

@@ -2,7 +2,7 @@
 import { motion } from "framer-motion"
 import { useCallback, useEffect, useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faMoon, faSun } from '@fortawesome/free-solid-svg-icons'
+import { faVolumeMute, faVolumeHigh } from '@fortawesome/free-solid-svg-icons'
 
 import 'swiper/css';
 import 'swiper/css/pagination';
@@ -15,9 +15,13 @@ import { swal_alert } from '@/src/helpers'
 import { IUser } from '@/src/interfaces'
 import Header from "@/components/header"
 import { user } from "@/src/queries"
+import Script from 'next/script'
+import loopify from "@/thirdparty/loopify"
+import { useRef } from 'react';
 
-const moon = <FontAwesomeIcon color='black' icon={faMoon} />
-const sun = <FontAwesomeIcon color='black' icon={faSun} />
+
+const moon = <FontAwesomeIcon color='rainbow' icon={faVolumeHigh} />
+const sun = <FontAwesomeIcon color='rainbow' icon={faVolumeMute} />
 
 export default function Home() {
 
@@ -30,6 +34,9 @@ export default function Home() {
   const [wallet_addr, setWallet] = useState('');
   const [need_vk, setNeedVk] = useState(false);
   const [need_alias, setNeedAlias] = useState(false);
+  const [play_audio,setPlayAudio] = useState(true)
+  const [audio_source, SetAudioSource] = useState(undefined as any);
+  const audioRef = useRef<HTMLAudioElement>(null);
 
 
   const do_query = useCallback(async () => {
@@ -65,19 +72,42 @@ export default function Home() {
     return () => clearInterval(id);
   }, [])
 
+  useEffect(function () {
+    if (audioRef.current) {
+      audioRef.current.volume = 0.3
+      audioRef.current.loop = true
+      audioRef.current.play()
+    }
+  }, [])
+
+  useEffect(function () {
+    if (!audioRef.current) return
+    
+    if (play_audio) {
+      audioRef.current.pause()
+    } else {
+      audioRef.current.play()
+    }
+  }, [play_audio])
 
   return (
   <div className={`${dark?'invert':''} select-none`}>
+
+    <audio ref={audioRef} src='/audio/loop.wav'/>
+    <div className="absolute fill w-screen h-screen z-0">
+      <motion.img className="absolute object-cover flex justify-center align-center object-contain" src={'/images/leaves.png'} />
+    </div>
+        
     <main
-    className={`flex min-h-screen flex-col items-center justify-between p-5 bg-orange-100 text-neutral-800 duration-700`}>
+    className={`flex min-h-screen flex-col items-center justify-between p-5 text-neutral-800 duration-700`}>
 
       <div
-      onClick={e=>setDark(!dark)}
-      className='fixed text-xl opacity-25 z-50 hover:opacity-100 duration-700 top-5 right-16'>
-        {dark ? sun : moon}
+      onClick={e=>setPlayAudio(!play_audio)}
+      className='fixed text-xl bg-black py-1 px-2 rounded-lg z-50 hover:opacity-50 duration-700 top-10 right-16 rainbow-bg'>
+        {play_audio ? sun : moon}
       </div>
 
-      <div className='flex text-center py-16 w-full md:w-[35%]'>
+      <div className='bg-black opacity-[80%] mt-20 z-40 flex text-center py-8 w-full md:w-1/3'>
         <motion.div
           initial={{ width: '33%' }}
           animate={{ width: show_games?'100vw':'33%' }}
@@ -120,11 +150,11 @@ export default function Home() {
           className={`
           ${wallet_addr && user_info?.credits && !need_alias && !need_vk? 'rainbow-bg':''} 
           opacity-50 ${show_games?'invert':''} ${dcasino.ready?'hover:opacity-100':''} 
-          hover:invert bg-orange-100 p-1 duration-700 text-sm md:text-base`}>
+          hover:invert bg-black text-white p-1 duration-700 text-sm md:text-base`}>
             {`Play`}
         </motion.div>
 
-        <div className=''>{'|'}</div>
+        <div className='text-white'>{'|'}</div>
 
         <motion.div
           initial={{ width: '33%' }}
@@ -138,11 +168,14 @@ export default function Home() {
         }
           
         }
-        className={`${wallet_addr && !need_vk && !need_alias?'':'rainbow-bg'} opacity-50 hover:opacity-100 hover:invert ${show_connect?'invert':''} bg-orange-100 p-1 duration-700 text-sm md:text-base`}>
+        className={`
+        ${wallet_addr && !need_vk && !need_alias?'':'rainbow-bg'} 
+        opacity-50 hover:opacity-100 hover:invert ${show_connect?'invert':''} 
+        bg-black p-1 duration-700 text-sm md:text-base text-white`}>
             {wallet_addr && !need_vk && !need_alias?'Account':'Connect'}
         </motion.div>
 
-        <div className=''>{'|'}</div>
+        <div className='text-white'>{'|'}</div>
 
         <motion.div
           initial={{ width: '33%' }}
@@ -174,20 +207,28 @@ export default function Home() {
         }
           
         }
-        className={`${!wallet_addr || user_info?.credits || need_alias || need_vk ?'':'rainbow-bg'} opacity-50 ${show_credit?'invert':''} hover:opacity-100 hover:invert bg-orange-100 p-1 duration-700 text-sm md:text-base`}>
+        className={`
+        ${!wallet_addr || user_info?.credits || need_alias || need_vk ?'':'rainbow-bg'} 
+        opacity-50 ${show_credit?'invert':''} hover:opacity-100 hover:invert bg-black 
+        text-white p-1 duration-700 text-sm md:text-base`}>
             {'Bank'}
         </motion.div>
       </div>
 
       <motion.div
-          initial={{ opacity: 0, translateY: 0}}
-          animate={{ opacity: 1, translateY: -100 }}
+          initial={{ opacity: 0.0, translateY: 0}}
+          animate={{ opacity: 0.75, translateY: -100 }}
           transition={{ duration: 1 }}
-          className="relative z-40  justify-between m-auto top-28 bottom-0">
+          className="relative z-40 p-16 mx-1 md:w-1/3 justify-between m-auto top-28 bottom-0 bg-black">
        
-        <div className='relative items-center justify-center'>
+        <div className='relative items-center justify-center opacity-100'>
         <motion.img
-          className="relative m-auto"
+          animate={{y: [1, -1.6, -2.0, -1.8, -1.6,  1]}}
+          transition={{
+            repeat: Infinity, 
+            duration: 0.75, 
+          }}
+          className="relative m-auto invert"
           draggable={false}
           onContextMenu={e=>e.preventDefault()}
           src="/images/spade.png"
@@ -195,16 +236,13 @@ export default function Home() {
           width={180}
           height={180}
         />
+        <div className='font-casino text-center text-white text-6xl md:text-8xl w-full'>{`d'CASINO`}</div>
         </div>
-        <div className='font-casino text-6xl md:text-8xl w-full'>{`d'CASINO`}</div>
-
-
+        
       </motion.div>
 
-
-
-      <div className='text-xs md:text-sm lg:text-sm text-center'>
-        <span className='opacity-25 '>{`d'casino v${dcasino.DCASINO_VERSION}. © 2024. Powered by AART Labs`}</span>
+      <div className='z-50 text-xs md:text-sm lg:text-sm text-center'>
+        <span className='rainbow text-center'>{`d'casino v${dcasino.DCASINO_VERSION}. © 2024. Powered by AART Labs`}</span>
       </div>
 
         
