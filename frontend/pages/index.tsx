@@ -13,10 +13,7 @@ import Connect from '@/components/connect'
 import { ERR_UNAUTHORISED, dcasino } from '@/generated/constants'
 import { swal_alert } from '@/src/helpers'
 import { IUser } from '@/src/interfaces'
-import Header from "@/components/header"
 import { user } from "@/src/queries"
-import Script from 'next/script'
-import loopify from "@/thirdparty/loopify"
 import { useRef } from 'react';
 
 
@@ -35,7 +32,6 @@ export default function Home() {
   const [need_vk, setNeedVk] = useState(false);
   const [need_alias, setNeedAlias] = useState(false);
   const [play_audio,setPlayAudio] = useState(true)
-  const [audio_source, SetAudioSource] = useState(undefined as any);
   const audioRef = useRef<HTMLAudioElement>(null);
 
 
