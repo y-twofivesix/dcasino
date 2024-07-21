@@ -54,6 +54,7 @@ function Hand(props : HandProps) {
             onClick={_ => handleClickCard(card)}
             className={`float-left h-fit w-fit md:w-1/5 relative px-2`}>
               <motion.img
+              loading="eager"
               initial={{ opacity: 0 }}
               animate={{ opacity: hold || !props.dealt? 1:0.75 , scale: hold? 1.05: 1 }}
               width="0"

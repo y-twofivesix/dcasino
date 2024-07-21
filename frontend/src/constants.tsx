@@ -90,9 +90,9 @@ export class Dcasino {
 
   async generate_vk() : Promise<boolean> {
 
-    if( !(await swal_confirm('generate a viewing key?'))) {
-      return false;
-    }
+    // if( !(await swal_confirm('generate a viewing key?'))) {
+    //   return false;
+    // }
     
     let entropy = random_string();
 

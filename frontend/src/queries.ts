@@ -4,18 +4,16 @@ import { QueryBalanceResponse } from "secretjs/dist/extensions/snip1155/msg/getB
 import { currency_str } from "./helpers";
 import { Result } from "./interfaces";
 
-export async function balance() : Promise<[string, string]> {
-
+export async function balance() : Promise<string> {
     const { balance } = await dcasino.granter?.query.bank.balance({
         address: dcasino.granter.address,
         denom: "uscrt",
       }) as QueryBalanceResponse;
   
-    let balance_print = currency_str(balance?.amount, 'uscrt');
-    let balance_amount = balance_print[0];
-    let balance_denom = balance_print[1];
+    let amount = parseInt(balance?.amount)/1e6;
+    let amount_str = (isNaN(amount) ? 'NaN' : String(amount.toFixed(2)));
 
-    return [balance_amount, balance_denom]
+    return amount_str
 }
 
 export async function vp_instance_state():  Promise<Result<i.VPIInstanceState | string>>  {
@@ -49,7 +47,7 @@ export async function user():  Promise<Result<i.IUser | string>>  {
             sender_key: dcasino.viewing_key
         }},
     }).catch(async (e: any) => {
-        console.error(e)
+        //console.error(e)
         return { inner: e, is_ok: false };
     });
 
@@ -69,7 +67,7 @@ Promise<Result<i.IAliasInfo>> {
             sender_key: dcasino.viewing_key
         } },
     }).catch(async (e) => {
-        console.log(`query alias info failed:${JSON.stringify(e)}`)
+        //console.log(`query alias info failed:${JSON.stringify(e)}`)
         return {inner: {}, is_ok: false};
     });
 
@@ -88,7 +86,7 @@ Promise<Result<i.IAliasMnem>> {
             sender_key: dcasino.viewing_key
         } },
     }).catch(async (e) => {
-        console.log(`query alias info failed:${JSON.stringify(e)}`)
+        //console.log(`query alias info failed:${JSON.stringify(e)}`)
         return {inner: {}, is_ok: false};
     });
 

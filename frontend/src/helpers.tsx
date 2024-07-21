@@ -315,16 +315,16 @@ export const do_init = async (wallet: string) => {
   let secretcli = null;
 
   if (wallet=='Keplr') secretcli = await init_keplr()
-  .catch(async e => { await swal_error(`${e}`)});
+  .catch(async e => { await swal_error(JSON.stringify(e))});
 
   else if (wallet=='MetaMask') secretcli = await init_metamask()
-  .catch(async e => { await swal_error(`${e}`)});
+  .catch(async e => { await swal_error(JSON.stringify(e))});
 
   else if (wallet=='Fina') secretcli = await init_fina()
-  .catch(async e => { await swal_error(`${e}`)});
+  .catch(async e => { await swal_error(JSON.stringify(e))});
 
   else if (wallet=='Leap') secretcli = await init_leap()
-  .catch(async e => { await swal_error(`${e}`)});
+  .catch(async e => { await swal_error(JSON.stringify(e))});
 
   
   if (!secretcli) {

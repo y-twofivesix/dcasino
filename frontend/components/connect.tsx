@@ -1,12 +1,10 @@
-import React, { CSSProperties, Dispatch, SetStateAction, useCallback, useEffect, useState,} from 'react'
+import React, { CSSProperties, Dispatch, SetStateAction, useState,} from 'react'
 import { Viewer, slide3 } from './components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faKey, faSquareCheck, faUserGroup, faWallet, faCaretRight, faCircleXmark, faCircle } from '@fortawesome/free-solid-svg-icons'
+import { faKey, faSquareCheck, faUserGroup, faWallet, faCaretRight, faCircle } from '@fortawesome/free-solid-svg-icons'
 import { motion } from 'framer-motion'
-import { check_env, do_init, swal_alert, swal_error, swal_success } from '@/src/helpers'
-import { ERR_UNAUTHORISED, dcasino } from '@/generated/constants'
-import { user } from '@/src/queries'
-import { IUser } from '@/src/interfaces'
+import { check_env, do_init, swal_alert, swal_success } from '@/src/helpers'
+import { dcasino } from '@/generated/constants'
 import BounceLoader from "react-spinners/BounceLoader";
 import Swal from 'sweetalert2'
 
@@ -218,7 +216,7 @@ function Connect(props: AboutProps) {
           onClick={async _=>await handleAlias()}
           className={`px-1 py-3 max-w-[500px] m-auto left-0 right-0 opacity-50 flex rounded-lg text-white  ${(props.wallet_addr&&!props.need_vk&&dcasino.enable_alias) || (!props.wallet_addr) || (props.need_vk) ?'':'bg-green-900 md:hover:bg-blue-600'}`}>
             <div className={`${(props.wallet_addr&&!props.need_vk&&dcasino.enable_alias) || (!props.wallet_addr) || (props.need_vk)?'':'leftandright'} p-3 h-full m-auto top-0 bottom-0`}>{props.wallet_addr&&!props.need_vk?(dcasino.enable_alias?check:caret):circle}</div>
-            <div className='p-2'>{alias} Create an Alias; a dummy wallet for faster app interaction This will greatly improve your experience.</div>
+            <div className='p-2'>{alias} Create an Alias; a dummy address for faster app interaction This will greatly improve your experience.</div>
           </div>
 
           <div className={`hidden px-1 py-3 max-w-[500px] m-auto left-0 right-0 opacity-50 flex rounded-lg text-white ${dcasino.enable_alias?'':'bg-green-900 md:hover:bg-blue-600'}`}>
@@ -280,12 +278,28 @@ function Connect(props: AboutProps) {
               }}
               className={` ${loading? '':'hidden'}
               ${props.dark?'invert':''}
-              absolute bg-black opacity-[25%] h-40 text-center text-white
+              absolute bg-black opacity-[25%] h-fit text-center text-white
               top-0 bottom-0 left-3 right-3 m-auto z-50
               p-4 rounded-2xl 
               md:w-1/3`}>
+
+                  <motion.img
+                    animate={{rotateY: [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 360] }}
+                    transition={{
+                      repeat: Infinity, 
+                      duration: 2, 
+                    }}
+                    className="relative m-auto invert"
+                    draggable={false}
+                    onContextMenu={e=>e.preventDefault()}
+                    src="/images/spade.png"
+                    alt="spade Logo"
+                    width={120}
+                    height={120}
+                  />
+  
                 <div><BounceLoader cssOverride={override} color='blue'/></div>
-                <div>{loading}</div>
+                <div className='py-4'>{loading}</div>
 
             </motion.div>
       </div>

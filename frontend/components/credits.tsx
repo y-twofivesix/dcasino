@@ -8,10 +8,13 @@ import { swal_alert, swal_error, swal_success } from '@/src/helpers'
 import { send_tx } from '@/src/transactions'
 import BounceLoader from 'react-spinners/BounceLoader'
 
-interface ConsultProps {
+interface BankProps {
     show_credits: boolean
     setShowCredits: Dispatch<SetStateAction<boolean>>,
-    dark: boolean
+    dark: boolean,
+    user_state: undefined | IUser,
+    bal: string | undefined
+    need_vk: boolean
 }
 
 const override: CSSProperties = {
@@ -21,9 +24,7 @@ const override: CSSProperties = {
 };
 
 
-function Credits(props: ConsultProps) {
-  const [user_state, setUserInfo] = useState(undefined as undefined | IUser);
-  const [bal, setBalance] = useState(undefined as undefined | string)
+function Credits(props: BankProps) {
   const [pay_in, setPayIn] = useState(undefined as number | undefined)
   const [pay_out, setPayOut] = useState(undefined as number | undefined)
   const [loading, setLoading] = useState('');
@@ -32,13 +33,12 @@ function Credits(props: ConsultProps) {
   const handlePayIn = useCallback (async ()=> {
     
     if (!dcasino.ready || !pay_in) return 
-    if (!dcasino.vk_valid) {
-      await swal_alert(`Please set a viewing key in the top left corner`,'Viewing key not set')
-      return
-    }
 
 
-    if ( user_state && !user_state.kyc_validated && ( pay_in > 50 || user_state?.credits >= 50)) {
+    if ( 
+      props.user_state && 
+      !props.user_state.kyc_validated && 
+      ( pay_in > 50 || props.user_state?.credits >= 50)) {
       await swal_alert('Credits are temporarily capped at 50 for users without KYC');
       return
     }
@@ -63,15 +63,11 @@ function Credits(props: ConsultProps) {
     finally {
       setLoading('')
     }
-}, [user_state, pay_in])
+}, [props.user_state, pay_in])
 
 const handlePayOut = useCallback (async ()=> {
     
   if (!dcasino.ready || !pay_out) return 
-  if (!dcasino.vk_valid) {
-    await swal_alert(`Please set a viewing key in the top left corner`,'Viewing key not set')
-    return
-  }
 
   try {
     setLoading('Withdrawing...')
@@ -95,29 +91,6 @@ const handlePayOut = useCallback (async ()=> {
   }
 }, [pay_out])
 
-  const do_query = useCallback(async () => {
-
-    if (!dcasino.ready) return
-
-    let user_res = await user()
-    if (user_res.is_ok) {
-      setUserInfo(user_res.inner as IUser)
-    } 
-    else if (ERR_UNAUTHORISED.test(user_res.inner as string)) {
-      dcasino.vk_valid = false;
-    }
-
-    let bal_ = await balance();
-    setBalance(bal_[0])
-
-  }, []);
-
-  useEffect(function () {
-    do_query();
-    const id = setInterval(do_query, 5_000);
-    return () => clearInterval(id);
-  }, [])
-
   
   return (
     <>
@@ -135,11 +108,11 @@ const handlePayOut = useCallback (async ()=> {
             </tr>
             <tr className='p-2'>
               <td className='p-2 text-left'>My Credits</td>
-              <td className='text-right'>{user_state? user_state.credits:'-'}</td>
+              <td className='text-right'>{props.user_state? props.user_state.credits:'please set a viewing key'}</td>
             </tr>
             <tr className='p-2'>
-              <td className='p-2 text-left'>My Scrt Balance</td>
-              <td className='p-2 text-right'>{bal} scrt</td>
+              <td className='p-2 text-left'>My scrt Balance</td>
+              <td className='p-2 text-right'>{props.bal ? `${props.bal} scrt` : '--'}</td>
             </tr>
           </tbody>
         </table>
@@ -218,8 +191,22 @@ const handlePayOut = useCallback (async ()=> {
               top-0 bottom-0 left-3 right-3 m-auto z-50
               p-4 rounded-2xl 
               md:w-1/3`}>
+                <motion.img
+                    animate={{rotateY: [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 360] }}
+                    transition={{
+                      repeat: Infinity, 
+                      duration: 2, 
+                    }}
+                    className="relative m-auto invert"
+                    draggable={false}
+                    onContextMenu={e=>e.preventDefault()}
+                    src="/images/spade.png"
+                    alt="spade Logo"
+                    width={120}
+                    height={120}
+                  />
                 <div><BounceLoader cssOverride={override} color='blue'/></div>
-                <div>{loading}</div>
+                <div className='py-4'>{loading}</div>
 
             </motion.div>
       </div>

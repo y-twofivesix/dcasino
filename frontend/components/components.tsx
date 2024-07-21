@@ -116,7 +116,7 @@ interface ViewerProps {
       className={`
       rounded-lg ${props.dark?'invert':''}
       fixed z-40 top-20 md:top-0 md:bottom-0 left-0 
-      right-0 m-auto w-11/12 h-3/4 lg:h-2/3 md:w-[730px] 
+      right-0 m-auto w-[95%] h-3/4 lg:h-2/3 md:w-[730px] 
       lg:w-[800px] bg-neutral-800 text-neutral-200`}>
         
         <div
@@ -127,7 +127,7 @@ interface ViewerProps {
           
           className='h-full relative overflow-y-auto'
             modules={[Navigation, Pagination]}
-            pagination={{ type: 'progressbar', }}
+            pagination={{ type: window.innerWidth < 700 ? 'fraction':'progressbar', }}
             navigation= {true}
             spaceBetween={50}
             slidesPerView={1}
@@ -150,7 +150,7 @@ interface ViewerProps {
       className={`
       rounded-lg ${props.dark?'invert':''}
       fixed z-40 top-20 md:top-0 md:bottom-0 left-0 
-      right-0 m-auto w-4/5 h-3/4 lg:h-2/3 md:w-[730px] 
+      right-0 m-auto w-[95%] h-3/4 lg:h-2/3 md:w-[730px] 
       lg:w-[800px] bg-neutral-800 text-neutral-200`}>
         <div
         onClick={e=>props.setShow(false)}

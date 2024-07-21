@@ -32,6 +32,7 @@ interface DealerProps {
 function DealerCard(props: DealerProps) {
     return (
     <motion.img
+    loading="eager"
     animate={{ x: props.pos * 25 }}
         alt={`dealercard-${props.value}`} 
     src={numberToImg(props.value)}
@@ -89,6 +90,7 @@ function Card (props: CardProps) {
     },[props])
 
     return (<motion.img alt={`card-${props.value}`} 
+            loading="eager"
             src={numberToImg( props.value!==undefined ? props.value : 255 )}
             onMouseOver={e=>{props.setHovered(true && e.currentTarget.className.includes('down'))}}
             onMouseOut={_=>{props.setHovered(false)}}
