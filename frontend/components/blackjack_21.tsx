@@ -64,8 +64,9 @@ function Card (props: CardProps) {
                     sender_key: dcasino.viewing_key,
                     as_alias: dcasino.enable_alias
                 }},
-                [], 150_000, dcasino.enable_alias? dcasino.cli: dcasino.granter)
+                [], 113_000, dcasino.enable_alias? dcasino.cli: dcasino.granter)
                 .catch(async e=> {await swal_error(e)})
+                .then((res)=>{ props.setTxLock(false); return res})
             : 
                 
             await send_tx(
@@ -75,13 +76,13 @@ function Card (props: CardProps) {
                     sender_key: dcasino.viewing_key,
                     as_alias: dcasino.enable_alias
                 }},
-                [], 150_000, dcasino.enable_alias? dcasino.cli: dcasino.granter)
-                .catch(async e=> {await swal_error(e)});
+                [], 65_000, dcasino.enable_alias? dcasino.cli: dcasino.granter)
+                .catch(async e=> {await swal_error(e)})
+                .then((res)=>{ props.setTxLock(false); return res});
 
             if (typeof tx === 'string') {
                 swal_error (tx);
                 props.setMessage('')
-                return;
             }
         } finally {
             props.setTxLock(false)
@@ -122,7 +123,6 @@ function BlackJack21(props: BlackJack21Props) {
 
     const handleInsurance = useCallback(async ()=>{
         if (tx_lock) return
-
         try {
             setTxLock(true)
             setMessage('please wait...')
@@ -134,12 +134,14 @@ function BlackJack21(props: BlackJack21Props) {
                     sender_key: dcasino.viewing_key,
                     as_alias: dcasino.enable_alias,
                 }},
-                [], 150_000, dcasino.enable_alias? dcasino.cli: dcasino.granter);
+                [], 110_000, dcasino.enable_alias? dcasino.cli: dcasino.granter)
+                .then((res)=>{ setTxLock(false); return res})
 
             if (typeof tx === 'string') {
                 swal_error (tx);
                 setMessage('')
-                return;
+                setTxLock(false)
+                return
             }
         } finally {
             setTxLock(false)
@@ -147,11 +149,12 @@ function BlackJack21(props: BlackJack21Props) {
     },[])
 
     const handleStand = useCallback(async ( double_down: boolean)=>{
-        if (!inst) { console.log(inst); return}
-        if (double_down && inst.credits < inst.bet)  {
+
+        if (double_down && inst && inst.credits < inst?.bet)  {
             await swal_alert('Not enough credits!');
             return
         }
+
         if (tx_lock) return
 
         try {
@@ -166,14 +169,16 @@ function BlackJack21(props: BlackJack21Props) {
                     as_alias: dcasino.enable_alias,
                     double_down: double_down
                 }},
-                [], 150_000, dcasino.enable_alias? dcasino.cli: dcasino.granter)
-                .catch(async e=> {await swal_error(e)});
+                [], 110_000, dcasino.enable_alias? dcasino.cli: dcasino.granter)
+                .catch(async e=> {await swal_error(e)})
+                .then((res)=>{ setTxLock(false); return res})
 
             
             if (typeof tx === 'string') {
                 swal_error (tx);
                 setMessage('')
-                return;
+                setTxLock(false)
+                return
             }
         } finally{
             setTxLock(false)

@@ -43,7 +43,7 @@ function Games(props: ConsultProps) {
               className="relative hidden md:flex">
                 <motion.img
                   className="absolute left-0 right-0 top-0 bottom-m m-auto invert"
-                  src="/images/arcade.png"
+                  src="/images/arcade.webp"
                   alt="video poker"
                   width={150}
                   height={150}
@@ -66,7 +66,7 @@ function Games(props: ConsultProps) {
               className="relative hidden md:flex">
                 <motion.img
                   className="absolute left-0 right-0 top-0 bottom-m m-auto invert"
-                  src="/images/spade.png"
+                  src="/images/spade.webp"
                   alt="video poker"
                   width={150}
                   height={150}

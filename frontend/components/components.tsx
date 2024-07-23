@@ -1,14 +1,20 @@
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, } from 'swiper/modules';
 import { motion } from "framer-motion"
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, useRef, useState } from 'react';
+import { useSwiper } from 'swiper/react';
+import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 
 import 'swiper/css';
 import 'swiper/css/pagination';
-import 'swiper/css/navigation';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+//import 'swiper/css/navigation';
+
+const right = <FontAwesomeIcon color='rainbow' icon={faAngleRight} />
+const left = <FontAwesomeIcon color='rainbow' icon={faAngleLeft} />
+
 
 export function slide ( title_font: [string, string], content_1: any, content_2: any, setDapp?: Dispatch<SetStateAction<string | undefined>> ) {
-
   return (
     <>
     <SwiperSlide key={title_font[0]}>
@@ -26,8 +32,15 @@ export function slide ( title_font: [string, string], content_1: any, content_2:
       </div>
 
         <div 
-        className='absolute bottom-16 w-full p-1 cursor-pointer text-orange-600 bg-neutral-900'>
-          <span onClick={_=>{setDapp ? setDapp(title_font[0]): ''}} >{`let's go!`}</span>
+        onClick={_=>{setDapp ? setDapp(title_font[0]): ''}}
+        className='absolute bottom-16 w-fit m-auto left-0 right-0  rounded-xl p-1 cursor-pointer text-orange-600 bg-neutral-900'>
+          <motion.div 
+          animate={{y: [1, -1.6, -2.0, -1.8, -1.6,  1] }}
+          transition={{
+            repeat: Infinity, 
+            duration: 0.75, 
+          }}
+          className='p-2' >{`let's go!`}</motion.div> 
         </div>
         
     </div>
@@ -108,6 +121,10 @@ interface ViewerProps {
 }
   export function Viewer (props: ViewerProps) {
     let scaler = props.vert ? 'scaleX': 'scaleY'
+    const swiper_ref = useRef<any>(null)
+    const [current_slide, setCurrentSlide] = useState(0);
+
+
     return (
       <motion.div
       initial={{ opacity: 0, [scaler]: 0}}
@@ -121,17 +138,42 @@ interface ViewerProps {
         
         <div
         onClick={e=>props.setShow(false)}
-        className='absolute items-center justify-center z-50 top-2 right-2 bg-red-900 hover:bg-red-600 px-2 py-1'>x</div>
-        <div className={`viewer pt-16 pb-5 px-2 h-full text-center break-words items-center justify-center`}>
+        className='absolute items-center justify-center z-50 top-2 right-2 bg-red-900 hover:bg-red-600 px-2 py-1 rounded-lg'>close module</div>
+        <div className={`viewer pt-12 pb-5 px-2 h-full text-center break-words items-center justify-center`}>
           <Swiper
-          
-          className='h-full relative overflow-y-auto'
-            modules={[Navigation, Pagination]}
-            pagination={{ type: window.innerWidth < 700 ? 'fraction':'progressbar', }}
+          onSwiper={(swiper) => {
+            swiper_ref.current = swiper;
+          }}
+            className='h-full relative overflow-y-auto'
+            modules={[Pagination]}
+            pagination={{ type:'progressbar', }}
             navigation= {true}
             spaceBetween={50}
             slidesPerView={1}
           >
+            <div
+            onClick={()=> {
+              if (!swiper_ref.current?.isBeginning) {
+                swiper_ref.current?.slidePrev();
+              }
+            }} 
+            className={`
+            ${!swiper_ref.current?.isBeginning?'rainbow':'text-white opacity-50'} 
+            duration-700 bg-neutral-900
+            absolute top-1/2 z-50 left-0.5 px-3 py-1`}>{left}</div>
+            <div
+            onClick={()=> {
+              if (!swiper_ref.current?.isEnd) {
+                swiper_ref.current?.slideNext()
+              }
+
+              }
+              
+            }  
+            className={`
+            ${!swiper_ref.current?.isEnd?'rainbow':'text-white opacity-50'} 
+            duration-700 bg-neutral-900
+            absolute top-1/2 z-50 right-0.5 px-3 py-1`}>{right}</div>
             {props.children}
           </Swiper>
   
@@ -154,7 +196,7 @@ interface ViewerProps {
       lg:w-[800px] bg-neutral-800 text-neutral-200`}>
         <div
         onClick={e=>props.setShow(false)}
-        className='absolute items-center justify-center z-50 top-2 right-2 bg-red-900 hover:bg-red-600 px-2 py-1'>x</div>
+        className='absolute items-center justify-center z-50 top-2 right-2 bg-red-900 hover:bg-red-600 px-2 py-1 rounded-lg'>close module</div>
         <div className={`plainviewer pt-16 pb-5 px-10  h-full text-center break-words text-white items-center justify-center`}>
 
           {props.children}
@@ -178,7 +220,7 @@ interface ViewerProps {
       bg-neutral-800 text-neutral-200 overflow-hidden`}>
         <div
         onClick={e=>props.setShow(false)}
-        className='absolute items-center justify-center z-50 top-2 right-2 bg-red-900 hover:bg-red-600 px-2 py-1'>x</div>
+        className='absolute items-center justify-center z-50 top-2 right-2 bg-red-900 hover:bg-red-600 px-2 py-1'>{"close d'App"}</div>
         <div className={`plainviewer2 p-2 overflow-hidden h-full text-center break-words text-white items-center justify-center`}>
 
           {props.children}

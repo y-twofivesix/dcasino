@@ -13,7 +13,7 @@ export function green(text : string) {
 export function numberToImg(num : number | undefined): string {
 
   if ( num == undefined || num == 255) {
-    return '/images/dcasinotiledbordered.png';
+    return '/images/dcasinotiledbordered.webp';
   }
 
   let [suit, rank] = translate_card(num);
@@ -57,7 +57,7 @@ export function numberToImg(num : number | undefined): string {
           break;
   }
       
-  return `/deck2/${rank_str.concat(suit_str)}.png`;
+  return `/deck2/${rank_str.concat(suit_str)}.webp`;
 }
 
 export function translate_card(value : number): [number, number] {

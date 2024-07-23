@@ -785,7 +785,7 @@ html, body {
       z-index: 5;
     }
   }
-  
+
   
 }
 
@@ -802,12 +802,7 @@ html, body {
 }
 
 .diamond {
-  position: relative;
-  height: 500px;
-  width: 500px;
-  line-height: 200px;
   text-align: center;
-  margin: 10px 40px;
 }
 .diamond:before {
   position: absolute;

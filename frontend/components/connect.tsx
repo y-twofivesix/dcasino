@@ -8,13 +8,14 @@ import { dcasino } from '@/generated/constants'
 import BounceLoader from "react-spinners/BounceLoader";
 import Swal from 'sweetalert2'
 
-interface AboutProps {
+interface ConnectProps {
     show: boolean
     setShow: Dispatch<SetStateAction<boolean>>,
     dark: boolean,
     wallet_addr: string,
     setWallet: Dispatch<SetStateAction<string>>,
     need_vk: boolean
+    need_alias:boolean
 }
 
 const override: CSSProperties = {
@@ -24,7 +25,7 @@ const override: CSSProperties = {
 };
 
 
-function Connect(props: AboutProps) {
+function Connect(props: ConnectProps) {
 
   const wallet = <FontAwesomeIcon color='white' icon={faWallet} />
   const key = <FontAwesomeIcon color='white' icon={faKey} />
@@ -101,7 +102,10 @@ function Connect(props: AboutProps) {
     // query 
     try {
       setLoading('Generating an alias...')
-      if (await dcasino.generate_alias()) { 
+      if (await dcasino.generate_alias()
+        .catch(()=>{ setLoading('')})
+        .then((res)=>{ setLoading(''); return res })
+      ) { 
         await swal_success('alias created!','',1000);
         dcasino.set_enable_alias(true);
       }
@@ -121,7 +125,10 @@ function Connect(props: AboutProps) {
 
     try {
       setLoading('Generating a Viewing Key...')
-      if (await dcasino.generate_vk()) { 
+      if (await dcasino.generate_vk()
+        .catch(()=>{ setLoading('')})
+        .then((res)=>{ setLoading(''); return res })
+      ) { 
         await swal_success('viewing key created!','',1000);
       }
     }
@@ -194,6 +201,14 @@ function Connect(props: AboutProps) {
         
         slide3('Connect',
         <div className='p-4'>
+          <div 
+          className={`
+          ${props.wallet_addr && !props.need_vk && !props.need_alias?'bg-green-900':'hidden'}
+          px-1 py-3 max-w-[500px] m-auto left-0 right-0 opacity-50 rounded-lg text-white `}>
+            <div className={`px-4 w-full text-center`}>
+            {"You're all set! You can close this module now!"}
+            </div>
+          </div>
 
           <div 
           onClick={_=>handleConnect()}
@@ -292,7 +307,7 @@ function Connect(props: AboutProps) {
                     className="relative m-auto invert"
                     draggable={false}
                     onContextMenu={e=>e.preventDefault()}
-                    src="/images/spade.png"
+                    src="/images/spade.webp"
                     alt="spade Logo"
                     width={120}
                     height={120}

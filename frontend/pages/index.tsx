@@ -16,8 +16,8 @@ import { IUser } from '@/src/interfaces'
 import { balance, user } from "@/src/queries"
 import { useRef } from 'react';
 
-const moon = <FontAwesomeIcon color='rainbow' icon={faVolumeHigh} />
-const sun = <FontAwesomeIcon color='rainbow' icon={faVolumeMute} />
+const vol_on = <FontAwesomeIcon color='black' icon={faVolumeHigh} />
+const vol_off = <FontAwesomeIcon color='black' icon={faVolumeMute} />
 
 export default function Home() {
 
@@ -45,10 +45,9 @@ export default function Home() {
       return 
     }
 
-    if (!wallet_addr) return 
-
     let user_res = await user()
     let bal_ = await balance()
+
     setBal(bal_)
     if (user_res.is_ok) {
       setUserInfo(user_res.inner as IUser)
@@ -74,7 +73,7 @@ export default function Home() {
 
   useEffect(function () {
     if (audioRef.current) {
-      audioRef.current.volume = 0.3
+      audioRef.current.volume = 0.5
       audioRef.current.loop = true
       audioRef.current.play()
     }
@@ -95,19 +94,19 @@ export default function Home() {
 
     <audio ref={audioRef} src='/audio/loop.wav'/>
     <div className="absolute fill w-screen h-screen z-0">
-      <motion.img loading="eager" className="absolute object-cover flex justify-center align-center object-contain" src={'/images/leaves.png'} />
+      <motion.img loading="eager" className="absolute object-cover flex justify-center align-center object-contain" src={'/images/leaves.webp'} />
     </div>
         
     <main
-    className={`flex min-h-screen flex-col items-center justify-between p-2 text-neutral-800 duration-700`}>
+    className={`relative flex min-h-screen flex-col items-center justify-between p-2 text-neutral-800 duration-700`}>
 
       <div
       onClick={e=>setPlayAudio(!play_audio)}
-      className='fixed text-xl bg-black py-1 px-2 rounded-lg z-50 hover:opacity-50 duration-700 top-10 right-16 rainbow-bg'>
-        {play_audio ? sun : moon}
+      className='fixed text-xl bg-black py-1 px-2 rounded-lg z-50 hover:opacity-50 duration-700 top-5 right-16 rainbow-bg'>
+        {play_audio ? vol_on : vol_off}
       </div>
 
-      <div className='bg-black opacity-[80%] topbar p-2 justify-center content-center mt-20 flex text-center py-8 w-full md:w-1/3 rounded-2xl'>
+      <div className='bg-black opacity-[80%] topbar px-2 justify-center content-center mt-16 flex text-center py-8 w-full md:w-2/3 lg:w-1/3 rounded-2xl'>
         <motion.div
           initial={{ width: '20%' }}
           animate={{ width: show_games?'50%':'20%' }}
@@ -225,11 +224,11 @@ export default function Home() {
 
       <motion.div
           initial={{ opacity: 0.0, translateY: 0}}
-          animate={{ opacity: 0.75, translateY: -100 }}
+          animate={{ opacity: 0.75, translateY: 0 }}
           transition={{ duration: 1 }}
-          className="diamond top-16">
+          className="diamond absolute top-1/3 w-[350px] h-[350px] md:w-[500px] md:h-[500px]">
        
-        <div className='relative items-center justify-center opacity-100 top-16'>
+        <div className='relative items-center justify-center opacity-100 top-1/4'>
         <motion.img
           animate={{y: [1, -1.6, -2.0, -1.8, -1.6,  1]}}
           transition={{
@@ -239,17 +238,17 @@ export default function Home() {
           className="relative m-auto invert"
           draggable={false}
           onContextMenu={e=>e.preventDefault()}
-          src="/images/spade.png"
+          src="/images/spade.webp"
           alt="spade Logo"
-          width={180}
-          height={180}
+          width={'25%'}
+          height={'25%'}
         />
         <div className='font-casino text-center text-white text-6xl md:text-8xl w-full'>{`d'CASINO`}</div>
         </div>
         
       </motion.div>
 
-      <div className='z-50 text-xs md:text-sm lg:text-sm text-center'>
+      <div className='absolute bottom-4 z-50 text-xs md:text-sm lg:text-sm text-center'>
         <span className='rainbow text-center'>{`d'casino v${dcasino.DCASINO_VERSION}. © 2024. Powered by AART Labs`}</span>
       </div>
 
@@ -269,7 +268,8 @@ export default function Home() {
         dark={dark} 
         setWallet={setWallet} 
         wallet_addr={wallet_addr}
-        need_vk={need_vk}/>
+        need_vk={need_vk}
+        need_alias={need_alias}/>
 
     </main>
 

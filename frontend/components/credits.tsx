@@ -50,10 +50,13 @@ function Credits(props: BankProps) {
         dcasino.dcasino_code_hash, 
         { pay_in : { amount: pay_in }},
         [{ amount: String( pay_in * 1_000_000 ) , denom: 'uscrt' }], 
-        66_000);
+        66_000)
+        .catch(()=>{ setLoading('')})
+        .then((res)=>{ setLoading(''); return res })
 
       if (typeof tx === 'string') {
           await swal_error (tx);
+          setLoading('')
           return;
       } else {
         await swal_success('transaction complete!', '',1500)
@@ -76,7 +79,9 @@ const handlePayOut = useCallback (async ()=> {
       dcasino.dcasino_code_hash, 
       { pay_out : { amount: pay_out }},
       [], 
-      66_000);
+      66_000)
+      .catch(()=>{ setLoading('')})
+      .then((res)=>{ setLoading(''); return res })
 
     if (typeof tx === 'string') {
         await swal_error (tx);
@@ -186,8 +191,7 @@ const handlePayOut = useCallback (async ()=> {
                 ease: [0, 0.71, 0.2, 1.01]
               }}
               className={` ${loading? '':'hidden'}
-              ${props.dark?'invert':''}
-              absolute bg-black opacity-[25%] h-40 text-center text-white
+              absolute bg-black opacity-[25%] h-fit text-center text-white
               top-0 bottom-0 left-3 right-3 m-auto z-50
               p-4 rounded-2xl 
               md:w-1/3`}>
@@ -200,7 +204,7 @@ const handlePayOut = useCallback (async ()=> {
                     className="relative m-auto invert"
                     draggable={false}
                     onContextMenu={e=>e.preventDefault()}
-                    src="/images/spade.png"
+                    src="/images/spade.webp"
                     alt="spade Logo"
                     width={120}
                     height={120}

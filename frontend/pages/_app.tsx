@@ -48,8 +48,8 @@ function NoSSRApp({ Component, pageProps }: AppProps) {
     lang="en" className={`${CASINO.variable} ${IBM.variable}`} >
 
     <Head>
-      <link rel="shortcut icon" href="/images/spade.png" />
-      <link rel="apple-touch-icon" sizes="180x180" href="/images/spade.png" />
+      <link rel="shortcut icon" href="/images/spade.webp" />
+      <link rel="apple-touch-icon" sizes="180x180" href="/images/spade.webp" />
     </Head>
 
     <Layout>

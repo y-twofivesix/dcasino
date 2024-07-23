@@ -22,6 +22,7 @@ interface ControlsProps {
     setUpdated: React.Dispatch<React.SetStateAction<string>>,
     user_bal: number | undefined,
     crt: boolean,
+    mobile: boolean,
     setCrt: React.Dispatch<React.SetStateAction<boolean>>,
 }
 function Controls( props : ControlsProps) {
@@ -66,11 +67,13 @@ function Controls( props : ControlsProps) {
                      }
             },
             [], 
-            150_000, 
-            dcasino.enable_alias? dcasino.cli: dcasino.granter);
+            113_000, 
+            dcasino.enable_alias? dcasino.cli: dcasino.granter)
+            .then((res)=>{ setTxLock(false); return res})
 
             if (typeof tx === 'string') {
                 await swal_error (tx);
+                setTxLock(false)
                 return;
             }
         }
@@ -102,11 +105,13 @@ function Controls( props : ControlsProps) {
                     sender_key: dcasino.viewing_key,
                     as_alias: dcasino.enable_alias
                 }},
-                [], 150_000, dcasino.enable_alias? dcasino.cli: dcasino.granter);
+                [], 95_000, dcasino.enable_alias? dcasino.cli: dcasino.granter)
+                .then((res)=>{ setTxLock(false); return res})
 
             
             if (typeof tx === 'string') {
                 swal_error (tx);
+                setTxLock(false)
                 return;
             }
 
@@ -128,7 +133,7 @@ function Controls( props : ControlsProps) {
     <div className='select-none text-white w-full flex justify-center items-center'>
         <div 
         onClick={async _ => { 
-            props.setCrt(!props.crt);
+            props.setCrt(!props.crt && !props.mobile);
         }} 
         className={`bg-neutral-800 p-4 rounded-l-2xl hover:bg-red-600 ${props.crt?'text-white':'text-neutral-500'}`}>
             CRT

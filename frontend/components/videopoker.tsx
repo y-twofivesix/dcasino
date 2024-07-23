@@ -26,6 +26,7 @@ function VideoPoker(props: VideoPokerProps) {
   const [updated, setUpdated] = useState('-');
   const [last_timestamp, setLastTimeStamp] = useState(0);
   const [crt, setCrt] = useState(true);
+  const [mobile, setMobile] = useState(true);
   
 
   useEffect(function () {
@@ -48,6 +49,7 @@ function VideoPoker(props: VideoPokerProps) {
 
   useEffect(function () {
 
+    setMobile(window.innerWidth < 700)
 
    let do_query = async function() {
 
@@ -110,9 +112,9 @@ function VideoPoker(props: VideoPokerProps) {
     return () => clearInterval(id);
   },[dealt, outcome, last_timestamp, props.active]);
 
-  let screen =  <div className={`w-full h-full bg-blue-700 absolute p-3 md:p-6 vp-sys-font text-sm ${crt?'screen-jerk':''}`}>
+  let screen =  <div className={`w-full h-full bg-blue-700 absolute p-3 md:p-6 vp-sys-font text-sm ${crt && !mobile?'screen-jerk':''}`}>
 
-    <div className={`pt-4 text-lg text-white text-center ${crt?'screen-glitch screen-glitch2':''}`}><span>{red('\u2665')} Video Poker {normal('\u2660')}</span></div>
+    <div className={`pt-4 text-lg text-white text-center ${crt && !mobile?'screen-glitch screen-glitch2':''}`}><span>{red('\u2665')} Video Poker {normal('\u2660')}</span></div>
 
     <div className='p-1 relative right-0 text-base inline bg-white text-black rounded-2xl'>
       <span className='px-2'>CR: {user_bal!=undefined? user_bal: '-'}</span>
@@ -124,7 +126,7 @@ function VideoPoker(props: VideoPokerProps) {
     dealt={dealt}
     bet={bet}
     outcome={outcome}
-    crt={crt}/>
+    crt={crt && !mobile}/>
     </div>
 
   <div className='relative w-full h-auto p-3 max-h-[10%] overflow-hidden'>
@@ -168,8 +170,8 @@ function VideoPoker(props: VideoPokerProps) {
       <div id='crt-screen' className='screen m-auto top-1 left-0 right-0 relative w-full h-full md:w-[90%] md:h-[85%] relative text-2xl'>
         {screen}
         <div className={`screen_overlay w-full h-full absolute pointer-events-none ${crt?'backdrop-blur-[0.5px]':''}`}></div>
-        <div className={`${crt?'':'hidden'} scan-bar w-full h-full absolute pointer-events-none`}><div className='scan'></div></div>
-        <img className='bezel w-full h-full absolute pointer-events-none' src='/images/bezel.png'/>
+        <div className={`${crt && !mobile?'':'hidden'} scan-bar w-full h-full absolute pointer-events-none`}><div className='scan'></div></div>
+        <img className='bezel w-full h-full absolute pointer-events-none' src='/images/bezel.webp'/>
       </div>
 
 
@@ -185,7 +187,8 @@ function VideoPoker(props: VideoPokerProps) {
       setOutcome={setOutcome}
       setUpdated={setUpdated}
       user_bal={user_bal}
-      crt={crt}
+      crt={crt && !mobile}
+      mobile={mobile}
       setCrt={setCrt}/>    
     </motion.div>
   )
